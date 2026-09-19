@@ -1,3 +1,5 @@
+import { publicAsset } from '../lib/publicAsset'
+
 export type BeatId =
   | 'cold-open'
   | 'team'
@@ -49,7 +51,7 @@ export interface BeatDefinition {
  *
  * Movies: drop YouTube ids into `youtubeId` when ready; local mp4 paths remain as rehearsal fallbacks.
  */
-export const BEATS: BeatDefinition[] = [
+const BEATS_RAW: BeatDefinition[] = [
   {
     index: 0,
     id: 'cold-open',
@@ -212,5 +214,12 @@ export const BEATS: BeatDefinition[] = [
     showHero: true,
   },
 ]
+
+export const BEATS: BeatDefinition[] = BEATS_RAW.map((beat) => ({
+  ...beat,
+  photoSrc: beat.photoSrc ? publicAsset(beat.photoSrc) : undefined,
+  videoSrc: beat.videoSrc ? publicAsset(beat.videoSrc) : undefined,
+  fallbackSrc: beat.fallbackSrc ? publicAsset(beat.fallbackSrc) : undefined,
+}))
 
 export const BEAT_COUNT = BEATS.length

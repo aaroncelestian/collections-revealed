@@ -2,6 +2,7 @@ import { BEATS, BEAT_COUNT, type BeatDefinition } from '../beats/catalog'
 import { OverlayManager } from '../overlay/OverlayManager'
 import { bindPresenterControls, type PresenterCommand } from '../controls/presenterControls'
 import { startHaliteHero } from '../scene/halite/hero-halite.js'
+import { publicAsset } from '../lib/publicAsset'
 
 type HeroHandle = {
   setVisible: (visible: boolean) => void
@@ -40,7 +41,7 @@ export class PresentationApp {
   private async bootHero() {
     try {
       this.hero = (await startHaliteHero(this.canvas, {
-        theatreUrl: '/hero/halite-theatre.json',
+        theatreUrl: publicAsset('/hero/halite-theatre.json'),
       })) as HeroHandle
       this.booted = true
     } catch (error) {

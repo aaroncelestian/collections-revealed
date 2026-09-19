@@ -1,7 +1,8 @@
 import { defineConfig } from 'vite'
 
 export default defineConfig({
-  base: './',
+  // GitHub Pages serves this repo from /collections-revealed/. Local dev stays relative.
+  base: process.env.PAGES_BASE || './',
   build: {
     assetsInlineLimit: 0,
     target: 'es2022',
