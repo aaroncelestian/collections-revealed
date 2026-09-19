@@ -1,0 +1,163 @@
+/* Scale bar + focus rack from MineralSciences hero-halite */
+
+.hero-scalebar {
+  position: absolute;
+  left: 0.85rem;
+  bottom: 0.85rem;
+  z-index: 21;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.28rem;
+  color: rgba(230, 240, 255, 0.9);
+  font-family: "Gill Sans", "Franklin Gothic Book", Calibri, Arial, sans-serif;
+  font-size: 0.62rem;
+  letter-spacing: 0.04em;
+  transform: translateZ(0);
+}
+
+.hero-scalebar-bar {
+  display: block;
+  height: 0;
+  border-bottom: 2px solid rgba(230, 240, 255, 0.85);
+  border-left: 2px solid rgba(230, 240, 255, 0.85);
+  border-right: 2px solid rgba(230, 240, 255, 0.85);
+  box-sizing: border-box;
+  min-width: 28px;
+  max-width: 220px;
+}
+
+.hero-scalebar-label {
+  line-height: 1;
+  color: rgba(200, 220, 245, 0.8);
+}
+
+.hero-focusrack {
+  position: absolute;
+  left: 0.85rem;
+  right: auto;
+  top: 50%;
+  z-index: 21;
+  pointer-events: none;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.45rem;
+  opacity: 0;
+  transform: translateY(-50%) translateX(-0.35rem);
+  transition: opacity 0.45s ease, transform 0.45s ease;
+  color: rgba(230, 240, 255, 0.88);
+  font-family: "Gill Sans", "Franklin Gothic Book", Calibri, Arial, sans-serif;
+  font-size: 0.58rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.hero-focusrack.is-active {
+  opacity: 1;
+  transform: translateY(-50%) translateX(0);
+  pointer-events: auto;
+  cursor: ns-resize;
+  touch-action: none;
+}
+
+.hero-focusrack.is-active .hero-focusrack-track,
+.hero-focusrack.is-interactive .hero-focusrack-track {
+  width: 18px;
+  margin-left: -7px;
+  margin-right: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0,
+    transparent calc(50% - 1.5px),
+    rgba(160, 210, 255, 0.2) calc(50% - 1.5px),
+    rgba(160, 210, 255, 0.5) 50%,
+    rgba(160, 210, 255, 0.2) calc(50% + 1.5px),
+    transparent calc(50% + 1.5px),
+    transparent 100%
+  );
+  box-shadow: none;
+}
+
+.hero-focusrack.is-interactive .hero-focusrack-ticks {
+  left: 50%;
+  right: auto;
+  width: 3px;
+  margin-left: -1.5px;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent 11px,
+    rgba(200, 225, 255, 0.4) 11px,
+    rgba(200, 225, 255, 0.4) 12px
+  );
+  border-radius: 2px;
+  box-shadow: 0 0 0 1px rgba(120, 170, 230, 0.18);
+}
+
+.hero-focusrack.is-dragging .hero-focusrack-marker,
+.hero-focusrack.is-active:hover .hero-focusrack-marker,
+.hero-focusrack.is-interactive:hover .hero-focusrack-marker {
+  width: 18px;
+  margin-left: -9px;
+  background: #fff;
+  box-shadow: 0 0 10px rgba(160, 210, 255, 0.65);
+}
+
+.hero-focusrack.is-active .hero-focusrack-marker,
+.hero-focusrack.is-interactive .hero-focusrack-marker {
+  transition: none;
+}
+
+.hero-focusrack-label {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  color: rgba(180, 210, 240, 0.75);
+  line-height: 1;
+}
+
+.hero-focusrack-track {
+  position: relative;
+  width: 3px;
+  height: min(38vh, 11.5rem);
+  border-radius: 2px;
+  background: linear-gradient(
+    180deg,
+    rgba(160, 210, 255, 0.15) 0%,
+    rgba(160, 210, 255, 0.45) 50%,
+    rgba(160, 210, 255, 0.15) 100%
+  );
+  box-shadow: 0 0 0 1px rgba(120, 170, 230, 0.18);
+}
+
+.hero-focusrack-ticks {
+  position: absolute;
+  inset: 0;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent 11px,
+    rgba(200, 225, 255, 0.35) 11px,
+    rgba(200, 225, 255, 0.35) 12px
+  );
+  opacity: 0.55;
+}
+
+.hero-focusrack-marker {
+  position: absolute;
+  left: 50%;
+  top: calc(var(--rack, 0.5) * 100%);
+  width: 14px;
+  height: 3px;
+  margin-left: -7px;
+  margin-top: -1.5px;
+  border-radius: 1px;
+  background: rgba(230, 245, 255, 0.95);
+  box-shadow: 0 0 8px rgba(140, 200, 255, 0.45);
+  transition: top 0.05s linear;
+}
+
+#stage-canvas.is-panning {
+  cursor: grab;
+}

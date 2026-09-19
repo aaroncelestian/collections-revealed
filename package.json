@@ -1,0 +1,21 @@
+{
+  "name": "collections-revealed-halite",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@theatre/core": "^0.7.2",
+    "three": "^0.175.0"
+  },
+  "devDependencies": {
+    "@theatre/studio": "^0.7.2",
+    "@types/three": "^0.175.0",
+    "typescript": "~5.8.3",
+    "vite": "^6.3.5"
+  }
+}
