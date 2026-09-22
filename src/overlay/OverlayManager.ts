@@ -1,6 +1,21 @@
-import type { BeatDefinition } from '../beats/catalog'
+import { ANCHOR_ALT_TEXT, ANCHOR_SRC } from '../beats/catalog'
+import type { BeatDefinition, BeatFrame } from '../beats/types'
+import { AnchorLayer } from './AnchorLayer'
+import { CompareLayer } from './CompareLayer'
+import { InteractionCue } from './InteractionCue'
+import { RainShadowDiagram } from './RainShadowDiagram'
+import { ZoomStack } from './ZoomStack'
+import { setLayerVisible } from './layerVisibility'
 
+/**
+ * The DOM half of the stage. Takes a resolved `BeatFrame` — the beat's base
+ * state with its reveal steps already folded in — and makes the screen match
+ * it. Nothing here decides what comes next; that is the app's job.
+ */
 export class OverlayManager {
+  readonly anchor: AnchorLayer
+  readonly cue: InteractionCue
+
   private readonly copyEl: HTMLElement
   private readonly labelsEl: HTMLElement
   private readonly photoLayer: HTMLElement
@@ -12,9 +27,15 @@ export class OverlayManager {
   private readonly fallbackLayer: HTMLElement
   private readonly fallbackImg: HTMLImageElement
   private readonly fallbackCopy: HTMLElement
-  private captionTimer: number | null = null
+  private readonly depthEl: HTMLElement
+  private readonly depthValue: HTMLElement
+  private readonly zoom: ZoomStack
+  private readonly compare: CompareLayer
+  private readonly diagram: RainShadowDiagram
+
   private labelTimers: number[] = []
   private degraded = false
+  private currentVideoSrc: string | null = null
 
   constructor() {
     this.copyEl = el('beat-copy')
@@ -22,15 +43,23 @@ export class OverlayManager {
     this.photoLayer = el('photo-layer')
     this.photoImg = el('photo-image') as HTMLImageElement
     this.videoLayer = el('video-layer')
-    this.video = el('bacteria-video') as HTMLVideoElement
+    this.video = el('beat-video') as HTMLVideoElement
     this.youtubeFrame = el('youtube-frame')
     this.captionsEl = el('video-captions')
     this.fallbackLayer = el('fallback-layer')
     this.fallbackImg = el('fallback-image') as HTMLImageElement
     this.fallbackCopy = el('fallback-copy')
+    this.depthEl = el('depth-readout')
+    this.depthValue = this.depthEl.querySelector('.depth-value') as HTMLElement
+
+    this.anchor = new AnchorLayer(el('anchor-layer'), ANCHOR_SRC, ANCHOR_ALT_TEXT)
+    this.zoom = new ZoomStack(el('zoom-layer'))
+    this.compare = new CompareLayer(el('compare-layer'))
+    this.diagram = new RainShadowDiagram(el('diagram-layer'))
+    this.cue = new InteractionCue(el('countdown-layer'), el('reveal-flash'))
   }
 
-  /** Preload local videos at start so reveal/lake never stall in rehearsal. */
+  /** Warm every local clip at boot so nothing stalls at the emotional peak. */
   preloadVideos(srcs: Array<string | undefined>) {
     const unique = [...new Set(srcs.filter((s): s is string => Boolean(s)))]
     for (const src of unique) {
@@ -41,6 +70,216 @@ export class OverlayManager {
       probe.load()
     }
   }
+
+  render(frame: BeatFrame) {
+    const { beat } = frame
+    this.clearTransient()
+
+    if (this.degraded) {
+      this.enterDegradedMode(beat)
+      return
+    }
+
+    this.fallbackLayer.hidden = true
+
+    const videoActive = Boolean(beat.videoSrc || beat.youtubeId) && frame.playVideo
+    const stage = beat.stage
+
+    this.anchor.set(beat.anchor ?? 'hidden', beat.fit ?? 'contain')
+
+    this.setPhoto(frame, stage === 'photo' && !videoActive)
+    this.setZoom(frame, stage === 'zoom')
+    this.setDiagram(frame, stage === 'diagram')
+    this.setCompare(frame, stage === 'compare')
+    void this.setVideo(frame, videoActive)
+
+    this.setCopy(frame)
+    this.setLabels(frame)
+  }
+
+  // ── Layers ────────────────────────────────────────────────────────────
+
+  private setCopy(frame: BeatFrame) {
+    if (!frame.headline) {
+      this.copyEl.hidden = true
+      this.copyEl.classList.remove('is-visible')
+      this.copyEl.innerHTML = ''
+      return
+    }
+
+    const support = frame.supporting
+      ? `<span class="supporting">${escapeHtml(frame.supporting)}</span>`
+      : ''
+    this.copyEl.hidden = false
+    this.copyEl.innerHTML = `${escapeHtml(frame.headline)}${support}`
+    requestAnimationFrame(() => this.copyEl.classList.add('is-visible'))
+  }
+
+  private setLabels(frame: BeatFrame) {
+    this.labelsEl.innerHTML = ''
+    if (!frame.labels?.length) {
+      this.labelsEl.hidden = true
+      return
+    }
+
+    this.labelsEl.hidden = false
+    for (const label of frame.labels) {
+      const node = document.createElement('div')
+      node.className = 'beat-label'
+      node.textContent = label.text
+      node.style.left = `${label.x}%`
+      node.style.top = `${label.y}%`
+      this.labelsEl.appendChild(node)
+      this.labelTimers.push(
+        window.setTimeout(() => node.classList.add('is-visible'), label.delayMs ?? 0)
+      )
+    }
+  }
+
+  private setPhoto(frame: BeatFrame, active: boolean) {
+    if (!active || !frame.photoSrc) {
+      setLayerVisible(this.photoLayer, false)
+      return
+    }
+
+    this.photoLayer.dataset.fit = frame.fit
+    this.photoImg.alt = frame.photoAlt ?? ''
+    this.photoImg.onerror = () => {
+      setLayerVisible(this.photoLayer, false)
+      if (frame.beat.fallbackSrc) this.enterDegradedMode(frame.beat)
+    }
+    if (this.photoImg.getAttribute('src') !== frame.photoSrc) {
+      this.photoImg.src = frame.photoSrc
+    }
+    setLayerVisible(this.photoLayer, true)
+  }
+
+  private setZoom(frame: BeatFrame, active: boolean) {
+    this.zoom.setVisible(active)
+    if (!active || !frame.beat.zoom) return
+    this.zoom.load(frame.beat.zoom)
+    this.zoom.show(frame.zoomIndex, frame.showScale)
+  }
+
+  private setDiagram(frame: BeatFrame, active: boolean) {
+    this.diagram.setVisible(active)
+    if (active) this.diagram.show(frame.diagramStage)
+  }
+
+  private setCompare(frame: BeatFrame, active: boolean) {
+    this.compare.setVisible(active)
+    if (!active || !frame.beat.compare) return
+    this.compare.load(frame.beat.compare)
+    this.compare.show(frame.comparePhase)
+  }
+
+  private async setVideo(frame: BeatFrame, active: boolean) {
+    const { beat } = frame
+
+    if (!active) {
+      this.stopVideo()
+      return
+    }
+
+    this.videoLayer.dataset.fit = frame.fit
+    setLayerVisible(this.videoLayer, true)
+    this.setCaption(frame.caption)
+
+    if (beat.youtubeId) {
+      this.video.hidden = true
+      this.video.pause()
+      this.youtubeFrame.hidden = false
+      this.youtubeFrame.innerHTML = `<iframe
+        src="https://www.youtube-nocookie.com/embed/${encodeURIComponent(beat.youtubeId)}?autoplay=1&mute=1&controls=0&loop=1&playlist=${encodeURIComponent(beat.youtubeId)}&rel=0"
+        title="${escapeHtml(beat.title)}"
+        allow="autoplay; encrypted-media"
+        allowfullscreen
+      ></iframe>`
+      return
+    }
+
+    this.youtubeFrame.hidden = true
+    this.youtubeFrame.innerHTML = ''
+    this.video.hidden = false
+
+    // Only reload when the clip actually changes, so a caption step does not
+    // restart the film from the top.
+    if (this.currentVideoSrc !== beat.videoSrc) {
+      this.currentVideoSrc = beat.videoSrc ?? null
+      this.video.src = beat.videoSrc!
+      this.video.poster = beat.poster ?? ''
+      this.video.loop = !beat.audio
+      this.setCaptionTrack(beat)
+      this.video.currentTime = 0
+    }
+
+    // The keypress that got us here is the user gesture browsers require
+    // before a clip may play with sound.
+    this.video.muted = !beat.audio
+    this.video.volume = 1
+
+    try {
+      await this.video.play()
+    } catch {
+      if (!this.video.muted) {
+        console.warn('[overlay] Sound blocked; retrying muted.')
+        this.video.muted = true
+        try {
+          await this.video.play()
+          return
+        } catch {
+          /* fall through to the still */
+        }
+      }
+      console.warn('[overlay] Video would not play; holding on a still.')
+      this.stopVideo()
+      if (frame.photoSrc) this.setPhoto(frame, true)
+      else this.enterDegradedMode(beat)
+    }
+  }
+
+  private setCaptionTrack(beat: BeatDefinition) {
+    this.video.querySelectorAll('track').forEach((t) => t.remove())
+    if (!beat.captionsSrc) return
+    const track = document.createElement('track')
+    track.kind = 'captions'
+    track.srclang = 'en'
+    track.label = 'English'
+    track.default = true
+    track.src = beat.captionsSrc
+    this.video.appendChild(track)
+  }
+
+  private setCaption(text: string | undefined) {
+    this.captionsEl.textContent = text ?? ''
+    this.captionsEl.hidden = !text
+  }
+
+  private stopVideo() {
+    if (this.currentVideoSrc === null && this.videoLayer.hidden) return
+    this.video.pause()
+    this.video.removeAttribute('src')
+    this.video.load()
+    this.currentVideoSrc = null
+    this.youtubeFrame.innerHTML = ''
+    this.youtubeFrame.hidden = true
+    this.video.hidden = false
+    this.setCaption(undefined)
+    setLayerVisible(this.videoLayer, false)
+  }
+
+  // ── Depth readout ─────────────────────────────────────────────────────
+
+  setDepth(metres: number | null) {
+    if (metres === null) {
+      this.depthEl.hidden = true
+      return
+    }
+    this.depthEl.hidden = false
+    this.depthValue.textContent = Math.round(metres).toLocaleString('en-US')
+  }
+
+  // ── Degrade path ──────────────────────────────────────────────────────
 
   enterDegradedMode(beat: BeatDefinition) {
     this.degraded = true
@@ -62,161 +301,28 @@ export class OverlayManager {
     this.fallbackLayer.hidden = true
   }
 
-  showBeat(beat: BeatDefinition) {
-    this.clearTransient()
-    if (this.degraded) {
-      this.enterDegradedMode(beat)
-      return
-    }
-
-    this.fallbackLayer.hidden = true
-    this.showCopy(beat)
-    this.showLabels(beat)
-    this.showPhoto(beat)
-    void this.showMotion(beat)
-  }
-
-  private showCopy(beat: BeatDefinition) {
-    if (!beat.headline) {
-      this.copyEl.hidden = true
-      this.copyEl.classList.remove('is-visible')
-      this.copyEl.innerHTML = ''
-      return
-    }
-
-    const support = beat.supporting
-      ? `<span class="supporting">${escapeHtml(beat.supporting)}</span>`
-      : ''
-    this.copyEl.hidden = false
-    this.copyEl.innerHTML = `${escapeHtml(beat.headline)}${support}`
-    requestAnimationFrame(() => this.copyEl.classList.add('is-visible'))
-  }
-
-  private showLabels(beat: BeatDefinition) {
-    this.labelsEl.innerHTML = ''
-    if (!beat.labels?.length) {
-      this.labelsEl.hidden = true
-      return
-    }
-
-    this.labelsEl.hidden = false
-    for (const label of beat.labels) {
-      const node = document.createElement('div')
-      node.className = 'beat-label'
-      node.textContent = label.text
-      node.style.left = `${label.x}%`
-      node.style.top = `${label.y}%`
-      this.labelsEl.appendChild(node)
-      const timer = window.setTimeout(() => node.classList.add('is-visible'), label.delayMs ?? 0)
-      this.labelTimers.push(timer)
-    }
-  }
-
-  private showPhoto(beat: BeatDefinition) {
-    const motionTakesOver = Boolean(beat.videoSrc || beat.youtubeId)
-    if (!beat.photoSrc || motionTakesOver) {
-      this.photoLayer.hidden = true
-      this.photoLayer.classList.remove('is-visible')
-      return
-    }
-
-    this.photoImg.alt = beat.photoAlt ?? ''
-    this.photoImg.onerror = () => {
-      this.photoLayer.hidden = true
-      this.photoLayer.classList.remove('is-visible')
-      if (beat.fallbackSrc) this.enterDegradedMode(beat)
-    }
-    this.photoImg.src = beat.photoSrc
-    this.photoLayer.hidden = false
-    requestAnimationFrame(() => this.photoLayer.classList.add('is-visible'))
-  }
-
-  private async showMotion(beat: BeatDefinition) {
-    if (!beat.videoSrc && !beat.youtubeId) {
-      this.stopMotion()
-      return
-    }
-
-    this.videoLayer.hidden = false
-    requestAnimationFrame(() => this.videoLayer.classList.add('is-visible'))
-    this.cycleCaptions(beat.captions ?? [])
-
-    // Prefer YouTube when an id is set (talk-day path once you upload)
-    if (beat.youtubeId) {
-      this.video.hidden = true
-      this.video.pause()
-      this.youtubeFrame.hidden = false
-      this.youtubeFrame.innerHTML = `<iframe
-        src="https://www.youtube-nocookie.com/embed/${encodeURIComponent(beat.youtubeId)}?autoplay=1&mute=1&controls=0&loop=1&playlist=${encodeURIComponent(beat.youtubeId)}&rel=0"
-        title="${escapeHtml(beat.title)}"
-        allow="autoplay; encrypted-media"
-        allowfullscreen
-      ></iframe>`
-      return
-    }
-
-    this.youtubeFrame.hidden = true
-    this.youtubeFrame.innerHTML = ''
-    this.video.hidden = false
-    this.video.src = beat.videoSrc!
-
-    try {
-      this.video.currentTime = 0
-      await this.video.play()
-    } catch {
-      console.warn('[overlay] Video play failed; using still.')
-      this.stopMotion()
-      if (beat.photoSrc) {
-        this.photoImg.alt = beat.photoAlt ?? ''
-        this.photoImg.src = beat.photoSrc
-        this.photoLayer.hidden = false
-        this.photoLayer.classList.add('is-visible')
-      } else {
-        this.enterDegradedMode(beat)
-      }
-    }
-  }
-
-  private cycleCaptions(lines: string[]) {
-    if (!lines.length) {
-      this.captionsEl.textContent = ''
-      return
-    }
-    let i = 0
-    this.captionsEl.textContent = lines[0]
-    this.captionTimer = window.setInterval(() => {
-      i = (i + 1) % lines.length
-      this.captionsEl.textContent = lines[i]
-    }, 4000)
-  }
-
-  private stopMotion() {
-    this.video.pause()
-    this.youtubeFrame.innerHTML = ''
-    this.youtubeFrame.hidden = true
-    this.video.hidden = false
-    this.videoLayer.classList.remove('is-visible')
-    this.videoLayer.hidden = true
+  get isDegraded() {
+    return this.degraded
   }
 
   private hideAllRichLayers() {
     this.copyEl.hidden = true
     this.labelsEl.hidden = true
-    this.photoLayer.hidden = true
-    this.stopMotion()
     this.copyEl.classList.remove('is-visible')
-    this.photoLayer.classList.remove('is-visible')
+    setLayerVisible(this.photoLayer, false)
+    this.anchor.set('hidden')
+    this.zoom.setVisible(false)
+    this.compare.setVisible(false)
+    this.diagram.setVisible(false)
+    this.setDepth(null)
+    this.stopVideo()
   }
 
   private clearTransient() {
-    if (this.captionTimer !== null) {
-      clearInterval(this.captionTimer)
-      this.captionTimer = null
-    }
+    this.cue.cancel()
     for (const t of this.labelTimers) clearTimeout(t)
     this.labelTimers = []
     this.copyEl.classList.remove('is-visible')
-    this.photoLayer.classList.remove('is-visible')
   }
 }
 

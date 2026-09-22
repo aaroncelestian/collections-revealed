@@ -9,6 +9,7 @@ import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
 import { BokehPass } from "three/addons/postprocessing/BokehPass.js";
 import { getProject, types } from "@theatre/core";
 import { setPauseButtonState, setPanButtonState } from "./hero-info.js";
+import { niceScaleUm, formatScale } from "../../lib/scale";
 
 /** 1 Three.js unit = 20 µm. Crystal long axis = 2 mm. Bacteria diameter = 1 µm. */
 const UM_PER_UNIT = 20;
@@ -216,23 +217,6 @@ function spawnMicrobes(inclusions, rng) {
     b.idx = i;
   });
   return bugs;
-}
-
-function niceScaleUm(raw) {
-  if (!(raw > 0) || !Number.isFinite(raw)) return 100;
-  const exp = Math.floor(Math.log10(raw));
-  const f = raw / 10 ** exp;
-  const nice = f < 1.5 ? 1 : f < 3.5 ? 2 : f < 7.5 ? 5 : 10;
-  return nice * 10 ** exp;
-}
-
-function formatScale(um) {
-  if (um >= 1000) {
-    const mm = um / 1000;
-    return mm >= 10 ? `${Math.round(mm)} mm` : `${parseFloat(mm.toFixed(2))} mm`;
-  }
-  if (um >= 10) return `${Math.round(um)} µm`;
-  return `${parseFloat(um.toFixed(1))} µm`;
 }
 
 function mountScaleBar(host) {
@@ -621,6 +605,7 @@ export async function startHaliteHero(canvas, meta = {}) {
   const focusTrack = focusRackEl?.querySelector(".hero-focusrack-track");
 
   let paused = false;
+  let rendering = true;
   let panMode = false;
   let blending = false;
   let userSpin = true;
@@ -1287,6 +1272,13 @@ export async function startHaliteHero(canvas, meta = {}) {
   function tick() {
     const dt = Math.min(0.05, clock.getDelta());
 
+    // Off-stage beats stop rendering entirely so the GPU is free for the
+    // globe/shaft scene running on its own canvas.
+    if (!rendering) {
+      requestAnimationFrame(tick);
+      return;
+    }
+
     // Safety: never leave DOF depth-pass hides stuck off after an error
     hostMesh.visible = true;
     hostEdges.visible = true;
@@ -1460,6 +1452,9 @@ export async function startHaliteHero(canvas, meta = {}) {
     },
     setPaused,
     setPanMode,
+    setRendering(on) {
+      rendering = !!on;
+    },
     dispose() {
       window.removeEventListener("resize", resize);
       sheet.sequence.pause();

@@ -6,7 +6,10 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "assets": "./scripts/prepare-assets.sh",
+    "world": "node scripts/build-world-data.mjs",
+    "preflight": "node scripts/preflight.mjs"
   },
   "dependencies": {
     "@theatre/core": "^0.7.2",
@@ -15,7 +18,9 @@
   "devDependencies": {
     "@theatre/studio": "^0.7.2",
     "@types/three": "^0.175.0",
+    "topojson-client": "^3.1.0",
     "typescript": "~5.8.3",
-    "vite": "^6.3.5"
+    "vite": "^6.3.5",
+    "world-atlas": "^2.0.2"
   }
 }

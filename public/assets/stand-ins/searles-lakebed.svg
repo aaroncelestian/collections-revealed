@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" role="img" aria-label="Stand-in illustration of a dry cracked lakebed below desert mountains">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#6d8bb0"/>
+      <stop offset="0.55" stop-color="#bcc9d6"/>
+      <stop offset="1" stop-color="#e6e1d6"/>
+    </linearGradient>
+    <linearGradient id="playa" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ded8c9"/>
+      <stop offset="1" stop-color="#f4f1e8"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1920" height="1080" fill="url(#sky)"/>
+
+  <!-- Sierra Nevada on the horizon: the wall that makes this place dry -->
+  <path d="M0 452 L140 372 L268 420 L392 316 L520 398 L650 300 L764 372 L880 336 L1010 404 L1140 352 L1268 424 L1400 364 L1530 430 L1660 386 L1800 442 L1920 404 L1920 520 L0 520 Z" fill="#54657c"/>
+  <path d="M0 500 L180 460 L340 492 L520 452 L700 496 L880 460 L1060 500 L1240 466 L1420 504 L1620 470 L1920 508 L1920 560 L0 560 Z" fill="#7b8899" opacity="0.85"/>
+
+  <rect y="520" width="1920" height="560" fill="url(#playa)"/>
+
+  <!-- Polygonal salt-crust cracks -->
+  <g stroke="#b6ab93" stroke-width="2.5" fill="none" opacity="0.75">
+    <path d="M0 620 L210 604 L430 640 L640 612 L900 648 L1150 616 L1400 652 L1680 620 L1920 644"/>
+    <path d="M0 724 L240 700 L470 744 L720 708 L980 752 L1240 712 L1520 756 L1780 716 L1920 740"/>
+    <path d="M0 856 L280 824 L560 872 L840 828 L1120 880 L1420 832 L1720 884 L1920 852"/>
+    <path d="M0 1010 L320 968 L660 1024 L1000 972 L1360 1030 L1700 976 L1920 1014"/>
+    <path d="M210 604 L240 700 L280 824 L320 968"/>
+    <path d="M430 640 L470 744 L560 872 L660 1024"/>
+    <path d="M640 612 L720 708 L840 828 L1000 972"/>
+    <path d="M900 648 L980 752 L1120 880 L1360 1030"/>
+    <path d="M1150 616 L1240 712 L1420 832 L1700 976"/>
+    <path d="M1400 652 L1520 756 L1720 884"/>
+    <path d="M1680 620 L1780 716 L1920 852"/>
+  </g>
+
+  <g fill="#8a806c" opacity="0.5">
+    <ellipse cx="520" cy="900" rx="120" ry="16"/>
+    <ellipse cx="1340" cy="806" rx="90" ry="12"/>
+  </g>
+
+  <g font-family="Gill Sans, Franklin Gothic Book, Calibri, Arial, sans-serif" font-size="26" fill="#3d4756" opacity="0.6">
+    <rect x="40" y="1002" width="252" height="42" fill="#3d4756" opacity="0.14"/>
+    <text x="56" y="1031" letter-spacing="3">STAND-IN ARTWORK</text>
+  </g>
+</svg>

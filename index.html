@@ -10,16 +10,38 @@
   <body>
     <div id="app" class="hero">
       <canvas id="stage-canvas" aria-hidden="true"></canvas>
+      <canvas id="globe-canvas" aria-hidden="true"></canvas>
 
       <div id="overlay-root" class="overlay-root" aria-live="polite">
-        <div id="beat-copy" class="beat-copy" hidden></div>
-        <div id="beat-labels" class="beat-labels" hidden></div>
+        <!-- The Searles Lake crystal. Mounts once, never unmounts. -->
+        <div id="anchor-layer" class="anchor-layer is-hidden">
+          <img alt="" />
+        </div>
+
         <div id="photo-layer" class="photo-layer" hidden>
           <img id="photo-image" alt="" />
         </div>
+
+        <div id="zoom-layer" class="zoom-layer" hidden>
+          <div class="zoom-box">
+            <div class="zoom-scalebar" aria-hidden="true">
+              <span class="zoom-scalebar-line"></span>
+              <span class="zoom-scalebar-label"></span>
+            </div>
+          </div>
+        </div>
+
+        <div id="diagram-layer" class="diagram-layer" hidden></div>
+
+        <div id="compare-layer" class="compare-layer" hidden>
+          <img class="compare-before" alt="" />
+          <img class="compare-after" alt="" />
+          <p class="compare-caption"></p>
+        </div>
+
         <div id="video-layer" class="video-layer" hidden>
           <video
-            id="bacteria-video"
+            id="beat-video"
             playsinline
             loop
             muted
@@ -29,6 +51,22 @@
           <div id="youtube-frame" class="youtube-frame" hidden></div>
           <p id="video-captions" class="video-captions" aria-hidden="true"></p>
         </div>
+
+        <div id="beat-copy" class="beat-copy" hidden></div>
+        <div id="beat-labels" class="beat-labels" hidden></div>
+
+        <div id="depth-readout" class="depth-readout" hidden aria-hidden="true">
+          <span class="depth-value">0</span>
+          <span class="depth-unit">metres down</span>
+        </div>
+
+        <div id="countdown-layer" class="countdown-layer" hidden aria-hidden="true">
+          <span class="countdown-number"></span>
+        </div>
+
+        <div id="reveal-flash" class="reveal-flash" aria-hidden="true"></div>
+        <div id="scene-fade" class="scene-fade" aria-hidden="true"></div>
+
         <div id="fallback-layer" class="fallback-layer" hidden>
           <img id="fallback-image" alt="" />
           <p id="fallback-copy" class="fallback-copy"></p>
@@ -36,9 +74,15 @@
       </div>
 
       <aside id="presenter-hud" class="presenter-hud" aria-label="Presenter readout">
-        <span id="hud-beat">Beat 1</span>
+        <div class="hud-row">
+          <span id="hud-clock" class="hud-clock">0:00</span>
+          <span id="hud-drift" class="hud-drift">on pace</span>
+        </div>
+        <span id="hud-beat">Beat 1 of 18</span>
         <span id="hud-title">Cold Open</span>
-        <span id="hud-hint">Space / → next · ← back · 1–9 / 0 jump</span>
+        <span id="hud-cue" class="hud-cue"></span>
+        <span id="hud-ask" class="hud-ask" hidden></span>
+        <span id="hud-hint">Space next · ← back · 1–7 acts · T timer · H hud · F fallback</span>
       </aside>
     </div>
     <script type="module" src="/src/main.ts"></script>

@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" role="img" aria-label="Stand-in illustration of a vivid pink brine pool on a white salt flat">
+  <defs>
+    <linearGradient id="sky2" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#7f9cbd"/>
+      <stop offset="1" stop-color="#e8e3d8"/>
+    </linearGradient>
+    <linearGradient id="crust" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#e4dfd1"/>
+      <stop offset="1" stop-color="#faf8f1"/>
+    </linearGradient>
+    <radialGradient id="brine" cx="0.5" cy="0.42" r="0.72">
+      <stop offset="0" stop-color="#ff5f92"/>
+      <stop offset="0.5" stop-color="#e8437c"/>
+      <stop offset="1" stop-color="#a62a5c"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="1920" height="1080" fill="url(#sky2)"/>
+  <path d="M0 402 L260 350 L520 392 L780 336 L1060 388 L1340 344 L1620 396 L1920 358 L1920 470 L0 470 Z" fill="#6a7a8e"/>
+  <rect y="450" width="1920" height="630" fill="url(#crust)"/>
+
+  <!-- Brine pool: the colour is the point -->
+  <path d="M250 640 C 470 574, 900 566, 1180 604 C 1470 644, 1710 706, 1690 802 C 1668 906, 1300 972, 960 966 C 620 960, 300 902, 232 812 C 186 750, 196 676, 250 640 Z" fill="url(#brine)"/>
+  <path d="M320 664 C 520 616, 880 610, 1120 644" stroke="#ffd0e0" stroke-width="7" fill="none" opacity="0.55" stroke-linecap="round"/>
+  <path d="M430 880 C 700 918, 1080 916, 1330 874" stroke="#ff9cc0" stroke-width="5" fill="none" opacity="0.4" stroke-linecap="round"/>
+
+  <!-- Salt rime at the waterline -->
+  <path d="M250 640 C 470 574, 900 566, 1180 604 C 1470 644, 1710 706, 1690 802 C 1668 906, 1300 972, 960 966 C 620 960, 300 902, 232 812 C 186 750, 196 676, 250 640 Z"
+        fill="none" stroke="#ffffff" stroke-width="14" opacity="0.8"/>
+
+  <g stroke="#bfb6a0" stroke-width="2.5" fill="none" opacity="0.6">
+    <path d="M0 540 L180 528 L340 552 L470 536"/>
+    <path d="M1760 560 L1860 542 L1920 566"/>
+    <path d="M0 1006 L300 968 L640 1022 L980 978 L1360 1030 L1720 982 L1920 1018"/>
+  </g>
+
+  <g font-family="Gill Sans, Franklin Gothic Book, Calibri, Arial, sans-serif" font-size="26" fill="#3d4756" opacity="0.6">
+    <rect x="40" y="1002" width="252" height="42" fill="#3d4756" opacity="0.14"/>
+    <text x="56" y="1031" letter-spacing="3">STAND-IN ARTWORK</text>
+  </g>
+</svg>

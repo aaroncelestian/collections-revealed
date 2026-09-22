@@ -6,3 +6,4 @@ dist
 docs/*.pdf
 /assets
 .asset-review
+.cache

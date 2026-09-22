@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" role="img" aria-label="Stand-in illustration of a sample bottle of clear brine as collected underground">
+  <defs>
+    <linearGradient id="bgF" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#11151d"/>
+      <stop offset="1" stop-color="#05070c"/>
+    </linearGradient>
+    <linearGradient id="liquidF" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#cfe0ea"/>
+      <stop offset="1" stop-color="#9db6c6"/>
+    </linearGradient>
+    <linearGradient id="glassF" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.26"/>
+      <stop offset="0.35" stop-color="#ffffff" stop-opacity="0.05"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0.18"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1920" height="1080" fill="url(#bgF)"/>
+  <ellipse cx="960" cy="908" rx="330" ry="46" fill="#000000" opacity="0.55"/>
+
+  <!-- Cap -->
+  <rect x="862" y="216" width="196" height="74" rx="10" fill="#2b3340"/>
+  <rect x="862" y="216" width="196" height="74" rx="10" fill="url(#glassF)"/>
+  <rect x="884" y="288" width="152" height="40" fill="#39424f"/>
+
+  <!-- Bottle body -->
+  <path d="M884 326 L1036 326 L1036 384 C 1036 404, 1108 452, 1108 520 L1108 836 C 1108 872, 1080 894, 1046 894 L874 894 C 840 894, 812 872, 812 836 L812 520 C 812 452, 884 404, 884 384 Z"
+        fill="#0d1219" stroke="#7f8d9c" stroke-width="5"/>
+
+  <!-- Liquid: clear, straight out of the mine -->
+  <path d="M818 560 L1102 560 L1102 836 C 1102 868, 1078 888, 1046 888 L874 888 C 842 888, 818 868, 818 836 Z" fill="url(#liquidF)"/>
+  <path d="M818 560 L1102 560 L1102 578 L818 578 Z" fill="#ffffff" opacity="0.45"/>
+
+  <path d="M884 326 L1036 326 L1036 384 C 1036 404, 1108 452, 1108 520 L1108 836 C 1108 872, 1080 894, 1046 894 L874 894 C 840 894, 812 872, 812 836 L812 520 C 812 452, 884 404, 884 384 Z"
+        fill="url(#glassF)"/>
+
+  <!-- Field label, hand-written -->
+  <rect x="852" y="628" width="216" height="128" rx="6" fill="#efe9d8" opacity="0.94"/>
+  <g stroke="#59595a" stroke-width="5" stroke-linecap="round" opacity="0.8">
+    <path d="M876 664 L1044 664"/>
+    <path d="M876 696 L1010 696"/>
+    <path d="M876 728 L994 728"/>
+  </g>
+
+  <g font-family="Gill Sans, Franklin Gothic Book, Calibri, Arial, sans-serif" fill="#ffffff">
+    <text x="960" y="1004" font-size="54" font-weight="600" text-anchor="middle" letter-spacing="2">1,100 m underground</text>
+  </g>
+  <g font-family="Gill Sans, Franklin Gothic Book, Calibri, Arial, sans-serif" font-size="26" fill="#ffffff" opacity="0.45">
+    <rect x="40" y="1002" width="252" height="42" fill="#ffffff" opacity="0.1"/>
+    <text x="56" y="1031" letter-spacing="3">STAND-IN ARTWORK</text>
+  </g>
+</svg>
