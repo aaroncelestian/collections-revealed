@@ -20,7 +20,7 @@ window.addEventListener('beforeunload', () => app.dispose())
 
 // Helpful in rehearsal: confirm boot in the console without cluttering the stage
 console.info(
-  '%cCollections Revealed — Life in Salt%c\nSpace/→ next · ← back · 1–7 acts · T timer · R reset · H HUD · F force fallback',
+  '%cCollections Revealed — Life in Salt%c\nSpace/→ next · ← back · 1–7 acts · T timer · R reset · H HUD',
   'font-weight:bold;font-size:14px',
   'color:#888',
 )

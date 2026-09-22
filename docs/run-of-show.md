@@ -20,7 +20,6 @@ the next press moves inside the beat or on to the next one.
 | `T` | start / pause the clock |
 | `R` | reset the clock |
 | `H` | hide the HUD |
-| `F` | force static fallbacks for the rest of the talk |
 
 The clock starts itself on your first press, so there is nothing to remember.
 `?audience=1` on the URL hides the HUD entirely for a house feed.
@@ -59,8 +58,8 @@ Do **not** explain the pink here. The ending needs it unexplained.
 
 ### Act 3 — The Zoom (3:30, 1:30)
 
-**3:30 · Zoom Ladder** — four frames, three presses, one continuous push. The frames are
-matched-scale crossfades, so keep saying *this is still the same rock*.
+**3:30 · Zoom Ladder** — four frames, three presses, one continuous push. The camera
+zooms and then holds, so keep saying *this is still the same rock*.
 
 - opens at 3.2 mm across, scale bar visible
 - press → 1.1 mm
@@ -165,10 +164,6 @@ nothing breaks if the room stays quiet.
 
 ## If something goes wrong
 
-- **A picture is black.** Press `F`. Every beat has a still behind it and the
-  talk continues from wherever you are.
-- **3D will not start.** The app detects it at boot and serves stills for the
-  scene beats automatically. Acts 2, 6 and 7 still work.
 - **The film has no sound.** Keep going. The narration is burned into the
   picture.
 - **You are behind.** The drift readout tells you by how much. Act 6 is the
@@ -178,12 +173,11 @@ nothing breaks if the room stays quiet.
 
 ## Still needs real photography
 
-Everything else is real. These four are clearly-labelled stand-in artwork and
+Everything else is real. These three are clearly-labelled stand-in artwork and
 swap by dropping a file in and changing one path in
 [`src/beats/catalog.ts`](../src/beats/catalog.ts):
 
 - `pink-brine-field.svg` — the pink brine in the field at Searles
-- `searles-lakebed.svg` — the dry lakebed (only used as a fallback)
 - `brine-bottle-field.svg` / `brine-bottle-lab.svg` — the before/after pair
 
 The before/after pair matters most, because the crossfade only works if both

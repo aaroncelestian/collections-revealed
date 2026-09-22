@@ -28,7 +28,6 @@ exists. Run it before you present.
 | `1`–`7` | Jump to the start of an act |
 | `T` / `R` | Start-pause / reset the clock |
 | `H` | Toggle HUD |
-| `F` | Force static fallbacks |
 
 Append `?audience=1` to the URL to hide the HUD on a house feed.
 

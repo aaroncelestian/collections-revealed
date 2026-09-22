@@ -112,7 +112,7 @@ export class PresentationApp {
       this.hero.setRendering(false)
       this.booted = true
     } catch (error) {
-      console.error('[app] Halite hero failed — static fallbacks only', error)
+      console.error('[app] Halite hero failed', error)
       this.sceneFailed = true
       this.hero = null
     }
@@ -145,12 +145,6 @@ export class PresentationApp {
         this.timerStart = null
         this.timerPausedAt = 0
         this.paintClock()
-        break
-      case 'force-fallback':
-        this.sceneFailed = true
-        this.hero?.setVisible(false)
-        this.globe?.setVisible(false)
-        this.overlay.enterDegradedMode(BEATS[this.beatIndex])
         break
     }
   }
@@ -196,7 +190,7 @@ export class PresentationApp {
     if (this.timerStart === null && (beatIndex > 0 || stepIndex > -1)) this.startTimer()
 
     this.routeScene(beat, frame, beatChanged)
-    this.paintOverlay(beat, frame, options.replayCues ?? true)
+    this.paintOverlay(frame, options.replayCues ?? true)
     this.paintHud(beat, frame)
   }
 
@@ -243,15 +237,7 @@ export class PresentationApp {
 
   // ── Overlay + interaction ──────────────────────────────────────────────
 
-  private paintOverlay(beat: BeatDefinition, frame: BeatFrame, replayCues: boolean) {
-    // Scene beats have nothing in the DOM to fall back to, so a dead WebGL
-    // context means the still has to take over.
-    if (this.sceneFailed && beat.stage === 'scene') {
-      this.overlay.enterDegradedMode(beat)
-      return
-    }
-
-    this.overlay.clearDegradedMode()
+  private paintOverlay(frame: BeatFrame, replayCues: boolean) {
     this.overlay.render(frame)
 
     if (!replayCues) {

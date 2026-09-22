@@ -24,9 +24,6 @@ export class OverlayManager {
   private readonly video: HTMLVideoElement
   private readonly youtubeFrame: HTMLElement
   private readonly captionsEl: HTMLElement
-  private readonly fallbackLayer: HTMLElement
-  private readonly fallbackImg: HTMLImageElement
-  private readonly fallbackCopy: HTMLElement
   private readonly depthEl: HTMLElement
   private readonly depthValue: HTMLElement
   private readonly zoom: ZoomStack
@@ -34,8 +31,10 @@ export class OverlayManager {
   private readonly diagram: RainShadowDiagram
 
   private labelTimers: number[] = []
-  private degraded = false
   private currentVideoSrc: string | null = null
+  private copyTimer: number | null = null
+  private copyKey = ''
+  private copyShown = false
 
   constructor() {
     this.copyEl = el('beat-copy')
@@ -46,9 +45,6 @@ export class OverlayManager {
     this.video = el('beat-video') as HTMLVideoElement
     this.youtubeFrame = el('youtube-frame')
     this.captionsEl = el('video-captions')
-    this.fallbackLayer = el('fallback-layer')
-    this.fallbackImg = el('fallback-image') as HTMLImageElement
-    this.fallbackCopy = el('fallback-copy')
     this.depthEl = el('depth-readout')
     this.depthValue = this.depthEl.querySelector('.depth-value') as HTMLElement
 
@@ -75,13 +71,6 @@ export class OverlayManager {
     const { beat } = frame
     this.clearTransient()
 
-    if (this.degraded) {
-      this.enterDegradedMode(beat)
-      return
-    }
-
-    this.fallbackLayer.hidden = true
-
     const videoActive = Boolean(beat.videoSrc || beat.youtubeId) && frame.playVideo
     const stage = beat.stage
 
@@ -101,6 +90,9 @@ export class OverlayManager {
 
   private setCopy(frame: BeatFrame) {
     if (!frame.headline) {
+      this.clearCopyTimer()
+      this.copyKey = ''
+      this.copyShown = false
       this.copyEl.hidden = true
       this.copyEl.classList.remove('is-visible')
       this.copyEl.innerHTML = ''
@@ -110,9 +102,40 @@ export class OverlayManager {
     const support = frame.supporting
       ? `<span class="supporting">${escapeHtml(frame.supporting)}</span>`
       : ''
+    const html = `${escapeHtml(frame.headline)}${support}`
+    const delay = frame.copyDelayMs ?? 0
+    const key = `${delay}\0${html}`
+
     this.copyEl.hidden = false
-    this.copyEl.innerHTML = `${escapeHtml(frame.headline)}${support}`
-    requestAnimationFrame(() => this.copyEl.classList.add('is-visible'))
+    this.copyEl.innerHTML = html
+
+    // A repaint of the line already on screen must not restart the wait.
+    if (key === this.copyKey) {
+      if (this.copyShown) this.copyEl.classList.add('is-visible')
+      return
+    }
+
+    this.clearCopyTimer()
+    this.copyKey = key
+    this.copyShown = false
+    this.copyEl.classList.remove('is-visible')
+
+    const show = () => {
+      this.copyShown = true
+      this.copyTimer = null
+      this.copyEl.classList.add('is-visible')
+    }
+    if (delay > 0) {
+      this.copyTimer = window.setTimeout(show, delay)
+      return
+    }
+    requestAnimationFrame(show)
+  }
+
+  private clearCopyTimer() {
+    if (this.copyTimer === null) return
+    window.clearTimeout(this.copyTimer)
+    this.copyTimer = null
   }
 
   private setLabels(frame: BeatFrame) {
@@ -146,7 +169,6 @@ export class OverlayManager {
     this.photoImg.alt = frame.photoAlt ?? ''
     this.photoImg.onerror = () => {
       setLayerVisible(this.photoLayer, false)
-      if (frame.beat.fallbackSrc) this.enterDegradedMode(frame.beat)
     }
     if (this.photoImg.getAttribute('src') !== frame.photoSrc) {
       this.photoImg.src = frame.photoSrc
@@ -228,13 +250,12 @@ export class OverlayManager {
           await this.video.play()
           return
         } catch {
-          /* fall through to the still */
+          /* give up on playback */
         }
       }
-      console.warn('[overlay] Video would not play; holding on a still.')
+      console.warn('[overlay] Video would not play.')
       this.stopVideo()
       if (frame.photoSrc) this.setPhoto(frame, true)
-      else this.enterDegradedMode(beat)
     }
   }
 
@@ -277,45 +298,6 @@ export class OverlayManager {
     }
     this.depthEl.hidden = false
     this.depthValue.textContent = Math.round(metres).toLocaleString('en-US')
-  }
-
-  // ── Degrade path ──────────────────────────────────────────────────────
-
-  enterDegradedMode(beat: BeatDefinition) {
-    this.degraded = true
-    this.clearTransient()
-    this.hideAllRichLayers()
-    this.fallbackLayer.hidden = false
-    if (beat.fallbackSrc) {
-      this.fallbackImg.src = beat.fallbackSrc
-      this.fallbackImg.alt = beat.fallbackAlt ?? beat.title
-    } else {
-      this.fallbackImg.removeAttribute('src')
-      this.fallbackImg.alt = ''
-    }
-    this.fallbackCopy.textContent = beat.headline ?? beat.title
-  }
-
-  clearDegradedMode() {
-    this.degraded = false
-    this.fallbackLayer.hidden = true
-  }
-
-  get isDegraded() {
-    return this.degraded
-  }
-
-  private hideAllRichLayers() {
-    this.copyEl.hidden = true
-    this.labelsEl.hidden = true
-    this.copyEl.classList.remove('is-visible')
-    setLayerVisible(this.photoLayer, false)
-    this.anchor.set('hidden')
-    this.zoom.setVisible(false)
-    this.compare.setVisible(false)
-    this.diagram.setVisible(false)
-    this.setDepth(null)
-    this.stopVideo()
   }
 
   private clearTransient() {

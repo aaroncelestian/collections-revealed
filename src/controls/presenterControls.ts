@@ -5,7 +5,6 @@ export type PresenterCommand =
   | { type: 'toggle-hud' }
   | { type: 'toggle-timer' }
   | { type: 'reset-timer' }
-  | { type: 'force-fallback' }
 
 type Listener = (command: PresenterCommand) => void
 
@@ -65,11 +64,6 @@ export function bindPresenterControls(onCommand: Listener): () => void {
 
     if (key === 'r' || key === 'R') {
       onCommand({ type: 'reset-timer' })
-      return
-    }
-
-    if (key === 'f' || key === 'F') {
-      onCommand({ type: 'force-fallback' })
     }
   }
 

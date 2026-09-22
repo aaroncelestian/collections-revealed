@@ -8,40 +8,44 @@ const ANCHOR_ALT =
   'Pink halite cubes perched on a pink salt crust, Searles Lake, California'
 
 /**
- * Zoom ladder. `fieldUm` is the true frame width in micrometres, derived from
- * the burned-in 100 um bar in each source micrograph — 01 is 3.2 mm across,
- * 04 is 424 um. Frames 03 and 04 are the same magnification (04 is a lateral
- * move to a cleaner inclusion field), so the ladder pushes 01 -> 02 -> 03 and
- * then holds.
+ * Zoom ladder, one shared picture.
+ *
+ * `fieldUm` is the true frame width, measured off the burned-in 100 µm bar.
+ * `xUm` / `yUm` place each frame in that same space (origin = top-left of
+ * frame 01). Frame 02 is locked to the right-hand side of the crystal in
+ * frame 01. Frames 03 and 04 are the same magnification; 04 is the measured
+ * shift down and left from 03, into a cleaner inclusion field. 03 itself is
+ * not a crop of 02 — the stage moved — so it is parked on the tube field
+ * the previous step was already aimed at.
  */
 const ZOOM_LADDER: ZoomFrame[] = [
   {
     src: '/assets/images/zoom/halite-zoom-01.jpg',
     fieldUm: 3200,
+    xUm: 0,
+    yUm: 0,
     alt: 'A single halite crystal under the microscope, about three millimetres across',
-    originX: 52,
-    originY: 46,
   },
   {
     src: '/assets/images/zoom/halite-zoom-02.jpg',
-    fieldUm: 1111,
+    fieldUm: 1107,
+    xUm: 1741.6,
+    yUm: 1041.6,
     alt: 'Ranks of long tube-shaped fluid inclusions inside the crystal',
-    originX: 46,
-    originY: 42,
   },
   {
     src: '/assets/images/zoom/halite-zoom-03.jpg',
-    fieldUm: 424,
+    fieldUm: 432,
+    xUm: 2034.8,
+    yUm: 1228.3,
     alt: 'Close view of rectangular fluid inclusions in clear salt',
-    originX: 58,
-    originY: 44,
   },
   {
     src: '/assets/images/zoom/halite-zoom-04.jpg',
-    fieldUm: 424,
+    fieldUm: 431,
+    xUm: 1915.3,
+    yUm: 1440.5,
     alt: 'A dense field of tiny rectangular brine pockets sealed in halite',
-    originX: 62,
-    originY: 52,
   },
 ]
 
@@ -73,8 +77,6 @@ const BEATS_RAW: BeatDefinition[] = [
         ask: 'SAY: the hands that went up were right.',
       },
     ],
-    fallbackSrc: ANCHOR,
-    fallbackAlt: ANCHOR_ALT,
   },
   {
     index: 1,
@@ -96,8 +98,6 @@ const BEATS_RAW: BeatDefinition[] = [
         supporting: 'It grew in a lake that dried up, and it kept a little of that lake inside.',
       },
     ],
-    fallbackSrc: ANCHOR,
-    fallbackAlt: ANCHOR_ALT,
   },
 
   // ─── Act 2 · The Place ─────────────────────────────────────────────────
@@ -121,8 +121,6 @@ const BEATS_RAW: BeatDefinition[] = [
         supporting: 'Three hours north of where we are standing.',
       },
     ],
-    fallbackSrc: '/assets/stand-ins/searles-lakebed.svg',
-    fallbackAlt: 'Dry cracked lakebed below desert mountains',
   },
   {
     index: 3,
@@ -159,8 +157,6 @@ const BEATS_RAW: BeatDefinition[] = [
         supporting: 'What it left behind was salt. A lot of salt.',
       },
     ],
-    fallbackSrc: '/assets/stand-ins/searles-lakebed.svg',
-    fallbackAlt: 'Dry cracked lakebed below desert mountains',
   },
   {
     index: 4,
@@ -183,8 +179,6 @@ const BEATS_RAW: BeatDefinition[] = [
         supporting: 'Hold on to that colour. We come back to it.',
       },
     ],
-    fallbackSrc: '/assets/stand-ins/pink-brine-field.svg',
-    fallbackAlt: 'A vivid pink brine pool sitting on a white salt flat',
   },
 
   // ─── Act 3 · The Zoom ──────────────────────────────────────────────────
@@ -226,8 +220,6 @@ const BEATS_RAW: BeatDefinition[] = [
         supporting: 'About one and a half grains of table salt, side by side.',
       },
     ],
-    fallbackSrc: '/assets/images/zoom/halite-zoom-03.jpg',
-    fallbackAlt: 'Close view of rectangular fluid inclusions in clear salt',
   },
   {
     index: 6,
@@ -253,8 +245,6 @@ const BEATS_RAW: BeatDefinition[] = [
         ],
       },
     ],
-    fallbackSrc: '/assets/images/zoom/halite-zoom-04.jpg',
-    fallbackAlt: 'A dense field of tiny rectangular brine pockets sealed in halite',
   },
 
   // ─── Act 4 · The Life ──────────────────────────────────────────────────
@@ -280,8 +270,6 @@ const BEATS_RAW: BeatDefinition[] = [
         caption: 'That is a living cell, inside the salt.',
       },
     ],
-    fallbackSrc: '/assets/fallbacks/bacteria.jpg',
-    fallbackAlt: 'Fluid inclusions in halite under the microscope',
   },
   {
     index: 8,
@@ -296,8 +284,6 @@ const BEATS_RAW: BeatDefinition[] = [
     fit: 'contain',
     headline: 'Same rock.',
     supporting: 'You have been looking at it this whole time.',
-    fallbackSrc: ANCHOR,
-    fallbackAlt: ANCHOR_ALT,
   },
 
   // ─── Act 5 · The Reach ─────────────────────────────────────────────────
@@ -316,8 +302,6 @@ const BEATS_RAW: BeatDefinition[] = [
     videoSrc: '/assets/video/searching-for-life.mp4',
     poster: '/assets/images/searching-for-life-poster.jpg',
     audio: true,
-    fallbackSrc: '/assets/images/searching-for-life-poster.jpg',
-    fallbackAlt: 'Title card reading Searching for Life in Salt Crystals',
   },
 
   // ─── Act 6 · The Depth ─────────────────────────────────────────────────
@@ -349,8 +333,6 @@ const BEATS_RAW: BeatDefinition[] = [
         supporting: 'The tunnels run out under the North Sea.',
       },
     ],
-    fallbackSrc: '/assets/images/boulby-surface.jpg',
-    fallbackAlt: 'Surface works of Boulby Mine in the English countryside',
   },
   {
     index: 11,
@@ -375,115 +357,88 @@ const BEATS_RAW: BeatDefinition[] = [
         supporting: 'Now it is a layer of salt, a kilometre down.',
       },
     ],
-    fallbackSrc: '/assets/images/boulby-tunnel.jpg',
-    fallbackAlt: 'Researchers walking a lit tunnel deep in Boulby Mine',
   },
   {
     index: 12,
     act: 'depth',
     id: 'salt-world',
     title: 'Salt World',
-    cue: 'Three photos, two presses. Land hard on the darkness.',
-    // Trimmed to help pay for the longer descent. The room is already dark and
-    // already underground by now, so these land faster than they used to.
+    cue: 'The drive is already rolling. Two presses. Land hard on the darkness.',
+    // The stills for this stretch are out. One continuous drive covers beats
+    // 13–15; this is where it starts, and the first line waits so the tunnel
+    // is on screen before anyone reads.
     seconds: 34,
-    stage: 'photo',
+    stage: 'video',
     anchor: 'hidden',
     scene: 'none',
     fit: 'cover',
-    photoSrc: '/assets/images/boulby-stalactites.jpg',
-    photoAlt: 'Halite soda-straw stalactites hanging from the mine ceiling',
+    videoSrc: '/assets/video/boulby-drive.mp4',
+    copyDelayMs: 3000,
     headline: 'Salt grows down here.',
     supporting: 'Even the ceiling is crystal.',
     steps: [
       {
         label: 'Closed tunnels',
-        photoSrc: '/assets/images/boulby-wood-cribs.jpg',
-        photoAlt: 'Wooden crib supports and mesh in a damaged mine tunnel',
         headline: 'Some tunnels are closed off.',
         supporting: 'Ancient water is eating the rock from the inside.',
       },
       {
         label: 'Lights off',
-        photoSrc: '/assets/images/boulby-aaron-scott.jpg',
-        photoAlt: 'Two researchers with headlamps in a dark salt tunnel',
         headline: 'Lights off.',
         supporting: 'Close your eyes. Open them. No difference.',
       },
     ],
-    fallbackSrc: '/assets/images/boulby-darkness.jpg',
-    fallbackAlt: 'Absolute darkness broken only by headlamps',
   },
   {
     index: 13,
     act: 'depth',
     id: 'finding-salt',
     title: 'Finding the Water',
-    cue: 'Photo, roll the drilling clip, the specimen in hand, then the bottle.',
+    cue: 'Three presses. The same drive keeps rolling under the lines.',
     seconds: 52,
-    stage: 'photo',
+    stage: 'video',
     anchor: 'hidden',
     scene: 'none',
     fit: 'cover',
-    photoSrc: '/assets/images/boulby-sampling.jpg',
-    photoAlt: 'Researchers setting up sampling gear in a salt tunnel',
-    videoSrc: '/assets/video/sampling.mp4',
-    holdPoster: true,
+    // Same clip as the beat before, so playback continues instead of restarting.
+    videoSrc: '/assets/video/boulby-drive.mp4',
     headline: 'We went looking for the water.',
     steps: [
       {
-        label: 'Roll the drilling clip',
-        playVideo: true,
+        label: 'The seam',
         caption: 'Drilling into a 250-million-year-old seam.',
         headline: undefined,
         supporting: undefined,
       },
       {
         label: 'Salt in hand',
-        playVideo: false,
-        photoSrc: '/assets/images/boulby-specimen.jpg',
-        photoAlt: 'A hand holding a block of clear salt from deep in the mine',
         headline: 'Salt, a mile down.',
         supporting: 'Sealed away since long before the dinosaurs.',
       },
       {
-        // The real sample bottle. Sets up the thesis beat that follows.
         label: 'The bottle we carried out',
-        // Portrait shot in a landscape run — letterbox rather than crop it.
-        fit: 'contain',
-        photoSrc: '/assets/images/boulby-brine-bottle.jpg',
-        photoAlt: 'A labelled sample bottle of cloudy brine from Boulby mine',
         headline: 'And we carried the water out.',
         supporting: 'Brine from the seam, in a bottle, on a bench.',
       },
     ],
-    fallbackSrc: '/assets/images/boulby-specimen.jpg',
-    fallbackAlt: 'A hand holding a block of clear salt from deep in the mine',
   },
   {
     index: 14,
     act: 'depth',
     id: 'brine-turns-pink',
     title: 'The Brine Turns Pink',
-    cue: 'This is the thesis. Slow down. Let the colour change land.',
+    cue: 'This is the thesis. Slow down. The drive stays up behind the lines.',
     ask: 'ASK: nothing was added to this bottle. What do you think happened?',
     seconds: 60,
-    stage: 'compare',
+    stage: 'video',
     anchor: 'hidden',
     scene: 'none',
-    fit: 'contain',
-    compare: {
-      beforeSrc: '/assets/stand-ins/brine-bottle-field.svg',
-      beforeLabel: 'Out of the mine',
-      afterSrc: '/assets/stand-ins/brine-bottle-lab.svg',
-      afterLabel: 'Weeks later',
-    },
-    comparePhase: 'before',
+    fit: 'cover',
+    videoSrc: '/assets/video/boulby-drive.mp4',
     headline: 'The brine came out clear.',
     steps: [
       {
-        label: 'Crossfade to pink',
-        comparePhase: 'after',
+        label: 'Weeks later',
         headline: 'Weeks later it was pink.',
         supporting: 'Nothing was added. Something grew.',
       },
@@ -491,14 +446,11 @@ const BEATS_RAW: BeatDefinition[] = [
         // Aaron: confirm the exact wording you want here. The ending hangs on
         // this line, and it is the claim the cold-open image cashes in.
         label: 'Name the colour',
-        comparePhase: 'after',
         flash: true,
         headline: 'The pink is alive.',
         supporting: 'That colour is made by microbes that can only live in salt.',
       },
     ],
-    fallbackSrc: '/assets/stand-ins/brine-bottle-lab.svg',
-    fallbackAlt: 'A sample bottle of brine, now vivid pink',
   },
 
   // ─── Act 7 · The Return ────────────────────────────────────────────────
@@ -528,8 +480,6 @@ const BEATS_RAW: BeatDefinition[] = [
         supporting: 'One cell, in one drop, in one crystal.',
       },
     ],
-    fallbackSrc: '/assets/fallbacks/halite.jpg',
-    fallbackAlt: 'Fluid inclusions inside a halite crystal',
   },
   {
     index: 16,
@@ -544,8 +494,6 @@ const BEATS_RAW: BeatDefinition[] = [
     fit: 'contain',
     headline: 'Look again.',
     supporting: 'The pink you saw in the very first picture — that was the life.',
-    fallbackSrc: ANCHOR,
-    fallbackAlt: ANCHOR_ALT,
   },
   {
     index: 17,
@@ -560,8 +508,6 @@ const BEATS_RAW: BeatDefinition[] = [
     fit: 'contain',
     headline: '35 million specimens.',
     supporting: 'Every single one still has something to say.',
-    fallbackSrc: ANCHOR,
-    fallbackAlt: ANCHOR_ALT,
   },
 ]
 
@@ -572,7 +518,6 @@ function resolvePaths(beat: BeatDefinition): BeatDefinition {
     videoSrc: beat.videoSrc ? publicAsset(beat.videoSrc) : undefined,
     poster: beat.poster ? publicAsset(beat.poster) : undefined,
     captionsSrc: beat.captionsSrc ? publicAsset(beat.captionsSrc) : undefined,
-    fallbackSrc: beat.fallbackSrc ? publicAsset(beat.fallbackSrc) : undefined,
     zoom: beat.zoom?.map((f) => ({ ...f, src: publicAsset(f.src) })),
     compare: beat.compare
       ? {

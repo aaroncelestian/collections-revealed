@@ -22,7 +22,6 @@
   --z-countdown: 9;
   --z-flash: 10;
   --z-fade: 11;
-  --z-fallback: 12;
 }
 
 *,
@@ -175,8 +174,7 @@ body {
 .video-layer,
 .zoom-layer,
 .diagram-layer,
-.compare-layer,
-.fallback-layer {
+.compare-layer {
   position: absolute;
   inset: 0;
   display: grid;
@@ -192,6 +190,11 @@ body {
 }
 
 .photo-layer[data-fit='contain'] img {
+  /* Fill the stage, then letterbox. A grid item with height: 100% still
+     grows to the photo's own aspect and pins to the top, which crops a
+     portrait down to its ceiling. */
+  position: absolute;
+  inset: 0;
   object-fit: contain;
 }
 
@@ -204,6 +207,8 @@ body {
 }
 
 .video-layer[data-fit='contain'] video {
+  position: absolute;
+  inset: 0;
   object-fit: contain;
 }
 
@@ -261,9 +266,8 @@ body {
 
 /* ── Zoom ladder ────────────────────────────────────────────────────── */
 
-/* Full bleed. The frames are `cover`, so on any display at least as wide as
-   4:3 the micrograph's full horizontal field spans the box exactly — the
-   scale bar stays honest while the picture fills the screen. */
+/* One shared picture. The world is in micrometres (1px = 1µm) and the camera
+   transform maps the current view onto this box. */
 .zoom-box {
   position: relative;
   width: 100%;
@@ -271,16 +275,20 @@ body {
   overflow: hidden;
 }
 
-.zoom-frame {
+.zoom-world {
   position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  opacity: 0;
-  transform: scale(1);
-  transition: opacity 1.5s ease, transform 1.5s cubic-bezier(0.32, 0, 0.2, 1);
-  will-change: transform, opacity;
+  left: 0;
+  top: 0;
+  transform-origin: 0 0;
+  pointer-events: none;
+  will-change: transform;
+}
+
+.zoom-plate {
+  position: absolute;
+  display: block;
+  object-fit: fill;
+  pointer-events: none;
 }
 
 /* Top-left is the only corner with nothing else in it: copy sits bottom-left,
@@ -481,31 +489,6 @@ body {
   pointer-events: none;
 }
 
-/* ── Fallback ───────────────────────────────────────────────────────── */
-
-.fallback-layer {
-  z-index: var(--z-fallback);
-  background: var(--deep);
-}
-
-.fallback-layer img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-}
-
-.fallback-copy {
-  position: absolute;
-  left: 6vw;
-  right: 6vw;
-  bottom: 10vh;
-  margin: 0;
-  font-size: var(--type-hero);
-  font-weight: 600;
-  color: var(--accent);
-  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.8);
-}
-
 /* ── Presenter HUD ──────────────────────────────────────────────────── */
 
 .presenter-hud {
@@ -641,7 +624,7 @@ body.is-hunting #stage-canvas {
   .beat-label,
   .photo-layer,
   .video-layer,
-  .zoom-frame,
+  .zoom-world,
   .anchor-layer,
   .compare-after {
     transition: none;

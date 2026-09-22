@@ -106,9 +106,13 @@ export interface ZoomFrame {
   /** True width of the frame in micrometres, read off the burned-in bar. */
   fieldUm: number
   alt: string
-  /** Ken Burns focus point, percent of frame. */
-  originX?: number
-  originY?: number
+  /**
+   * Top-left of this frame in the ladder's shared micrometre space
+   * (origin is the top-left of the widest frame). Frames that sit here
+   * zoom as one picture instead of crossfading.
+   */
+  xUm?: number
+  yUm?: number
 }
 
 export interface BeatDefinition {
@@ -145,6 +149,11 @@ export interface BeatDefinition {
   captionsSrc?: string
   /** Hold on the poster until a step sets playVideo. */
   holdPoster?: boolean
+  /**
+   * Wait this long before the opening line fades in. Reveal steps ignore it,
+   * so a later keypress still brings its line up immediately.
+   */
+  copyDelayMs?: number
 
   zoom?: ZoomFrame[]
   zoomIndex?: number
@@ -161,9 +170,6 @@ export interface BeatDefinition {
   hunt?: boolean
 
   steps?: RevealStep[]
-
-  fallbackSrc?: string
-  fallbackAlt?: string
 }
 
 /** Flattened state the overlay renders: beat base with steps 0..n applied. */
@@ -185,6 +191,8 @@ export interface BeatFrame {
   scenePhase?: GlobePhase
   hunt: boolean
   playVideo: boolean
+  /** Opening line only. Reveal steps clear this so a keypress is immediate. */
+  copyDelayMs?: number
 }
 
 /**
@@ -210,6 +218,7 @@ export function resolveFrame(beat: BeatDefinition, stepIndex: number): BeatFrame
     scenePhase: beat.scenePhase,
     hunt: beat.hunt ?? false,
     playVideo: !beat.holdPoster,
+    copyDelayMs: stepIndex < 0 ? beat.copyDelayMs : undefined,
   }
 
   const steps = beat.steps ?? []

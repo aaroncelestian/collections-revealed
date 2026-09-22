@@ -53,4 +53,20 @@ else
   echo "   skip (source .mov not found)"
 fi
 
+echo "==> boulby drive (first half, compressed)"
+DRIVE="$SRC/boulby_Drive.MP4"
+if [ -f "$DRIVE" ]; then
+  # The stage loops this clip, so the first half of the drive is enough.
+  STAMP=$(ffmpeg -i "$DRIVE" 2>&1 | sed -n 's/.*Duration: \([0-9:.]*\).*/\1/p' | head -1)
+  HALF=$(python3 -c "h,m,s='$STAMP'.split(':'); print((int(h)*3600+int(m)*60+float(s))/2)")
+  ffmpeg -y -loglevel error -i "$DRIVE" -t "$HALF" \
+    -c:v libx264 -preset medium -crf 22 -pix_fmt yuv420p \
+    -c:a aac -b:a 128k \
+    -movflags +faststart \
+    "$VID/boulby-drive.mp4"
+  echo "   boulby-drive.mp4 (${HALF}s)"
+else
+  echo "   skip (source boulby_Drive.MP4 not found)"
+fi
+
 echo "==> done"
