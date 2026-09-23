@@ -7,7 +7,9 @@ const PUSH_MS = 1700
 
 interface Plate {
   frame: ZoomFrame
-  el: HTMLImageElement
+  /** Decoded source. Kept out of the layout so Chrome never textures a giant bitmap. */
+  img: HTMLImageElement
+  canvas: HTMLCanvasElement
   /** Height in the shared micrometre space. */
   hUm: number
 }
@@ -27,6 +29,10 @@ interface View {
  * there is no crossfade. A finer frame is drawn only once the camera has
  * arrived at its scale, so a wide view never shows a little rectangle of
  * the next photo sitting inside it.
+ *
+ * Each frame is painted into a canvas the size of the stage. Scaling the
+ * photograph itself with CSS makes a layer tens of thousands of pixels wide
+ * once the camera pushes in, and Chrome throws that layer away.
  */
 export class ZoomStack {
   private readonly root: HTMLElement
@@ -75,22 +81,23 @@ export class ZoomStack {
     this.current = -1
     this.world.replaceChildren()
     this.plates = frames.map((frame, index) => {
-      const img = document.createElement('img')
-      img.className = 'zoom-plate'
+      const img = new Image()
       img.src = frame.src
       img.alt = frame.alt
-      img.style.zIndex = String(index + 1)
-      img.style.visibility = 'hidden'
-      const plate: Plate = { frame, el: img, hUm: frame.fieldUm * 0.75 }
+      const canvas = document.createElement('canvas')
+      canvas.className = 'zoom-plate'
+      canvas.setAttribute('role', 'img')
+      canvas.setAttribute('aria-label', frame.alt)
+      canvas.style.zIndex = String(index + 1)
+      canvas.style.visibility = 'hidden'
+      const plate: Plate = { frame, img, canvas, hUm: frame.fieldUm * 0.75 }
       img.addEventListener('load', () => {
         if (img.naturalWidth > 0) {
           plate.hUm = frame.fieldUm * (img.naturalHeight / img.naturalWidth)
-          this.place(plate)
           if (this.current >= 0) this.apply()
         }
       })
-      this.place(plate)
-      this.world.appendChild(img)
+      this.world.appendChild(canvas)
       return plate
     })
   }
@@ -180,34 +187,75 @@ export class ZoomStack {
     this.raf = requestAnimationFrame(step)
   }
 
-  private place(plate: Plate) {
-    const { frame } = plate
-    plate.el.style.left = `${frame.xUm ?? 0}px`
-    plate.el.style.top = `${frame.yUm ?? 0}px`
-    plate.el.style.width = `${frame.fieldUm}px`
-    plate.el.style.height = `${plate.hUm}px`
-  }
-
   private apply() {
     const rect = this.box.getBoundingClientRect()
     const boxW = rect.width > 1 ? rect.width : 1
+    const boxH = rect.height > 1 ? rect.height : 1
+    // Stay under Chrome's texture limit on a retina screen. The canvas is the
+    // stage, not the micrometre world, so 2× is already sharp.
+    const dpr = Math.min(window.devicePixelRatio || 1, 2)
+    const bw = Math.max(1, Math.round(boxW * dpr))
+    const bh = Math.max(1, Math.round(boxH * dpr))
     const s = boxW / this.view.w
-    this.world.style.transform = `translate(${-this.view.x * s}px, ${-this.view.y * s}px) scale(${s})`
 
-    // A finer plate stays hidden until the camera is at its scale, so the
-    // push reads as one picture sharpening rather than a picture-in-picture.
     for (const plate of this.plates) {
-      const atScale = this.view.w <= plate.frame.fieldUm * 1.04
-      const overlaps =
-        this.view.x < (plate.frame.xUm ?? 0) + plate.frame.fieldUm &&
-        this.view.x + this.view.w > (plate.frame.xUm ?? 0) &&
-        this.view.y < (plate.frame.yUm ?? 0) + plate.hUm &&
-        this.view.y + this.view.h > (plate.frame.yUm ?? 0)
-      const coarsest = plate.frame.fieldUm >= this.frames[0].fieldUm * 0.98
-      plate.el.style.visibility = (coarsest || atScale) && overlaps ? 'visible' : 'hidden'
+      const show = this.plateShown(plate)
+      plate.canvas.style.visibility = show ? 'visible' : 'hidden'
+      if (!show) continue
+      const ctx = plate.canvas.getContext('2d')
+      if (!ctx) continue
+      if (plate.canvas.width !== bw || plate.canvas.height !== bh) {
+        plate.canvas.width = bw
+        plate.canvas.height = bh
+      }
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
+      ctx.clearRect(0, 0, boxW, boxH)
+      this.drawPlate(plate, ctx, s)
     }
 
     if (this.scaleVisible) this.layoutBar()
+  }
+
+  /** A finer plate stays hidden until the camera is at its scale. */
+  private plateShown(plate: Plate): boolean {
+    const x = plate.frame.xUm ?? 0
+    const y = plate.frame.yUm ?? 0
+    const atScale = this.view.w <= plate.frame.fieldUm * 1.04
+    const overlaps =
+      this.view.x < x + plate.frame.fieldUm &&
+      this.view.x + this.view.w > x &&
+      this.view.y < y + plate.hUm &&
+      this.view.y + this.view.h > y
+    const coarsest = plate.frame.fieldUm >= this.frames[0].fieldUm * 0.98
+    return (coarsest || atScale) && overlaps
+  }
+
+  /** Paint the part of this frame that the camera can see, into stage pixels. */
+  private drawPlate(plate: Plate, ctx: CanvasRenderingContext2D, s: number) {
+    const img = plate.img
+    if (!img.complete || img.naturalWidth === 0) return
+    const x = plate.frame.xUm ?? 0
+    const y = plate.frame.yUm ?? 0
+    const pw = plate.frame.fieldUm
+    const ph = plate.hUm
+    const ix0 = Math.max(x, this.view.x)
+    const iy0 = Math.max(y, this.view.y)
+    const ix1 = Math.min(x + pw, this.view.x + this.view.w)
+    const iy1 = Math.min(y + ph, this.view.y + this.view.h)
+    if (ix1 <= ix0 || iy1 <= iy0) return
+    const nw = img.naturalWidth
+    const nh = img.naturalHeight
+    ctx.drawImage(
+      img,
+      ((ix0 - x) / pw) * nw,
+      ((iy0 - y) / ph) * nh,
+      ((ix1 - ix0) / pw) * nw,
+      ((iy1 - iy0) / ph) * nh,
+      (ix0 - this.view.x) * s,
+      (iy0 - this.view.y) * s,
+      (ix1 - ix0) * s,
+      (iy1 - iy0) * s
+    )
   }
 
   private setScaleVisible(visible: boolean) {
