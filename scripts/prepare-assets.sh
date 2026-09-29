@@ -55,20 +55,17 @@ else
   echo "   skip (source .mov not found)"
 fi
 
-echo "==> boulby drive (first half, compressed)"
-DRIVE="$SRC/boulby_Drive.MP4"
+echo "==> boulby drive (720p mov -> mp4)"
+# The 720p export, not the 112 MB original: this is the one small enough to
+# live in the repo. Rewrapped rather than re-encoded, so the picture and the
+# engine audio are what came out of the edit, and the index moves to the front
+# so the clip starts on the first bytes instead of the last.
+DRIVE="$SRC/boulby_Drive--720.mov"
 if [ -f "$DRIVE" ]; then
-  # The stage loops this clip, so the first half of the drive is enough.
-  STAMP=$(ffmpeg -i "$DRIVE" 2>&1 | sed -n 's/.*Duration: \([0-9:.]*\).*/\1/p' | head -1)
-  HALF=$(python3 -c "h,m,s='$STAMP'.split(':'); print((int(h)*3600+int(m)*60+float(s))/2)")
-  ffmpeg -y -loglevel error -i "$DRIVE" -t "$HALF" \
-    -c:v libx264 -preset medium -crf 22 -pix_fmt yuv420p \
-    -c:a aac -b:a 128k \
-    -movflags +faststart \
-    "$VID/boulby-drive.mp4"
-  echo "   boulby-drive.mp4 (${HALF}s)"
+  swift "$ROOT/scripts/remux-mp4.swift" "$DRIVE" "$VID/boulby-drive.mp4"
+  echo "   boulby-drive.mp4"
 else
-  echo "   skip (source boulby_Drive.MP4 not found)"
+  echo "   skip (source boulby_Drive--720.mov not found)"
 fi
 
 echo "==> done"

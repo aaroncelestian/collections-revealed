@@ -383,7 +383,7 @@ const BEATS_RAW: BeatDefinition[] = [
     act: 'depth',
     id: 'salt-world',
     title: 'Salt World',
-    cue: 'The drive rolls on arrival. Two presses cut to the stills. Land hard on the darkness.',
+    cue: 'The drive rolls on arrival, with sound. Two presses cut to the stills. Land hard on the darkness.',
     // Opens on the drive out through the tunnels, then the same two presses as
     // before. The first press ends the clip, so it never runs under the beats
     // that follow. `photoSrc` here is the still the beat falls back to if the
@@ -396,6 +396,10 @@ const BEATS_RAW: BeatDefinition[] = [
     photoSrc: '/assets/images/boulby-stalactites.jpg',
     photoAlt: 'Halite soda-straw stalactites hanging from the mine ceiling',
     videoSrc: '/assets/video/boulby-drive.mp4',
+    // Runs with the engine and the tunnel noise. 46 seconds against a 34
+    // second beat, so it does not loop — the first press cuts it off long
+    // before the end, and a loop seam under the sound would be audible.
+    audio: true,
     copyDelayMs: 3000,
     headline: 'Salt grows down here.',
     supporting: 'Even the ceiling is crystal.',

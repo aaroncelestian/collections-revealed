@@ -9,7 +9,7 @@ missing, plus anything here that nothing points at.
 | `images/anchor-searles-halite.jpg` | the anchor — acts 1, 4, 7 | generated from `assets/new_hero.jpg` |
 | `images/zoom/halite-zoom-01..04.jpg` | zoom ladder (3.2 mm / 1.1 mm / 0.42 mm / 0.42 mm) | generated |
 | `images/searching-for-life-poster.jpg` | Mars film poster | generated |
-| `video/boulby-drive.mp4` | salt world, the drive in | |
+| `video/boulby-drive.mp4` | salt world, the drive in — plays with sound | generated |
 | `images/boulby-stalactites.jpg` | salt world, the still it falls back to | |
 | `images/boulby-wood-cribs.jpg` | salt world, closed tunnels | |
 | `images/boulby-aaron-scott.jpg` | salt world, lights off | |
