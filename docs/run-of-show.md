@@ -140,8 +140,10 @@ the drilling clip, salt in hand, then the real sample bottle we carried out.
 ### Act 7 — The Return (12:54, 2:40)
 
 **12:54 · Drive the Microscope** — hand the live crystal to the room, then let
-the last three presses carry the room out. Press once to take the scripted
-camera off and unlock the controls.
+the last three presses carry the room out. The beat opens already inside the
+inclusion, in the water, with the cells in shot, and drifts there for as long as
+you hold it. Press once to take the scripted camera off and unlock the controls;
+the view does not jump, so you can keep talking through the press.
 > **ASK:** "You steer. Left, right, further in. Shout when you see one move."
 > Drag to turn it, scroll to push in, drag the focus rack on the left.
 > Take directions from the room; do not drive to a destination you already

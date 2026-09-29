@@ -21,6 +21,7 @@ import { startHaliteHero } from '../scene/halite/hero-halite.js'
 import { startGlobeDive, type GlobeDiveHandle } from '../scene/GlobeDive'
 import { startSolarSystem, type SolarSystemHandle } from '../scene/SolarSystem'
 import { publicAsset } from '../lib/publicAsset'
+import { toggleFullscreen } from '../lib/fullscreen'
 
 type HeroHandle = {
   setVisible: (visible: boolean) => void
@@ -168,6 +169,9 @@ export class PresentationApp {
         this.timerStart = null
         this.timerPausedAt = 0
         this.paintClock()
+        break
+      case 'toggle-fullscreen':
+        toggleFullscreen()
         break
     }
   }
