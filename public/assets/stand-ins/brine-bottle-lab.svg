@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" role="img" aria-label="Stand-in illustration of the same sample bottle after weeks in the lab, the brine now vivid pink">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" role="img" aria-label="Stand-in illustration of the same sample bottle hours later in the lab, the brine now vivid pink">
   <defs>
     <linearGradient id="bgL" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0" stop-color="#11151d"/>
@@ -48,10 +48,10 @@
 
   <!-- Baked text stays in the top band; the bottom-left belongs to the headline copy. -->
   <g font-family="Gill Sans, Franklin Gothic Book, Calibri, Arial, sans-serif" fill="#ffffff">
-    <text x="1880" y="104" font-size="54" font-weight="600" text-anchor="end" letter-spacing="2">Weeks later, on the bench</text>
+    <text x="1880" y="100" font-size="46" font-weight="600" text-anchor="end" letter-spacing="2">Hours later, on the bench</text>
   </g>
   <g font-family="Gill Sans, Franklin Gothic Book, Calibri, Arial, sans-serif" font-size="26" fill="#ffffff" opacity="0.45">
-    <rect x="40" y="62" width="252" height="42" fill="#ffffff" opacity="0.1"/>
+    <rect x="40" y="62" width="330" height="42" fill="#ffffff" opacity="0.1"/>
     <text x="56" y="91" letter-spacing="3">STAND-IN ARTWORK</text>
   </g>
 </svg>

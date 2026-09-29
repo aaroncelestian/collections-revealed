@@ -1,6 +1,9 @@
 # Life in Salt — run of show
 
-18 beats, 7 acts, 14:54 of stage time against a 15-minute slot. Room of ~100.
+18 beats, 7 acts, 15:34 of stage time against a 15-minute slot. Room of ~100.
+The overrun is all in the closing pull-back, which is the first thing to trim if
+the room runs long: the hunt can end on "Found one" and go straight to the last
+two frames.
 
 The Searles Lake halite crystal is the hub. It opens the talk, returns at every
 act break, and closes it. The cold open is silent and pink, nobody is told why,
@@ -131,24 +134,40 @@ the drilling clip, salt in hand, then the real sample bottle we carried out.
 "The brine came out clear."
 > **ASK:** "Nothing was added to this bottle. What do you think happened?"
 > Take two or three answers. Press: the bottle crossfades to pink.
-> "Weeks later it was pink. Nothing was added. Something grew."
+> "Hours later it was pink. Nothing was added. Something grew."
 > Press: "The pink is alive."
 
-### Act 7 — The Return (12:54, 2:00)
+### Act 7 — The Return (12:54, 2:40)
 
-**12:54 · Drive the Microscope** — hand the live crystal to the room.
-Press once to take the scripted camera off and unlock the controls.
+**12:54 · Drive the Microscope** — hand the live crystal to the room, then let
+the last three presses carry the room out. Press once to take the scripted
+camera off and unlock the controls.
 > **ASK:** "You steer. Left, right, further in. Shout when you see one move."
 > Drag to turn it, scroll to push in, drag the focus rack on the left.
 > Take directions from the room; do not drive to a destination you already
 > know. Give it 45 seconds. Press when someone spots one: "Found one. One cell,
 > in one drop, in one crystal."
 
-**13:54 · Look Again** — the identical cold-open frame, unchanged.
+Then the way out, one press each. Every move runs itself — say nothing over the
+first one, and let each picture arrive before you speak.
+
+> Press: the camera takes itself back and pulls out of the crystal over five
+> seconds, until the whole 2 mm cube is in frame. *"One crystal."*
+> Press: the crystal dissolves into the Earth at surface range with Searles
+> still pinned, and backs off to a ball in space over six seconds.
+> *"One planet we know it happens on."*
+> Press: the planet becomes one of eight, and the camera climbs to the whole
+> system over fifteen seconds. *"So we go looking on the others."*
+
+The last shot holds — the planets keep orbiting — so you can talk over it for as
+long as you like. Stepping back and pressing again replays each move from the
+start, so it is safe to rehearse.
+
+**14:34 · Look Again** — the identical cold-open frame, unchanged.
 Say the last line slowly: "The pink you saw in the very first picture — that
 was the life."
 
-**14:24 · Send-off** — "35 million specimens. Every single one still has
+**15:04 · Send-off** — "35 million specimens. Every single one still has
 something to say."
 
 ## The four interaction beats
@@ -172,7 +191,9 @@ nothing breaks if the room stays quiet.
 - **The film has no sound.** Keep going. The narration is burned into the
   picture.
 - **You are behind.** The drift readout tells you by how much. Act 6 is the
-  compressible one: `salt-world` and `finding-salt` can each lose a press.
+  compressible one: `salt-world` and `finding-salt` can each lose a press. The
+  hunt in Act 7 is the other: cut it short and start the pull-back early, since
+  the three moves out cannot be hurried once they are running.
 - **You overshoot.** `←` steps backwards one reveal at a time and reproduces
   each state exactly, so there is no half-undone screen.
 

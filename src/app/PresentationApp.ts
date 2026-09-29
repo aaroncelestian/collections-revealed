@@ -12,20 +12,28 @@ import {
   type BeatDefinition,
   type BeatFrame,
   type GlobePhase,
+  type SceneKind,
+  type SolarPhase,
 } from '../beats/catalog'
 import { OverlayManager } from '../overlay/OverlayManager'
 import { bindPresenterControls, type PresenterCommand } from '../controls/presenterControls'
 import { startHaliteHero } from '../scene/halite/hero-halite.js'
 import { startGlobeDive, type GlobeDiveHandle } from '../scene/GlobeDive'
+import { startSolarSystem, type SolarSystemHandle } from '../scene/SolarSystem'
 import { publicAsset } from '../lib/publicAsset'
 
 type HeroHandle = {
   setVisible: (visible: boolean) => void
   setPaused: (paused: boolean) => void
   setPanMode: (on: boolean) => void
+  setInside: (on: boolean) => void
+  setPullBack: (on: boolean) => void
   setRendering: (on: boolean) => void
   dispose: () => void
 }
+
+/** Matches the canvas opacity transition in presentation.css. */
+const SCENE_FADE_MS = 700
 
 /**
  * Root coordinator.
@@ -41,11 +49,14 @@ export class PresentationApp {
 
   private hero: HeroHandle | null = null
   private globe: GlobeDiveHandle | null = null
+  private solar: SolarSystemHandle | null = null
   private hunting = false
+  private readonly fadeOutTimers = new Map<SceneKind, number>()
 
   private readonly overlay: OverlayManager
   private readonly heroCanvas: HTMLCanvasElement
   private readonly globeCanvas: HTMLCanvasElement
+  private readonly solarCanvas: HTMLCanvasElement
 
   private readonly hud: {
     clock: HTMLElement
@@ -64,9 +75,14 @@ export class PresentationApp {
   private timerPausedAt = 0
   private clockHandle: number | null = null
 
-  constructor(heroCanvas: HTMLCanvasElement, globeCanvas: HTMLCanvasElement) {
+  constructor(
+    heroCanvas: HTMLCanvasElement,
+    globeCanvas: HTMLCanvasElement,
+    solarCanvas: HTMLCanvasElement
+  ) {
     this.heroCanvas = heroCanvas
     this.globeCanvas = globeCanvas
+    this.solarCanvas = solarCanvas
     this.hud = {
       clock: must('hud-clock'),
       drift: must('hud-drift'),
@@ -105,6 +121,10 @@ export class PresentationApp {
     })
     this.globe.setVisible(false)
     this.globe.setRendering(false)
+
+    this.solar = startSolarSystem(this.solarCanvas)
+    this.solar.setVisible(false)
+    this.solar.setRendering(false)
 
     try {
       this.hero = (await startHaliteHero(this.heroCanvas, {
@@ -181,7 +201,6 @@ export class PresentationApp {
 
   private goTo(beatIndex: number, stepIndex: number, options: { replayCues?: boolean } = {}) {
     if (beatIndex < 0 || beatIndex >= BEAT_COUNT) return
-    const beatChanged = beatIndex !== this.beatIndex
     this.beatIndex = beatIndex
     this.stepIndex = stepIndex
 
@@ -192,39 +211,85 @@ export class PresentationApp {
     // never has to remember to press anything extra.
     if (this.timerStart === null && (beatIndex > 0 || stepIndex > -1)) this.startTimer()
 
-    this.routeScene(beat, frame, beatChanged)
+    this.routeScene(frame)
     this.paintOverlay(frame, options.replayCues ?? true)
     this.paintHud(beat, frame)
   }
 
   // ── Scene routing ──────────────────────────────────────────────────────
 
-  private routeScene(beat: BeatDefinition, frame: BeatFrame, beatChanged: boolean) {
-    const wanted = this.sceneFailed ? 'none' : beat.scene ?? 'none'
+  private routeScene(frame: BeatFrame) {
+    const wanted = this.sceneFailed ? 'none' : frame.scene
 
     document.body.classList.toggle('scene-hero', wanted === 'hero')
     document.body.classList.toggle('scene-globe', wanted === 'globe')
+    document.body.classList.toggle('scene-solar', wanted === 'solar')
 
     const heroOn = wanted === 'hero'
     // Hand the crystal back before the frames stop, so the scripted camera has
     // a chance to pick up where the room left off.
-    if (!heroOn) this.setHunting(false)
+    if (!heroOn) {
+      this.setHunting(false)
+      this.hero?.setInside(false)
+    }
     this.hero?.setVisible(heroOn)
-    this.hero?.setRendering(heroOn)
+    this.holdThroughFade('hero', heroOn, (on) => this.hero?.setRendering(on))
 
     const globeOn = wanted === 'globe'
     this.globe?.setVisible(globeOn)
     this.globe?.setRendering(globeOn)
     if (!globeOn) this.overlay.setDepth(null)
 
+    const solarOn = wanted === 'solar'
+    // Sized off the globe's live altitude rather than where its pull-back was
+    // meant to finish: the press can land while it is still easing out.
+    if (solarOn) this.solar?.matchEarth(this.globe?.cameraDistance() ?? 14)
+    this.solar?.setVisible(solarOn)
+    this.holdThroughFade('solar', solarOn, (on) => this.solar?.setRendering(on))
+
     if (globeOn && frame.scenePhase) {
       // A countdown step holds its scene change until the room reaches zero.
-      if (frame.countFrom === undefined) this.globe?.setPhase(frame.scenePhase)
+      if (frame.countFrom === undefined) this.globe?.setPhase(frame.scenePhase as GlobePhase)
+    }
+    if (solarOn && frame.scenePhase) this.solar?.setPhase(frame.scenePhase as SolarPhase)
+
+    if (heroOn) {
+      // Hunting first: it pauses the scripted camera, and the inside hold has
+      // to see that it is already parked before deciding whether to cut.
+      this.setHunting(frame.hunt)
+      this.hero?.setInside(frame.inside)
+      this.hero?.setPullBack(frame.pullBack)
     }
 
-    if (heroOn) this.setHunting(frame.hunt)
+    // Leaving the globe rewinds it. Without this a step that hands over to
+    // another scene and steps back again finds the globe already arrived, and
+    // the move plays once per page load instead of once per press.
+    if (!globeOn) this.globe?.setPhase('world')
+  }
 
-    if (beatChanged && !globeOn) this.globe?.setPhase('world')
+  /**
+   * The scene canvases cross-dissolve in CSS, so a scene that has just been
+   * routed away from has to keep drawing until it is invisible. Cutting its
+   * frames on the keypress freezes the picture halfway through its own fade,
+   * which is exactly where the closing pull-back needs both scenes moving.
+   */
+  private holdThroughFade(scene: SceneKind, on: boolean, apply: (on: boolean) => void) {
+    const pending = this.fadeOutTimers.get(scene)
+    if (pending !== undefined) {
+      clearTimeout(pending)
+      this.fadeOutTimers.delete(scene)
+    }
+    if (on) {
+      apply(true)
+      return
+    }
+    this.fadeOutTimers.set(
+      scene,
+      window.setTimeout(() => {
+        this.fadeOutTimers.delete(scene)
+        apply(false)
+      }, SCENE_FADE_MS)
+    )
   }
 
   /**
@@ -337,8 +402,11 @@ export class PresentationApp {
     this.unbindControls?.()
     document.removeEventListener('visibilitychange', this.onVisibilityChange)
     if (this.clockHandle !== null) clearInterval(this.clockHandle)
+    for (const timer of this.fadeOutTimers.values()) clearTimeout(timer)
+    this.fadeOutTimers.clear()
     this.hero?.dispose()
     this.globe?.dispose()
+    this.solar?.dispose()
   }
 }
 

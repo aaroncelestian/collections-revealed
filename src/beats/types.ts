@@ -36,7 +36,7 @@ export type StageKind =
   | 'scene'
 
 /** Which WebGL scene the canvas renders, if any. */
-export type SceneKind = 'none' | 'hero' | 'globe'
+export type SceneKind = 'none' | 'hero' | 'globe' | 'solar'
 
 /** Where the Searles Lake crystal sits. It never unmounts, it only moves. */
 export type AnchorPlacement = 'hidden' | 'full' | 'inset'
@@ -49,6 +49,17 @@ export type GlobePhase =
   | 'boulby-surface'
   | 'shaft'
   | 'seam'
+  /** Closing pull-back: the planet fills the frame, then slowly recedes. */
+  | 'earth-out'
+
+/** Named camera state inside SolarSystem. */
+export type SolarPhase = 'earth' | 'system'
+
+/**
+ * A named camera state inside whichever scene the beat has up. Each scene
+ * ignores the names that are not its own.
+ */
+export type ScenePhase = GlobePhase | SolarPhase
 
 export interface BeatLabel {
   text: string
@@ -102,9 +113,18 @@ export interface RevealStep {
   /** Stage of a multi-part diagram. */
   diagramStage?: number
   comparePhase?: 'before' | 'after'
-  scenePhase?: GlobePhase
+  /**
+   * Swap the WebGL scene mid-beat. The closing pull-back needs it: one beat
+   * runs the crystal, the planet and the solar system in a single move.
+   */
+  scene?: SceneKind
+  scenePhase?: ScenePhase
   /** Hand the live crystal to the room. */
   hunt?: boolean
+  /** Hold the scripted crystal camera in the water inside the inclusion. */
+  inside?: boolean
+  /** Take the crystal back off the room and pull the camera out to the whole specimen. */
+  pullBack?: boolean
   /** Start the beat's video (used when a beat opens on a poster frame). */
   playVideo?: boolean
   /** Pulse the screen as this reveal lands. */
@@ -182,9 +202,11 @@ export interface BeatDefinition {
   compare?: ComparePair
   comparePhase?: 'before' | 'after'
 
-  scenePhase?: GlobePhase
+  scenePhase?: ScenePhase
   countFrom?: number
   hunt?: boolean
+  inside?: boolean
+  pullBack?: boolean
 
   steps?: RevealStep[]
 }
@@ -206,8 +228,11 @@ export interface BeatFrame {
   countFrom?: number
   diagramStage: number
   comparePhase: 'before' | 'after'
-  scenePhase?: GlobePhase
+  scene: SceneKind
+  scenePhase?: ScenePhase
   hunt: boolean
+  inside: boolean
+  pullBack: boolean
   playVideo: boolean
   /** Opening line only. Reveal steps clear this so a keypress is immediate. */
   copyDelayMs?: number
@@ -234,8 +259,11 @@ export function resolveFrame(beat: BeatDefinition, stepIndex: number): BeatFrame
     countFrom: undefined,
     diagramStage: beat.diagramStage ?? 0,
     comparePhase: beat.comparePhase ?? 'before',
+    scene: beat.scene ?? 'none',
     scenePhase: beat.scenePhase,
     hunt: beat.hunt ?? false,
+    inside: beat.inside ?? false,
+    pullBack: beat.pullBack ?? false,
     playVideo: !beat.holdPoster,
     copyDelayMs: stepIndex < 0 ? beat.copyDelayMs : undefined,
   }
@@ -260,8 +288,11 @@ export function resolveFrame(beat: BeatDefinition, stepIndex: number): BeatFrame
     if (has('showScale')) frame.showScale = step.showScale!
     if (has('diagramStage')) frame.diagramStage = step.diagramStage!
     if (has('comparePhase')) frame.comparePhase = step.comparePhase!
+    if (has('scene')) frame.scene = step.scene!
     if (has('scenePhase')) frame.scenePhase = step.scenePhase
     if (has('hunt')) frame.hunt = step.hunt!
+    if (has('inside')) frame.inside = step.inside!
+    if (has('pullBack')) frame.pullBack = step.pullBack!
     if (has('playVideo')) frame.playVideo = step.playVideo!
     // Countdown only belongs to the step that fired it, never to later ones.
     frame.countFrom = i === stepIndex ? step.countFrom : undefined

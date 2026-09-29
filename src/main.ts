@@ -2,11 +2,15 @@ import { PresentationApp } from './app/PresentationApp'
 
 const heroCanvas = document.getElementById('stage-canvas')
 const globeCanvas = document.getElementById('globe-canvas')
+const solarCanvas = document.getElementById('solar-canvas')
 if (!(heroCanvas instanceof HTMLCanvasElement)) {
   throw new Error('Missing #stage-canvas')
 }
 if (!(globeCanvas instanceof HTMLCanvasElement)) {
   throw new Error('Missing #globe-canvas')
+}
+if (!(solarCanvas instanceof HTMLCanvasElement)) {
+  throw new Error('Missing #solar-canvas')
 }
 
 // Audience mode: append ?audience=1 to hide the presenter HUD on the house feed
@@ -14,7 +18,7 @@ if (new URLSearchParams(window.location.search).has('audience')) {
   document.body.classList.add('is-audience')
 }
 
-const app = new PresentationApp(heroCanvas, globeCanvas)
+const app = new PresentationApp(heroCanvas, globeCanvas, solarCanvas)
 
 window.addEventListener('beforeunload', () => app.dispose())
 

@@ -30,7 +30,7 @@ means dropping a file in and changing one path in `src/beats/catalog.ts`.
 | --- | --- |
 | `stand-ins/pink-brine-field.svg` | the pink brine in the field at Searles |
 | `stand-ins/brine-bottle-field.svg` | the sample bottle as collected |
-| `stand-ins/brine-bottle-lab.svg` | the same bottle, weeks later, pink |
+| `stand-ins/brine-bottle-lab.svg` | the same bottle, hours later, pink |
 
 The bottle pair must be shot identically — same bottle, fill line, light and
 angle — because the beat crossfades one into the other and the colour change is

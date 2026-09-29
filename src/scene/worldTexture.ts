@@ -213,7 +213,23 @@ function landGradient(ctx: CanvasRenderingContext2D, h: number) {
 /** Yields to the browser so a half-second of painting never blocks a keypress. */
 const breathe = () => new Promise<void>((r) => setTimeout(r, 0))
 
-export async function buildWorldTextures(anisotropy: number): Promise<WorldTextureSet> {
+let cached: Promise<WorldTextureSet> | null = null
+
+/**
+ * One painted Earth for the whole talk.
+ *
+ * The globe and the solar system are separate scenes on separate canvases, and
+ * the closing move cross-dissolves one into the other — so they have to be the
+ * same Earth, down to the pixel. Sharing the textures also keeps the half
+ * second of Canvas2D work off the second scene's boot. The first caller's
+ * anisotropy wins; later callers get what it built.
+ */
+export function buildWorldTextures(anisotropy: number): Promise<WorldTextureSet> {
+  cached ??= paintWorldTextures(anisotropy)
+  return cached
+}
+
+async function paintWorldTextures(anisotropy: number): Promise<WorldTextureSet> {
   const world = ((await import('./world-data.json')) as { default: WorldData }).default
 
   const land = pathFor(world.land, COLOR_W, COLOR_H)

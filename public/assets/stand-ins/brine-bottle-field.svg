@@ -44,10 +44,10 @@
 
   <!-- Baked text stays in the top band; the bottom-left belongs to the headline copy. -->
   <g font-family="Gill Sans, Franklin Gothic Book, Calibri, Arial, sans-serif" fill="#ffffff">
-    <text x="1880" y="104" font-size="54" font-weight="600" text-anchor="end" letter-spacing="2">1,100 m underground</text>
+    <text x="1880" y="100" font-size="46" font-weight="600" text-anchor="end" letter-spacing="2">1,100 m underground</text>
   </g>
   <g font-family="Gill Sans, Franklin Gothic Book, Calibri, Arial, sans-serif" font-size="26" fill="#ffffff" opacity="0.45">
-    <rect x="40" y="62" width="252" height="42" fill="#ffffff" opacity="0.1"/>
+    <rect x="40" y="62" width="330" height="42" fill="#ffffff" opacity="0.1"/>
     <text x="56" y="91" letter-spacing="3">STAND-IN ARTWORK</text>
   </g>
 </svg>

@@ -50,7 +50,8 @@ body {
 }
 
 #stage-canvas,
-#globe-canvas {
+#globe-canvas,
+#solar-canvas {
   position: absolute;
   inset: 0;
   width: 100%;

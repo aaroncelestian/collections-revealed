@@ -487,7 +487,7 @@ const BEATS_RAW: BeatDefinition[] = [
       beforeSrc: '/assets/stand-ins/brine-bottle-field.svg',
       beforeLabel: 'Out of the mine',
       afterSrc: '/assets/stand-ins/brine-bottle-lab.svg',
-      afterLabel: 'Weeks later',
+      afterLabel: 'Hours later',
     },
     comparePhase: 'before',
     headline: 'The brine came out clear.',
@@ -495,7 +495,7 @@ const BEATS_RAW: BeatDefinition[] = [
       {
         label: 'Crossfade to pink',
         comparePhase: 'after',
-        headline: 'Weeks later it was pink.',
+        headline: 'Hours later it was pink.',
         supporting: 'Nothing was added. Something grew.',
       },
       {
@@ -516,12 +516,18 @@ const BEATS_RAW: BeatDefinition[] = [
     act: 'return',
     id: 'hunt',
     title: 'Drive the Microscope',
-    cue: 'Hand the crystal to the room. Take directions. Do not rush this.',
+    cue: 'Hand the crystal to the room, take directions, then let the last three presses carry the room out.',
     ask: 'ASK: you steer. Drag to turn it, scroll to go in, slide the focus. Shout when you see one move.',
-    seconds: 60,
+    // The hunt is about a minute of it; the rest is the pull-back, which runs
+    // itself once each press starts it.
+    seconds: 100,
     stage: 'scene',
     scene: 'hero',
     anchor: 'hidden',
+    // The beat opens in the water, with the cells in shot. The scripted camera
+    // is a loop that is only inside for part of its run, so without this the
+    // opening frame is whichever part of the loop the clock happened to reach.
+    inside: true,
     headline: 'Here is what that looks like from inside.',
     steps: [
       {
@@ -535,6 +541,39 @@ const BEATS_RAW: BeatDefinition[] = [
         hunt: true,
         headline: 'Found one.',
         supporting: 'One cell, in one drop, in one crystal.',
+      },
+      // ── The way out. One press each, every move runs on its own. ────────
+      {
+        // Takes the controls back and walks the camera out over five seconds.
+        // The room has been inside this thing for a minute — this is the first
+        // time they see it whole.
+        label: 'Pull out to the whole crystal (5s)',
+        hunt: false,
+        // The move starts from wherever the room left the camera, so the hold
+        // has to be released before the pull rather than re-armed under it.
+        inside: false,
+        pullBack: true,
+        ask: 'SAY nothing. Let it fall away.',
+        headline: 'One crystal.',
+        supporting: 'Two millimetres of salt, with a lake still sealed inside it.',
+      },
+      {
+        // Cross-dissolves on to the planet at the size the crystal left, then
+        // keeps backing off. Searles is still pinned on it.
+        label: 'Out to the planet',
+        scene: 'globe',
+        scenePhase: 'earth-out',
+        headline: 'One planet we know it happens on.',
+        supporting: undefined,
+      },
+      {
+        // Aaron: your line. The picture makes the argument — this is the only
+        // salt with anything living in it that anyone has ever found.
+        label: 'Out to the solar system',
+        scene: 'solar',
+        scenePhase: 'system',
+        headline: 'So we go looking on the others.',
+        supporting: 'Same rock. Same salt. Same question.',
       },
     ],
   },

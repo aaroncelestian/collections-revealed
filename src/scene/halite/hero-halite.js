@@ -607,6 +607,11 @@ export async function startHaliteHero(canvas, meta = {}) {
   let paused = false;
   let rendering = true;
   let panMode = false;
+  /** Closing move: the camera backs out of the crystal under its own steam. */
+  let pullingBack = false;
+  /** Scripted camera held on the orbit inside the inclusion. */
+  let insideHold = false;
+  let pullStartedAt = 0;
   let blending = false;
   let userSpin = true;
   let dragging = false;
@@ -657,6 +662,28 @@ export async function startHaliteHero(canvas, meta = {}) {
   const SPIRAL_LOOK0 = new THREE.Vector3(22, 0.4, 0.2);
   const OVERVIEW_CAM = new THREE.Vector3(48, 30, 195);
   const OVERVIEW_LOOK = new THREE.Vector3(0, 0, 0);
+
+  // Inside hold. The story loop only spends its middle third in the water, so
+  // a beat that has to open on the microbes cannot take whatever the loop
+  // happens to be showing when the presenter arrives. This parks the sequence
+  // on the orbit segment and runs it back and forth there: always inside,
+  // still moving, and it holds for as long as anyone talks over it. The orbit
+  // eases at both ends, so the turnaround is a slow stop, not a bounce.
+  const INSIDE_FROM = APPROACH_T1;
+  const INSIDE_RATE = PLAY_RATE * 0.55;
+  /** Past this from the inclusion, the camera is looking at the crystal, not in it. */
+  const INSIDE_R = 12;
+
+  // Closing pull-back: from wherever the room left the camera out to the whole
+  // specimen, then a slow drift further out. The drift matters — this shot
+  // dissolves into the Earth, and a frozen crystal under a moving planet reads
+  // as a cut rather than as one continuous move away.
+  const PULLBACK_SECONDS = 5;
+  const PULLBACK_DRIFT = 1.4;
+  const PULLBACK_DRIFT_SECONDS = 16;
+  const _pullFromCam = new THREE.Vector3();
+  const _pullFromLook = new THREE.Vector3();
+  let pullFromFov = 38;
 
   const DEEP_SEQ_START = APPROACH_T0;
   const DEEP_SEQ_END = ORBIT_T1;
@@ -849,9 +876,57 @@ export async function startHaliteHero(canvas, meta = {}) {
     }
   }
 
+  function playInside() {
+    return sheet.sequence
+      .play({
+        range: [INSIDE_FROM, ORBIT_T1],
+        iterationCount: Infinity,
+        direction: "alternate",
+        rate: INSIDE_RATE,
+      })
+      .catch((err) => {
+        if (err && (paused || pullingBack || !insideHold)) return;
+        if (err) console.warn("[halite] inside hold interrupted", err);
+      });
+  }
+
+  /**
+   * Park the scripted camera in the water inside the inclusion and keep it
+   * there.
+   *
+   * Only cuts if the camera is somewhere else. Arriving from the beat's own
+   * orbit, or from wherever the room drove it, has to be left alone — every
+   * press inside the beat passes through here, and a cut on each one would
+   * snap the view back to the same framing and undo the room's driving.
+   */
+  function setInside(next) {
+    const on = !!next;
+    if (on === insideHold) return;
+    insideHold = on;
+    if (!on) {
+      // Back to the full loop. Whoever is taking the camera next — the room,
+      // or the closing pull-back — stops it again a moment later.
+      if (!paused && !pullingBack) playStory();
+      return;
+    }
+    pullingBack = false;
+    blending = false;
+    if (camera.position.distanceTo(habitatWorld(_look)) > INSIDE_R) {
+      sheet.sequence.position = INSIDE_FROM;
+      applyStoryCamera();
+      // The room's controls orbit and focus on whatever the scripted camera
+      // was looking at, so they have to be re-aimed after a cut.
+      if (paused) storyLookAt(exploreTarget);
+    }
+    if (!paused) playInside();
+  }
+
   function setPaused(next) {
     if (next === paused && !blending) return;
     paused = next;
+    // Handing the crystal to the room outranks either scripted move.
+    pullingBack = false;
+    insideHold = false;
     blending = false;
     focusDragging = false;
     setPauseButtonState(paused);
@@ -868,6 +943,67 @@ export async function startHaliteHero(canvas, meta = {}) {
       setPanMode(false);
       setFocusRackInteractive(false);
       blending = true;
+    }
+  }
+
+  /**
+   * Hand the camera back off the room and walk it out to the whole specimen.
+   *
+   * Takes over from wherever the beat left the camera — mid-orbit, or wherever
+   * the room dragged it to — so the move always lands on the same framing. The
+   * overview pose is authored in crystal-local space, but the crystal sits at
+   * the origin and only ever rotates, so those numbers frame it just as well
+   * read as world space; using them there leaves the specimen turning
+   * underneath the camera rather than towing the camera round with it.
+   */
+  function setPullBack(next) {
+    const on = !!next;
+    if (on === pullingBack) return;
+    if (!on) {
+      pullingBack = false;
+      return;
+    }
+    if (paused) _pullFromLook.copy(exploreTarget);
+    else storyLookAt(_pullFromLook);
+    _pullFromCam.copy(camera.position);
+    pullFromFov = camera.fov;
+    pullStartedAt = clock.elapsedTime;
+    pullingBack = true;
+    insideHold = false;
+    paused = false;
+    blending = false;
+    focusDragging = false;
+    setPanMode(false);
+    setPauseButtonState(false);
+    setFocusRackInteractive(false);
+    sheet.sequence.pause();
+  }
+
+  function updatePullBack() {
+    const t = Math.max(0, clock.elapsedTime - pullStartedAt);
+    const u = THREE.MathUtils.clamp(t / PULLBACK_SECONDS, 0, 1);
+    const framed = easeInOutCubic(u);
+
+    _camPos.copy(_pullFromCam).lerp(OVERVIEW_CAM, framed);
+    if (u >= 1) {
+      // Eased in from a standstill, so the drift picks up exactly where the
+      // framing move set the camera down.
+      const drift = THREE.MathUtils.clamp(
+        (t - PULLBACK_SECONDS) / PULLBACK_DRIFT_SECONDS,
+        0,
+        1
+      );
+      _camPos.multiplyScalar(1 + (PULLBACK_DRIFT - 1) * easeInCubic(drift));
+    }
+    camera.position.copy(_camPos);
+
+    exploreTarget.copy(_pullFromLook).lerp(OVERVIEW_LOOK, framed);
+    camera.lookAt(exploreTarget);
+
+    const fov = THREE.MathUtils.lerp(pullFromFov, 38, framed);
+    if (Math.abs(camera.fov - fov) > 0.01) {
+      camera.fov = fov;
+      camera.updateProjectionMatrix();
     }
   }
 
@@ -1148,7 +1284,7 @@ export async function startHaliteHero(canvas, meta = {}) {
 
   function updateScaleBar() {
     if (!scaleBar || !scaleLabel) return;
-    if (paused) _look.copy(exploreTarget);
+    if (paused || pullingBack) _look.copy(exploreTarget);
     else storyLookAt(_look);
     const dist = camera.position.distanceTo(_look);
     const worldH = 2 * dist * Math.tan((camera.fov * Math.PI) / 180 / 2);
@@ -1284,7 +1420,12 @@ export async function startHaliteHero(canvas, meta = {}) {
     hostEdges.visible = true;
     cavityMesh.visible = true;
 
-    if (paused) {
+    if (pullingBack) {
+      updatePullBack();
+      // The specimen keeps turning as it recedes; a still crystal at this
+      // distance looks like a photograph of one.
+      if (!dragging) spinRoot(rotPerFrame * 0.4);
+    } else if (paused) {
       camera.lookAt(exploreTarget);
     } else if (blending) {
       blendTowardStory(dt);
@@ -1300,7 +1441,7 @@ export async function startHaliteHero(canvas, meta = {}) {
       }
     }
 
-    if (paused) _look.copy(exploreTarget);
+    if (paused || pullingBack) _look.copy(exploreTarget);
     else storyLookAt(_look);
     const focusDist = camera.position.distanceTo(_look);
     // Bokeh uses view-space Z (planar focus), not Euclidean distance — match it
@@ -1328,7 +1469,9 @@ export async function startHaliteHero(canvas, meta = {}) {
     // When zoomed out, keep DOF off unless the user is actively racking —
     // and even then iris stays small so mid-rack can look sharp
     const wantDof = dofAmt > 0.08 || (manualFocus && iris > 0.04);
-    const hold = !paused && !focusDragging && fieldMm <= FIELD_MM_MAX
+    // The sequence is parked wherever the beat paused it, so without this the
+    // pull-back can inherit a rack-focus hold authored for a tight shot.
+    const hold = !paused && !pullingBack && !focusDragging && fieldMm <= FIELD_MM_MAX
       ? activeFocusHold(seqPos)
       : null;
     bokehPass.enabled = wantDof;
@@ -1363,6 +1506,9 @@ export async function startHaliteHero(canvas, meta = {}) {
           targetAperture = Math.min(targetAperture, 0.0001);
           targetMaxblur = Math.min(targetMaxblur, 0.008);
         }
+      } else if (pullingBack) {
+        // Focus rides the crystal centre the whole way out, and the iris
+        // follows the field of view, which is opening out on its own.
       } else if (isDiveCamera(seqPos)) {
         // Lock focus plane to the look target; open iris only as we settle
         targetFocus = focusViewZ;
@@ -1452,6 +1598,8 @@ export async function startHaliteHero(canvas, meta = {}) {
     },
     setPaused,
     setPanMode,
+    setInside,
+    setPullBack,
     setRendering(on) {
       const next = !!on;
       // The blend back onto the scripted camera is driven a frame at a time, and

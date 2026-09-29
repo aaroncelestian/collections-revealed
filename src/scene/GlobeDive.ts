@@ -2,11 +2,11 @@ import * as THREE from 'three'
 import { Line2 } from 'three/addons/lines/Line2.js'
 import { LineGeometry } from 'three/addons/lines/LineGeometry.js'
 import { LineMaterial } from 'three/addons/lines/LineMaterial.js'
-import { BOULBY, SEARLES } from './places'
+import { BOULBY, SEARLES, lonLatToVec3, orientationFor } from './places'
+import { atmosphereShell, starfield } from './space'
 import { buildWorldTextures } from './worldTexture'
 import type { GlobePhase } from '../beats/types'
 
-const DEG = Math.PI / 180
 const GLOBE_R = 1
 
 /** Metres of real rock per world unit in the shaft, so 1,100 m is 110 units. */
@@ -35,11 +35,24 @@ const PLUNGE_END_DISTANCE = 1.18
  */
 const SHAFT_SECONDS = 30
 
+/** How fast the camera closes on a phase's altitude. Lower is slower. */
+const APPROACH_RATE = 2.1
+
 interface PhasePose {
   /** Camera distance from globe centre. */
   distance: number
   lonLat: [number, number] | null
   spin: boolean
+  /** Jump here on arrival, then travel to `distance`. */
+  from?: number
+  /**
+   * Run `from` → `distance` as a timed pull instead of the default approach.
+   * Apparent size goes as one over distance, so an exponential approach spends
+   * all its picture in the first half-second and then creeps. Stepping the
+   * distance geometrically over a fixed time is what makes a long climb read
+   * as one steady pull.
+   */
+  pullSeconds?: number
 }
 
 /**
@@ -52,30 +65,19 @@ const GLOBE_POSES: Record<string, PhasePose> = {
   searles: { distance: 2.55, lonLat: SEARLES, spin: false },
   arc: { distance: 3.0, lonLat: null, spin: false },
   'boulby-surface': { distance: 2.5, lonLat: BOULBY, spin: false },
+  /**
+   * The closing pull-back. Opens with the planet overfilling the frame, the
+   * Searles pin still on it, and backs off slowly until Earth is a ball in
+   * space — where `SolarSystem` picks the same ball up and keeps going.
+   *
+   * Held still rather than spun: the hand-over to the solar system is a
+   * cross-dissolve between two Earths, and they have to face the same way.
+   */
+  'earth-out': { distance: 14, from: 1.9, lonLat: SEARLES, spin: false, pullSeconds: 6 },
 }
 
-function lonLatToVec3(lon: number, lat: number, r = GLOBE_R): THREE.Vector3 {
-  const phi = (90 - lat) * DEG
-  const theta = (lon + 180) * DEG
-  return new THREE.Vector3(
-    -r * Math.sin(phi) * Math.cos(theta),
-    r * Math.cos(phi),
-    r * Math.sin(phi) * Math.sin(theta)
-  )
-}
-
-/**
- * Rotation that swings a lon/lat round to face the camera with north up.
- * Done as two steps because `setFromUnitVectors` alone leaves arbitrary roll,
- * which reads as the planet lolling sideways.
- */
-function orientationFor(lon: number, lat: number): THREE.Quaternion {
-  const target = lonLatToVec3(lon, lat).normalize()
-  const q = new THREE.Quaternion().setFromUnitVectors(target, new THREE.Vector3(0, 0, 1))
-  const north = new THREE.Vector3(0, 1, 0).applyQuaternion(q)
-  const roll = Math.atan2(north.x, north.y)
-  return q.premultiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 0, 1), roll))
-}
+/** Distance the closing pull-back ends on, for the solar system to match. */
+export const EARTH_OUT_DISTANCE = GLOBE_POSES['earth-out'].distance
 
 /** Procedural sedimentary strata, with the Permian salt seam near the bottom. */
 function strataTexture(): THREE.CanvasTexture {
@@ -156,6 +158,12 @@ function saltTexture(): THREE.CanvasTexture {
 
 export interface GlobeDiveHandle {
   setPhase: (phase: GlobePhase) => void
+  /**
+   * Current camera altitude in globe radii. The closing dissolve into the
+   * solar system needs it: the press can land while the pull-back is still
+   * easing, and the Earth it hands over to has to be the same size.
+   */
+  cameraDistance: () => number
   setVisible: (visible: boolean) => void
   setRendering: (on: boolean) => void
   resize: () => void
@@ -202,7 +210,7 @@ export function startGlobeDive(
   const earth = new THREE.Mesh(new THREE.SphereGeometry(GLOBE_R, 128, 96), earthMat)
   globeGroup.add(earth)
 
-  globeScene.add(atmosphere())
+  globeScene.add(atmosphereShell(GLOBE_R))
   globeScene.add(starfield(1400))
 
   // Faint enough to read as a map graticule rather than a wireframe. It stays
@@ -386,6 +394,9 @@ export function startGlobeDive(
 
   let distance = GLOBE_POSES.world.distance
   let targetDistance = distance
+  let pullSeconds = 0
+  let pullElapsed = 0
+  let pullFrom = distance
   const quat = orientationFor(GLOBE_POSES.world.lonLat![0], GLOBE_POSES.world.lonLat![1])
   const targetQuat = quat.clone()
   globeGroup.quaternion.copy(quat)
@@ -527,8 +538,16 @@ export function startGlobeDive(
     const pose = GLOBE_POSES[next]
     if (!pose) return
     targetDistance = pose.distance
+    if (pose.from !== undefined) distance = pose.from
+    pullFrom = distance
+    pullSeconds = pose.pullSeconds ?? 0
+    pullElapsed = 0
     spin = pose.spin
     if (pose.lonLat) targetQuat.copy(orientationFor(pose.lonLat[0], pose.lonLat[1]))
+    // A pose that jumps its altitude is a cut, not a flight, so it jumps its
+    // facing too. Slerping instead would whip the globe round at surface
+    // range, under the dissolve, where the turn is all the room can see.
+    if (pose.from !== undefined) quat.copy(targetQuat)
 
     // The flight path belongs to the flight and to the landing, nothing else.
     // Stepping back, or jumping to an earlier act with a digit key, has to
@@ -577,7 +596,7 @@ export function startGlobeDive(
       }
     }
 
-    const ease = 1 - Math.exp(-2.1 * dt)
+    const ease = 1 - Math.exp(-APPROACH_RATE * dt)
     quat.slerp(targetQuat, ease)
     globeGroup.quaternion.copy(quat)
     camera.up.set(0, 1, 0)
@@ -612,7 +631,14 @@ export function startGlobeDive(
         fade(0, 700)
       }
     } else {
-      distance += (targetDistance - distance) * ease
+      if (pullSeconds > 0) {
+        pullElapsed = Math.min(pullSeconds, pullElapsed + dt)
+        const p = pullElapsed / pullSeconds
+        const e = p < 0.5 ? 4 * p ** 3 : 1 - (-2 * p + 2) ** 3 / 2
+        distance = pullFrom * (targetDistance / pullFrom) ** e
+      } else {
+        distance += (targetDistance - distance) * (1 - Math.exp(-APPROACH_RATE * dt))
+      }
       camera.position.set(0, 0, distance)
       camera.lookAt(0, 0, 0)
       camera.fov = 42
@@ -718,6 +744,7 @@ export function startGlobeDive(
 
   return {
     setPhase,
+    cameraDistance: () => distance,
     setVisible(next: boolean) {
       visible = next
       canvas.style.opacity = next ? '1' : '0'
@@ -747,97 +774,6 @@ export function startGlobeDive(
       renderer.dispose()
     },
   }
-}
-
-/**
- * Rim glow standing in for an atmosphere.
- *
- * Drawn on the inside of a slightly larger sphere and brightened towards the
- * silhouette, so the planet gets a lit edge instead of a hard cut against the
- * black stage. Cheap, and it is the difference between a sphere and a world.
- */
-function atmosphere(): THREE.Mesh {
-  return new THREE.Mesh(
-    // Only the sliver between this radius and the planet is ever visible, so
-    // the shell stays tight. Wider and it separates into a blue ring orbiting
-    // the Earth rather than sitting on it.
-    new THREE.SphereGeometry(GLOBE_R * 1.09, 64, 48),
-    new THREE.ShaderMaterial({
-      transparent: true,
-      blending: THREE.AdditiveBlending,
-      side: THREE.BackSide,
-      depthWrite: false,
-      uniforms: {
-        uColor: { value: new THREE.Color(0x5e9fdc) },
-        uPower: { value: 2.2 },
-        uStrength: { value: 0.75 },
-      },
-      vertexShader: `
-        varying vec3 vNormalW;
-        varying vec3 vViewW;
-        void main() {
-          vec4 world = modelMatrix * vec4(position, 1.0);
-          vNormalW = normalize(mat3(modelMatrix) * normal);
-          vViewW = normalize(cameraPosition - world.xyz);
-          gl_Position = projectionMatrix * viewMatrix * world;
-        }
-      `,
-      fragmentShader: `
-        uniform vec3 uColor;
-        uniform float uPower;
-        uniform float uStrength;
-        varying vec3 vNormalW;
-        varying vec3 vViewW;
-        void main() {
-          // Back faces, so the normal points inward and has to be flipped
-          // before measuring how close to grazing we are.
-          float rim = 1.0 - abs(dot(normalize(-vNormalW), normalize(vViewW)));
-          float a = pow(clamp(rim, 0.0, 1.0), uPower) * uStrength;
-          gl_FragColor = vec4(uColor * a, a);
-        }
-      `,
-    })
-  )
-}
-
-/** Sparse stars, so the black around the planet reads as space, not as a void. */
-function starfield(count: number): THREE.Points {
-  const positions = new Float32Array(count * 3)
-  const colors = new Float32Array(count * 3)
-  let seed = 90210
-  const rand = () => {
-    seed = (seed * 1103515245 + 12345) & 0x7fffffff
-    return seed / 0x7fffffff
-  }
-
-  for (let i = 0; i < count; i++) {
-    // Even spread over the sphere: cosine-distributed latitude, not uniform,
-    // or the stars bunch at the poles.
-    const u = rand() * 2 - 1
-    const theta = rand() * Math.PI * 2
-    const r = 120 + rand() * 60
-    const s = Math.sqrt(1 - u * u)
-    positions.set([r * s * Math.cos(theta), r * u, r * s * Math.sin(theta)], i * 3)
-
-    const warm = 0.72 + rand() * 0.28
-    colors.set([warm, warm * (0.92 + rand() * 0.08), warm * (0.88 + rand() * 0.12)], i * 3)
-  }
-
-  const geo = new THREE.BufferGeometry()
-  geo.setAttribute('position', new THREE.BufferAttribute(positions, 3))
-  geo.setAttribute('color', new THREE.BufferAttribute(colors, 3))
-
-  return new THREE.Points(
-    geo,
-    new THREE.PointsMaterial({
-      size: 1.5,
-      sizeAttenuation: false,
-      vertexColors: true,
-      transparent: true,
-      opacity: 0.7,
-      depthWrite: false,
-    })
-  )
 }
 
 /**
