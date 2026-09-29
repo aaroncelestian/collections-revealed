@@ -58,6 +58,14 @@ export interface BeatLabel {
   delayMs?: number
 }
 
+/** Opening plate: what the talk is and who is giving it. */
+export interface TitleCard {
+  /** Small line above the title, e.g. the series name. */
+  eyebrow?: string
+  title: string
+  byline: string
+}
+
 export interface ComparePair {
   beforeSrc: string
   beforeLabel: string
@@ -78,6 +86,8 @@ export interface RevealStep {
   headline?: string
   supporting?: string
   labels?: BeatLabel[]
+  /** Set to `undefined` to clear the opening plate on this keypress. */
+  titleCard?: TitleCard
   photoSrc?: string
   photoAlt?: string
   /** Override the beat's framing, e.g. for a portrait photo in a landscape run. */
@@ -113,6 +123,12 @@ export interface ZoomFrame {
    */
   xUm?: number
   yUm?: number
+  /**
+   * The stage moved to reach this frame, so it is not a crop of the one before
+   * it. Arriving here dissolves instead of popping the new photograph in at the
+   * end of the push.
+   */
+  crossfade?: boolean
 }
 
 export interface BeatDefinition {
@@ -134,6 +150,7 @@ export interface BeatDefinition {
   headline?: string
   supporting?: string
   labels?: BeatLabel[]
+  titleCard?: TitleCard
 
   photoSrc?: string
   photoAlt?: string
@@ -179,6 +196,7 @@ export interface BeatFrame {
   headline?: string
   supporting?: string
   labels?: BeatLabel[]
+  titleCard?: TitleCard
   photoSrc?: string
   photoAlt?: string
   fit: 'cover' | 'contain'
@@ -206,6 +224,7 @@ export function resolveFrame(beat: BeatDefinition, stepIndex: number): BeatFrame
     headline: beat.headline,
     supporting: beat.supporting,
     labels: beat.labels,
+    titleCard: beat.titleCard,
     photoSrc: beat.photoSrc,
     photoAlt: beat.photoAlt,
     fit: beat.fit ?? 'cover',
@@ -232,6 +251,7 @@ export function resolveFrame(beat: BeatDefinition, stepIndex: number): BeatFrame
     if (has('headline')) frame.headline = step.headline
     if (has('supporting')) frame.supporting = step.supporting
     if (has('labels')) frame.labels = step.labels
+    if (has('titleCard')) frame.titleCard = step.titleCard
     if (has('photoSrc')) frame.photoSrc = step.photoSrc
     if (has('photoAlt')) frame.photoAlt = step.photoAlt
     if (has('fit')) frame.fit = step.fit!

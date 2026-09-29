@@ -17,6 +17,7 @@ export class OverlayManager {
   readonly cue: InteractionCue
 
   private readonly copyEl: HTMLElement
+  private readonly titleEl: HTMLElement
   private readonly labelsEl: HTMLElement
   private readonly photoLayer: HTMLElement
   private readonly photoImg: HTMLImageElement
@@ -31,13 +32,18 @@ export class OverlayManager {
   private readonly diagram: RainShadowDiagram
 
   private labelTimers: number[] = []
+  /** Bumped on every render, so work that had to await can tell it is stale. */
+  private renderToken = 0
   private currentVideoSrc: string | null = null
   private copyTimer: number | null = null
   private copyKey = ''
   private copyShown = false
+  private titleKey = ''
+  private titleShown = false
 
   constructor() {
     this.copyEl = el('beat-copy')
+    this.titleEl = el('title-card')
     this.labelsEl = el('beat-labels')
     this.photoLayer = el('photo-layer')
     this.photoImg = el('photo-image') as HTMLImageElement
@@ -67,9 +73,23 @@ export class OverlayManager {
     }
   }
 
+  /**
+   * Same for the stills. A layer is shown as soon as its `src` is set, so a
+   * picture fetched on the keypress that needs it shows as an empty stage
+   * until it arrives — which is exactly what a fast advance does.
+   */
+  preloadImages(srcs: Array<string | undefined>) {
+    for (const src of new Set(srcs.filter((s): s is string => Boolean(s)))) {
+      const probe = new Image()
+      probe.decoding = 'async'
+      probe.src = src
+    }
+  }
+
   render(frame: BeatFrame) {
     const { beat } = frame
     this.clearTransient()
+    const token = ++this.renderToken
 
     const videoActive = Boolean(beat.videoSrc || beat.youtubeId) && frame.playVideo
     const stage = beat.stage
@@ -80,13 +100,49 @@ export class OverlayManager {
     this.setZoom(frame, stage === 'zoom')
     this.setDiagram(frame, stage === 'diagram')
     this.setCompare(frame, stage === 'compare')
-    void this.setVideo(frame, videoActive)
+    void this.setVideo(frame, videoActive, token)
 
+    this.setTitleCard(frame)
     this.setCopy(frame)
     this.setLabels(frame)
   }
 
   // ── Layers ────────────────────────────────────────────────────────────
+
+  private setTitleCard(frame: BeatFrame) {
+    const card = frame.titleCard
+    if (!card) {
+      this.titleKey = ''
+      this.titleShown = false
+      this.titleEl.hidden = true
+      this.titleEl.classList.remove('is-visible')
+      this.titleEl.innerHTML = ''
+      return
+    }
+
+    const eyebrow = card.eyebrow
+      ? `<span class="title-eyebrow">${escapeHtml(card.eyebrow)}</span>`
+      : ''
+    const html = `${eyebrow}<span class="title-name">${escapeHtml(card.title)}</span><span class="title-byline">${escapeHtml(card.byline)}</span>`
+
+    this.titleEl.hidden = false
+    this.titleEl.innerHTML = html
+
+    // Same contract as the copy line: a repaint of the plate already on
+    // screen must not replay its fade.
+    if (html === this.titleKey) {
+      if (this.titleShown) this.titleEl.classList.add('is-visible')
+      return
+    }
+
+    this.titleKey = html
+    this.titleShown = false
+    this.titleEl.classList.remove('is-visible')
+    requestAnimationFrame(() => {
+      this.titleShown = true
+      this.titleEl.classList.add('is-visible')
+    })
+  }
 
   private setCopy(frame: BeatFrame) {
     if (!frame.headline) {
@@ -195,7 +251,7 @@ export class OverlayManager {
     this.compare.show(frame.comparePhase)
   }
 
-  private async setVideo(frame: BeatFrame, active: boolean) {
+  private async setVideo(frame: BeatFrame, active: boolean, token: number) {
     const { beat } = frame
 
     if (!active) {
@@ -242,21 +298,28 @@ export class OverlayManager {
 
     try {
       await this.video.play()
+      return
     } catch {
-      if (!this.video.muted) {
-        console.warn('[overlay] Sound blocked; retrying muted.')
-        this.video.muted = true
-        try {
-          await this.video.play()
-          return
-        } catch {
-          /* give up on playback */
-        }
-      }
-      console.warn('[overlay] Video would not play.')
-      this.stopVideo()
-      if (frame.photoSrc) this.setPhoto(frame, true)
+      // A press lands while the clip is still opening: the next beat's render
+      // aborts this play(), and everything below would tear down the picture
+      // that render just put up — including a clip it had started itself.
+      if (token !== this.renderToken) return
     }
+
+    if (!this.video.muted) {
+      console.warn('[overlay] Sound blocked; retrying muted.')
+      this.video.muted = true
+      try {
+        await this.video.play()
+        return
+      } catch {
+        if (token !== this.renderToken) return
+      }
+    }
+
+    console.warn('[overlay] Video would not play.')
+    this.stopVideo()
+    if (frame.photoSrc) this.setPhoto(frame, true)
   }
 
   private setCaptionTrack(beat: BeatDefinition) {
@@ -305,6 +368,7 @@ export class OverlayManager {
     for (const t of this.labelTimers) clearTimeout(t)
     this.labelTimers = []
     this.copyEl.classList.remove('is-visible')
+    this.titleEl.classList.remove('is-visible')
   }
 }
 

@@ -6,10 +6,11 @@ missing, plus anything here that nothing points at.
 
 | File | Beat | |
 | --- | --- | --- |
-| `images/anchor-searles-halite.jpg` | the anchor — acts 1, 4, 7 | generated |
+| `images/anchor-searles-halite.jpg` | the anchor — acts 1, 4, 7 | generated from `assets/new_hero.jpg` |
 | `images/zoom/halite-zoom-01..04.jpg` | zoom ladder (3.2 mm / 1.1 mm / 0.42 mm / 0.42 mm) | generated |
 | `images/searching-for-life-poster.jpg` | Mars film poster | generated |
-| `images/boulby-stalactites.jpg` | salt world, crystal ceiling | |
+| `video/boulby-drive.mp4` | salt world, the drive in | |
+| `images/boulby-stalactites.jpg` | salt world, the still it falls back to | |
 | `images/boulby-wood-cribs.jpg` | salt world, closed tunnels | |
 | `images/boulby-aaron-scott.jpg` | salt world, lights off | |
 | `images/boulby-sampling.jpg` | finding the water | |

@@ -34,7 +34,8 @@ these and turns red when you are more than 15 seconds behind.
 
 ### Act 1 — The Object (0:00, 1:30)
 
-**0:00 · Cold Open** — full-frame crystal, silence, no type.
+**0:00 · Cold Open** — full-frame crystal, silence, title plate low-left:
+*Collections Revealed / Life in Salt / Aaron Celestian, PhD*.
 Say nothing for a five count. Let them look.
 > **ASK:** "Something in this rock is alive. Hands up if you believe me."
 > Count the room out loud — "six, nine, about a dozen of you."
@@ -63,7 +64,9 @@ zooms and then holds, so keep saying *this is still the same rock*.
 
 - opens at 3.2 mm across, scale bar visible
 - press → 1.1 mm
-- press → 0.42 mm, **scale bar disappears**
+- press → 0.42 mm, **scale bar disappears**. This one is a dissolve, not a cut:
+  the stage moved to a different part of the crystal, so the picture blends
+  while the camera keeps pushing
   > **ASK:** "How wide is this picture, really? Take three guesses, out loud."
   > Take exactly three. Repeat each one back so the room hears them.
 - press → the bar snaps in. "Four tenths of a millimetre. About one and a half
@@ -114,10 +117,12 @@ down the shaft with the depth readout climbing to 1,100 m.
 > When it stops: "Eleven hundred metres. More than three Eiffel Towers,
 > stacked." Press to open out into the salt chamber.
 
-**10:28 · Salt World** — three photos, two presses: crystal ceiling, closed
-tunnels, then lights off. Land hard on the darkness — "close your eyes, open
-them, no difference" — and hold it. The room is already dark by now, so these
-land faster than they read on paper.
+**10:28 · Salt World** — opens on the drive out through the tunnels, running
+silent. Say nothing for the first three seconds; the line comes up on its own.
+Then two presses: closed tunnels, then lights off. The first press ends the
+clip. Land hard on the darkness — "close your eyes, open them, no difference" —
+and hold it. The room is already dark by now, so these land faster than they
+read on paper.
 
 **11:02 · Finding the Water** — four screens, three presses: the sampling setup,
 the drilling clip, salt in hand, then the real sample bottle we carried out.

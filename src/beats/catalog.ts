@@ -5,7 +5,15 @@ export * from './types'
 
 const ANCHOR = '/assets/images/anchor-searles-halite.jpg'
 const ANCHOR_ALT =
-  'Pink halite cubes perched on a pink salt crust, Searles Lake, California'
+  'A close field of pink halite cubes grown on a pink salt crust, Searles Lake, California'
+
+/**
+ * The anchor is a portrait macro on a landscape stage, so every beat that
+ * shows it fills the frame rather than letterboxing it. It is a field of
+ * crystals, not an object on a backdrop — the crop costs nothing and the
+ * full-bleed pink is what the closing line cashes in.
+ */
+const ANCHOR_FIT = 'cover' as const
 
 /**
  * Zoom ladder, one shared picture.
@@ -16,7 +24,9 @@ const ANCHOR_ALT =
  * frame 01. Frames 03 and 04 are the same magnification; 04 is the measured
  * shift down and left from 03, into a cleaner inclusion field. 03 itself is
  * not a crop of 02 — the stage moved — so it is parked on the tube field
- * the previous step was already aimed at.
+ * the previous step was already aimed at and marked `crossfade`: the camera
+ * keeps pushing on 02 while 03 dissolves over it, because a cut to a different
+ * part of the crystal reads as a jump.
  */
 const ZOOM_LADDER: ZoomFrame[] = [
   {
@@ -38,6 +48,7 @@ const ZOOM_LADDER: ZoomFrame[] = [
     fieldUm: 432,
     xUm: 2034.8,
     yUm: 1228.3,
+    crossfade: true,
     alt: 'Close view of rectangular fluid inclusions in clear salt',
   },
   {
@@ -68,10 +79,18 @@ const BEATS_RAW: BeatDefinition[] = [
     stage: 'anchor',
     anchor: 'full',
     scene: 'none',
-    fit: 'contain',
+    fit: ANCHOR_FIT,
+    titleCard: {
+      eyebrow: 'Collections Revealed',
+      title: 'Life in Salt',
+      byline: 'Aaron Celestian, PhD',
+    },
     steps: [
       {
         label: 'Answer the show of hands',
+        // The plate clears as the first line lands, so the crystal is alone
+        // on screen for the rest of the act.
+        titleCard: undefined,
         headline: 'Something in here is alive.',
         supporting: 'And it has been for a very long time.',
         ask: 'SAY: the hands that went up were right.',
@@ -88,7 +107,7 @@ const BEATS_RAW: BeatDefinition[] = [
     stage: 'anchor',
     anchor: 'full',
     scene: 'none',
-    fit: 'contain',
+    fit: ANCHOR_FIT,
     headline: 'Halite. Rock salt.',
     supporting: 'Searles Lake, California.',
     steps: [
@@ -112,6 +131,7 @@ const BEATS_RAW: BeatDefinition[] = [
     scene: 'globe',
     scenePhase: 'world',
     anchor: 'inset',
+    fit: ANCHOR_FIT,
     headline: 'Where is this from?',
     steps: [
       {
@@ -281,7 +301,7 @@ const BEATS_RAW: BeatDefinition[] = [
     stage: 'anchor',
     anchor: 'full',
     scene: 'none',
-    fit: 'contain',
+    fit: ANCHOR_FIT,
     headline: 'Same rock.',
     supporting: 'You have been looking at it this whole time.',
   },
@@ -363,15 +383,18 @@ const BEATS_RAW: BeatDefinition[] = [
     act: 'depth',
     id: 'salt-world',
     title: 'Salt World',
-    cue: 'The drive is already rolling. Two presses. Land hard on the darkness.',
-    // The stills for this stretch are out. One continuous drive covers beats
-    // 13–15; this is where it starts, and the first line waits so the tunnel
-    // is on screen before anyone reads.
+    cue: 'The drive rolls on arrival. Two presses cut to the stills. Land hard on the darkness.',
+    // Opens on the drive out through the tunnels, then the same two presses as
+    // before. The first press ends the clip, so it never runs under the beats
+    // that follow. `photoSrc` here is the still the beat falls back to if the
+    // clip will not play.
     seconds: 34,
-    stage: 'video',
+    stage: 'photo',
     anchor: 'hidden',
     scene: 'none',
     fit: 'cover',
+    photoSrc: '/assets/images/boulby-stalactites.jpg',
+    photoAlt: 'Halite soda-straw stalactites hanging from the mine ceiling',
     videoSrc: '/assets/video/boulby-drive.mp4',
     copyDelayMs: 3000,
     headline: 'Salt grows down here.',
@@ -379,11 +402,16 @@ const BEATS_RAW: BeatDefinition[] = [
     steps: [
       {
         label: 'Closed tunnels',
+        playVideo: false,
+        photoSrc: '/assets/images/boulby-wood-cribs.jpg',
+        photoAlt: 'Wooden crib supports and mesh in a damaged mine tunnel',
         headline: 'Some tunnels are closed off.',
         supporting: 'Ancient water is eating the rock from the inside.',
       },
       {
         label: 'Lights off',
+        photoSrc: '/assets/images/boulby-aaron-scott.jpg',
+        photoAlt: 'Two researchers with headlamps in a dark salt tunnel',
         headline: 'Lights off.',
         supporting: 'Close your eyes. Open them. No difference.',
       },
@@ -394,29 +422,46 @@ const BEATS_RAW: BeatDefinition[] = [
     act: 'depth',
     id: 'finding-salt',
     title: 'Finding the Water',
-    cue: 'Three presses. The same drive keeps rolling under the lines.',
+    cue: 'Photo, roll the drilling clip, the specimen in hand, then the bottle.',
     seconds: 52,
-    stage: 'video',
+    stage: 'photo',
     anchor: 'hidden',
     scene: 'none',
-    fit: 'cover',
-    // Same clip as the beat before, so playback continues instead of restarting.
-    videoSrc: '/assets/video/boulby-drive.mp4',
+    // Portrait in a landscape run. Cover was pinning the crop on the black
+    // ceiling and cutting off the person and the hole.
+    fit: 'contain',
+    photoSrc: '/assets/images/boulby-sampling.jpg',
+    photoAlt: 'Researchers setting up sampling gear in a salt tunnel',
+    videoSrc: '/assets/video/sampling.mp4',
+    holdPoster: true,
     headline: 'We went looking for the water.',
     steps: [
       {
-        label: 'The seam',
+        label: 'Roll the drilling clip',
+        playVideo: true,
+        fit: 'cover',
         caption: 'Drilling into a 250-million-year-old seam.',
         headline: undefined,
         supporting: undefined,
       },
       {
         label: 'Salt in hand',
+        playVideo: false,
+        // Same portrait problem as the opening photo: cover pinned on the
+        // black ceiling and cut the two of them off at the chest.
+        fit: 'contain',
+        photoSrc: '/assets/images/boulby-specimen.jpg',
+        photoAlt: 'A hand holding a block of clear salt from deep in the mine',
         headline: 'Salt, a mile down.',
         supporting: 'Sealed away since long before the dinosaurs.',
       },
       {
+        // The real sample bottle. Sets up the thesis beat that follows.
         label: 'The bottle we carried out',
+        // Portrait shot in a landscape run — letterbox rather than crop it.
+        fit: 'contain',
+        photoSrc: '/assets/images/boulby-brine-bottle.jpg',
+        photoAlt: 'A labelled sample bottle of cloudy brine from Boulby mine',
         headline: 'And we carried the water out.',
         supporting: 'Brine from the seam, in a bottle, on a bench.',
       },
@@ -427,18 +472,25 @@ const BEATS_RAW: BeatDefinition[] = [
     act: 'depth',
     id: 'brine-turns-pink',
     title: 'The Brine Turns Pink',
-    cue: 'This is the thesis. Slow down. The drive stays up behind the lines.',
+    cue: 'This is the thesis. Slow down. Let the colour change land.',
     ask: 'ASK: nothing was added to this bottle. What do you think happened?',
     seconds: 60,
-    stage: 'video',
+    stage: 'compare',
     anchor: 'hidden',
     scene: 'none',
-    fit: 'cover',
-    videoSrc: '/assets/video/boulby-drive.mp4',
+    fit: 'contain',
+    compare: {
+      beforeSrc: '/assets/stand-ins/brine-bottle-field.svg',
+      beforeLabel: 'Out of the mine',
+      afterSrc: '/assets/stand-ins/brine-bottle-lab.svg',
+      afterLabel: 'Weeks later',
+    },
+    comparePhase: 'before',
     headline: 'The brine came out clear.',
     steps: [
       {
-        label: 'Weeks later',
+        label: 'Crossfade to pink',
+        comparePhase: 'after',
         headline: 'Weeks later it was pink.',
         supporting: 'Nothing was added. Something grew.',
       },
@@ -446,6 +498,7 @@ const BEATS_RAW: BeatDefinition[] = [
         // Aaron: confirm the exact wording you want here. The ending hangs on
         // this line, and it is the claim the cold-open image cashes in.
         label: 'Name the colour',
+        comparePhase: 'after',
         flash: true,
         headline: 'The pink is alive.',
         supporting: 'That colour is made by microbes that can only live in salt.',
@@ -491,7 +544,7 @@ const BEATS_RAW: BeatDefinition[] = [
     stage: 'anchor',
     anchor: 'full',
     scene: 'none',
-    fit: 'contain',
+    fit: ANCHOR_FIT,
     headline: 'Look again.',
     supporting: 'The pink you saw in the very first picture — that was the life.',
   },
@@ -505,7 +558,7 @@ const BEATS_RAW: BeatDefinition[] = [
     stage: 'anchor',
     anchor: 'full',
     scene: 'none',
-    fit: 'contain',
+    fit: ANCHOR_FIT,
     headline: '35 million specimens.',
     supporting: 'Every single one still has something to say.',
   },
@@ -539,6 +592,18 @@ export const BEAT_COUNT = BEATS.length
 
 export const ANCHOR_SRC = publicAsset(ANCHOR)
 export const ANCHOR_ALT_TEXT = ANCHOR_ALT
+
+/** Every still the talk can put on screen, so the overlay can warm them all. */
+export const IMAGE_SOURCES: string[] = BEATS.flatMap((beat) =>
+  [
+    beat.photoSrc,
+    beat.poster,
+    beat.compare?.beforeSrc,
+    beat.compare?.afterSrc,
+    ...(beat.steps?.map((step) => step.photoSrc) ?? []),
+    ...(beat.zoom?.map((frame) => frame.src) ?? []),
+  ].filter((src): src is string => Boolean(src))
+)
 
 /** Total stage budget in seconds, used by the HUD pace indicator. */
 export const TALK_SECONDS = BEATS.reduce((sum, b) => sum + b.seconds, 0)

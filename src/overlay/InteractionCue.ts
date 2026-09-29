@@ -9,6 +9,7 @@ export class InteractionCue {
   private readonly number: HTMLElement
   private readonly flashEl: HTMLElement
   private timer: number | null = null
+  private hideTimer: number | null = null
   private onZero: (() => void) | null = null
 
   constructor(root: HTMLElement, flashEl: HTMLElement) {
@@ -34,7 +35,8 @@ export class InteractionCue {
       }
       this.cancelTimer()
       this.root.classList.remove('is-visible')
-      window.setTimeout(() => {
+      this.hideTimer = window.setTimeout(() => {
+        this.hideTimer = null
         this.root.hidden = true
         this.number.textContent = ''
       }, 320)
@@ -65,6 +67,12 @@ export class InteractionCue {
    */
   cancel() {
     this.cancelTimer()
+    // The fade-out that follows zero also hides the layer, so it has to go too
+    // or it lands on a countdown the presenter has already restarted.
+    if (this.hideTimer !== null) {
+      clearTimeout(this.hideTimer)
+      this.hideTimer = null
+    }
     this.onZero = null
     this.root.hidden = true
     this.root.classList.remove('is-visible')

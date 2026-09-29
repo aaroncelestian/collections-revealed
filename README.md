@@ -99,9 +99,10 @@ Under `src/overlay/`:
 - `AnchorLayer` — the crystal, mounted once, animating between full frame,
   corner inset and hidden. Separate from the shared photo layer so it can
   crossfade with itself.
-- `ZoomStack` — matched-scale crossfades across the four micrographs with a live
-  scale bar. Field widths come from the burned-in bars in the source TIFFs
-  (3.2 mm, 1.1 mm, 0.42 mm, 0.42 mm).
+- `ZoomStack` — the four micrographs as one continuous push, with a live scale
+  bar. Field widths come from the burned-in bars in the source TIFFs
+  (3.2 mm, 1.1 mm, 0.42 mm, 0.42 mm). Frame 03 is where the microscope stage
+  moved, so it dissolves in rather than popping the new picture on screen.
 - `RainShadowDiagram` — inline SVG, revealed in three stages.
 - `CompareLayer` — before/after crossfade for the brine bottle.
 - `InteractionCue` — the countdown and the reveal flash.

@@ -400,6 +400,7 @@ export function startGlobeDive(
   let shaftRunning = false
   let seamProgress = 0
   let seamRunning = false
+  let modeTimer: number | null = null
 
   const clock = new THREE.Clock()
 
@@ -454,9 +455,27 @@ export function startGlobeDive(
     seamRunning = false
   }
 
+  /**
+   * Apply a queued return to the globe now.
+   *
+   * The swap back is held behind a short fade, and a press landing inside that
+   * window would otherwise read a stale `mode`: asking for the shaft while the
+   * old one is still nominally up skips the whole descent.
+   */
+  function flushModeSwitch() {
+    if (modeTimer === null) return
+    window.clearTimeout(modeTimer)
+    modeTimer = null
+    mode = 'globe'
+    seamProgress = 0
+    seamRunning = false
+    fade(0, 200)
+  }
+
   function setPhase(next: GlobePhase) {
     if (next === phase) return
     phase = next
+    flushModeSwitch()
 
     if (next === 'seam') {
       // Presenter has moved on. Wherever the fall had got to, be at the bottom.
@@ -495,7 +514,8 @@ export function startGlobeDive(
 
     if (mode !== 'globe') {
       fade(1, 220)
-      window.setTimeout(() => {
+      modeTimer = window.setTimeout(() => {
+        modeTimer = null
         if (disposed) return
         mode = 'globe'
         seamProgress = 0
@@ -704,6 +724,9 @@ export function startGlobeDive(
       if (next) resize()
       if (!next) {
         options.onDepth?.(null)
+        // Same for a queued scene swap: its fade would otherwise sit black over
+        // whichever scene the next beat brings up.
+        flushModeSwitch()
         // The plunge drives the full-screen cover a frame at a time, and it
         // stops being ticked the moment this scene is routed away from. Jumping
         // acts mid-fall would otherwise leave the next beat behind black.
@@ -719,6 +742,7 @@ export function startGlobeDive(
     resize,
     dispose() {
       disposed = true
+      if (modeTimer !== null) window.clearTimeout(modeTimer)
       window.removeEventListener('resize', resize)
       renderer.dispose()
     },

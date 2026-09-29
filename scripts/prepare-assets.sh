@@ -23,7 +23,9 @@ need sips
 
 echo "==> anchor still"
 # The talk's home base. Same file every time it returns on screen.
-cp -f "$SRC/halite-trona.jpg" "$IMG/anchor-searles-halite.jpg"
+sips --setProperty format jpeg \
+     --setProperty formatOptions 86 \
+     "$SRC/new_hero.jpg" --out "$IMG/anchor-searles-halite.jpg" >/dev/null
 
 echo "==> zoom ladder (tif -> jpg)"
 for n in 01 02 03 04; do

@@ -20,8 +20,8 @@ export class AnchorLayer {
   }
 
   set(placement: AnchorPlacement, fit: 'cover' | 'contain' = 'contain') {
-    // The inset stays `contain` too: cropping it would stop it reading as the
-    // same picture the talk opened on.
+    // The inset takes the same fit as the full frame: a different crop would
+    // stop it reading as the picture the talk opened on.
     this.img.style.objectFit = fit
     if (placement === this.placement) return
     this.placement = placement

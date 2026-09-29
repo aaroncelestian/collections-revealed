@@ -4,14 +4,21 @@ import { setLayerVisible } from './layerVisibility'
 
 /** How long one push takes before the picture holds. */
 const PUSH_MS = 1700
+/** Where in the push a dissolve starts and ends, as a fraction of the ease. */
+const FADE_IN = 0.2
+const FADE_OUT = 0.85
 
 interface Plate {
+  /** Rung in the ladder. Also the stacking order. */
+  index: number
   frame: ZoomFrame
   /** Decoded source. Kept out of the layout so Chrome never textures a giant bitmap. */
   img: HTMLImageElement
   canvas: HTMLCanvasElement
   /** Height in the shared micrometre space. */
   hUm: number
+  /** Dissolve weight. Only a `crossfade` plate ever leaves 1. */
+  alpha: number
 }
 
 interface View {
@@ -24,11 +31,15 @@ interface View {
 /**
  * The zoom ladder as one picture.
  *
- * Every frame is placed in a shared micrometre space. A press moves the
- * camera from the current view to the next frame and then holds there —
- * there is no crossfade. A finer frame is drawn only once the camera has
- * arrived at its scale, so a wide view never shows a little rectangle of
- * the next photo sitting inside it.
+ * Every frame is placed in a shared micrometre space. A press moves the camera
+ * from the current view to the next frame and then holds there. Only the
+ * camera's own frame and coarser ones beneath it paint, and a finer frame waits
+ * until the camera has arrived at its scale, so a wide view never shows a
+ * little rectangle of the next photo sitting inside it.
+ *
+ * A frame marked `crossfade` is not a crop of the one before it, so it can
+ * never be reached by pushing in. The camera still pushes on the outgoing
+ * frame, but the new one dissolves over it at its own full framing.
  *
  * Each frame is painted into a canvas the size of the stage. Scaling the
  * photograph itself with CSS makes a layer tens of thousands of pixels wide
@@ -49,6 +60,8 @@ export class ZoomStack {
   private onStage = false
   private snapOnShow = true
   private raf = 0
+  /** The dissolve in flight. Set only while a crossfade boundary is being crossed. */
+  private fading: { index: number; rising: boolean } | null = null
   private reducedMotion: boolean
 
   constructor(root: HTMLElement) {
@@ -90,7 +103,14 @@ export class ZoomStack {
       canvas.setAttribute('aria-label', frame.alt)
       canvas.style.zIndex = String(index + 1)
       canvas.style.visibility = 'hidden'
-      const plate: Plate = { frame, img, canvas, hUm: frame.fieldUm * 0.75 }
+      const plate: Plate = {
+        index,
+        frame,
+        img,
+        canvas,
+        hUm: frame.fieldUm * 0.75,
+        alpha: frame.crossfade ? 0 : 1,
+      }
       img.addEventListener('load', () => {
         if (img.naturalWidth > 0) {
           plate.hUm = frame.fieldUm * (img.naturalHeight / img.naturalWidth)
@@ -120,12 +140,22 @@ export class ZoomStack {
 
   private frameRect(index: number): View {
     const plate = this.plates[index]
-    const frame = plate?.frame ?? this.frames[index]
+    if (plate) return this.plateRect(plate)
+    const frame = this.frames[index]
     return {
       x: frame.xUm ?? 0,
       y: frame.yUm ?? 0,
       w: frame.fieldUm,
-      h: plate?.hUm ?? frame.fieldUm * 0.75,
+      h: frame.fieldUm * 0.75,
+    }
+  }
+
+  private plateRect(plate: Plate): View {
+    return {
+      x: plate.frame.xUm ?? 0,
+      y: plate.frame.yUm ?? 0,
+      w: plate.frame.fieldUm,
+      h: plate.hUm,
     }
   }
 
@@ -159,19 +189,26 @@ export class ZoomStack {
   private moveTo(index: number, animate: boolean) {
     const from = { ...this.view }
     const to = this.coverView(this.frameRect(index))
+    const dissolve = this.dissolveAcross(this.current, index)
     this.current = index
     cancelAnimationFrame(this.raf)
 
     if (!animate || from.w <= 1) {
       this.view = to
+      this.settle()
       this.apply()
       return
     }
 
+    this.fading = dissolve
     const start = performance.now()
     const step = (now: number) => {
       const t = Math.min(1, (now - start) / PUSH_MS)
       const e = easeInOut(t)
+      if (dissolve) {
+        const weight = fadeWeight(e)
+        this.plates[dissolve.index].alpha = dissolve.rising ? weight : 1 - weight
+      }
       const w = Math.exp(Math.log(from.w) + (Math.log(to.w) - Math.log(from.w)) * e)
       const h = w * (to.h / to.w)
       const fromCx = from.x + from.w / 2
@@ -182,9 +219,34 @@ export class ZoomStack {
       const cy = fromCy + (toCy - fromCy) * e
       this.view = { x: cx - w / 2, y: cy - h / 2, w, h }
       this.apply()
-      if (t < 1) this.raf = requestAnimationFrame(step)
+      if (t < 1) {
+        this.raf = requestAnimationFrame(step)
+      } else {
+        this.settle()
+        this.apply()
+      }
     }
     this.raf = requestAnimationFrame(step)
+  }
+
+  /**
+   * The dissolve boundary this move crosses, if any: the finest `crossfade`
+   * frame between where the camera was and where it is going.
+   */
+  private dissolveAcross(from: number, to: number): { index: number; rising: boolean } | null {
+    if (from < 0 || from === to) return null
+    for (let i = Math.max(from, to); i > Math.min(from, to); i--) {
+      if (this.frames[i]?.crossfade) return { index: i, rising: to > from }
+    }
+    return null
+  }
+
+  /** Resting state: no dissolve in flight, and every plate at or below the camera opaque. */
+  private settle() {
+    this.fading = null
+    for (const plate of this.plates) {
+      plate.alpha = plate.frame.crossfade && plate.index > this.current ? 0 : 1
+    }
   }
 
   private apply() {
@@ -196,11 +258,12 @@ export class ZoomStack {
     const dpr = Math.min(window.devicePixelRatio || 1, 2)
     const bw = Math.max(1, Math.round(boxW * dpr))
     const bh = Math.max(1, Math.round(boxH * dpr))
-    const s = boxW / this.view.w
 
     for (const plate of this.plates) {
-      const show = this.plateShown(plate)
+      const view = this.plateView(plate)
+      const show = this.plateShown(plate, view)
       plate.canvas.style.visibility = show ? 'visible' : 'hidden'
+      plate.canvas.style.opacity = plate.alpha >= 1 ? '' : plate.alpha.toFixed(3)
       if (!show) continue
       const ctx = plate.canvas.getContext('2d')
       if (!ctx) continue
@@ -210,38 +273,58 @@ export class ZoomStack {
       }
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
       ctx.clearRect(0, 0, boxW, boxH)
-      this.drawPlate(plate, ctx, s)
+      this.drawPlate(plate, ctx, view, boxW)
     }
 
     if (this.scaleVisible) this.layoutBar()
   }
 
-  /** A finer plate stays hidden until the camera is at its scale. */
-  private plateShown(plate: Plate): boolean {
+  /**
+   * Which camera this plate is painted through. A dissolving plate holds its
+   * own framing for the whole push, so it fades in full frame instead of as a
+   * rectangle inside the outgoing picture.
+   */
+  private plateView(plate: Plate): View {
+    if (this.fading?.index === plate.index) return this.coverView(this.plateRect(plate))
+    return this.view
+  }
+
+  private plateShown(plate: Plate, view: View): boolean {
+    // A dissolving plate is governed by its fade, not by where the camera is.
+    if (this.fading?.index === plate.index) return plate.alpha > 0
+    // Frames finer than the camera's never paint: 03 and 04 share a
+    // magnification, so "at this scale" alone would let 04 sit on top of 03.
+    if (plate.index > this.current) return false
     const x = plate.frame.xUm ?? 0
     const y = plate.frame.yUm ?? 0
-    const atScale = this.view.w <= plate.frame.fieldUm * 1.04
+    const atScale = view.w <= plate.frame.fieldUm * 1.04
     const overlaps =
-      this.view.x < x + plate.frame.fieldUm &&
-      this.view.x + this.view.w > x &&
-      this.view.y < y + plate.hUm &&
-      this.view.y + this.view.h > y
+      view.x < x + plate.frame.fieldUm &&
+      view.x + view.w > x &&
+      view.y < y + plate.hUm &&
+      view.y + view.h > y
     const coarsest = plate.frame.fieldUm >= this.frames[0].fieldUm * 0.98
     return (coarsest || atScale) && overlaps
   }
 
   /** Paint the part of this frame that the camera can see, into stage pixels. */
-  private drawPlate(plate: Plate, ctx: CanvasRenderingContext2D, s: number) {
+  private drawPlate(
+    plate: Plate,
+    ctx: CanvasRenderingContext2D,
+    view: View,
+    boxW: number
+  ) {
     const img = plate.img
     if (!img.complete || img.naturalWidth === 0) return
+    const s = boxW / view.w
     const x = plate.frame.xUm ?? 0
     const y = plate.frame.yUm ?? 0
     const pw = plate.frame.fieldUm
     const ph = plate.hUm
-    const ix0 = Math.max(x, this.view.x)
-    const iy0 = Math.max(y, this.view.y)
-    const ix1 = Math.min(x + pw, this.view.x + this.view.w)
-    const iy1 = Math.min(y + ph, this.view.y + this.view.h)
+    const ix0 = Math.max(x, view.x)
+    const iy0 = Math.max(y, view.y)
+    const ix1 = Math.min(x + pw, view.x + view.w)
+    const iy1 = Math.min(y + ph, view.y + view.h)
     if (ix1 <= ix0 || iy1 <= iy0) return
     const nw = img.naturalWidth
     const nh = img.naturalHeight
@@ -251,11 +334,23 @@ export class ZoomStack {
       ((iy0 - y) / ph) * nh,
       ((ix1 - ix0) / pw) * nw,
       ((iy1 - iy0) / ph) * nh,
-      (ix0 - this.view.x) * s,
-      (iy0 - this.view.y) * s,
+      (ix0 - view.x) * s,
+      (iy0 - view.y) * s,
       (ix1 - ix0) * s,
       (iy1 - iy0) * s
     )
+  }
+
+  /**
+   * How wide the picture on screen is. Mid-dissolve the two layers sit at
+   * different magnifications, so the bar tracks their blend rather than
+   * jumping when the incoming frame takes over.
+   */
+  private visibleWidthUm(): number {
+    if (!this.fading) return this.view.w
+    const plate = this.plates[this.fading.index]
+    const incoming = this.coverView(this.plateRect(plate)).w
+    return this.view.w * (1 - plate.alpha) + incoming * plate.alpha
   }
 
   private setScaleVisible(visible: boolean) {
@@ -270,8 +365,9 @@ export class ZoomStack {
     if (!this.scaleVisible || this.view.w <= 1) return
     const rect = this.box.getBoundingClientRect()
     if (rect.width < 1) return
-    const barUm = niceScaleUm(this.view.w * 0.25)
-    const barPx = (barUm / this.view.w) * rect.width
+    const visibleUm = this.visibleWidthUm()
+    const barUm = niceScaleUm(visibleUm * 0.25)
+    const barPx = (barUm / visibleUm) * rect.width
     this.barLine.style.width = `${barPx.toFixed(1)}px`
     this.barLabel.textContent = formatScale(barUm)
   }
@@ -279,4 +375,13 @@ export class ZoomStack {
 
 function easeInOut(t: number): number {
   return t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2
+}
+
+/**
+ * Dissolve weight for a push that is `e` of the way through. The fade sits
+ * inside the push so the outgoing frame is already moving when it starts, and
+ * the new frame is fully there before the camera settles.
+ */
+function fadeWeight(e: number): number {
+  return Math.min(1, Math.max(0, (e - FADE_IN) / (FADE_OUT - FADE_IN)))
 }

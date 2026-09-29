@@ -3,6 +3,7 @@ import {
   BEAT_COUNT,
   BEAT_START_SECONDS,
   BEATS,
+  IMAGE_SOURCES,
   TALK_SECONDS,
   actStartIndex,
   activeAsk,
@@ -58,7 +59,6 @@ export class PresentationApp {
 
   private unbindControls: (() => void) | null = null
   private sceneFailed = false
-  private booted = false
 
   private timerStart: number | null = null
   private timerPausedAt = 0
@@ -88,11 +88,13 @@ export class PresentationApp {
     // dissolved. Repaint the current position on return.
     document.addEventListener('visibilitychange', this.onVisibilityChange)
 
+    // The cold open is DOM only, so put it up now rather than behind WebGL boot.
+    this.goTo(0, -1)
     void this.boot()
   }
 
   private readonly onVisibilityChange = () => {
-    if (document.visibilityState !== 'visible' || !this.booted) return
+    if (document.visibilityState !== 'visible') return
     this.goTo(this.beatIndex, this.stepIndex, { replayCues: false })
   }
 
@@ -110,21 +112,22 @@ export class PresentationApp {
       })) as HeroHandle
       this.hero.setVisible(false)
       this.hero.setRendering(false)
-      this.booted = true
     } catch (error) {
       console.error('[app] Halite hero failed', error)
       this.sceneFailed = true
       this.hero = null
     }
 
-    this.goTo(0, -1)
+    this.overlay.preloadImages(IMAGE_SOURCES)
+
+    // Route the scene for wherever the presenter has got to. Boot is slow enough
+    // that they may already have moved, and snapping back to beat 1 loses them.
+    this.goTo(this.beatIndex, this.stepIndex, { replayCues: false })
   }
 
   // ── Presenter intents ──────────────────────────────────────────────────
 
   private onCommand(command: PresenterCommand) {
-    if (!this.booted && !this.sceneFailed) return
-
     switch (command.type) {
       case 'next':
         this.advance(1)
@@ -203,9 +206,11 @@ export class PresentationApp {
     document.body.classList.toggle('scene-globe', wanted === 'globe')
 
     const heroOn = wanted === 'hero'
+    // Hand the crystal back before the frames stop, so the scripted camera has
+    // a chance to pick up where the room left off.
+    if (!heroOn) this.setHunting(false)
     this.hero?.setVisible(heroOn)
     this.hero?.setRendering(heroOn)
-    if (!heroOn) this.setHunting(false)
 
     const globeOn = wanted === 'globe'
     this.globe?.setVisible(globeOn)

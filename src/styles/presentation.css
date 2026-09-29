@@ -73,8 +73,7 @@ body {
 .anchor-layer {
   position: absolute;
   inset: 0;
-  display: grid;
-  place-items: center;
+  overflow: hidden;
   background: #000;
   transition: opacity 0.9s ease, transform 0.9s cubic-bezier(0.4, 0, 0.2, 1),
     border-radius 0.9s ease;
@@ -83,7 +82,11 @@ body {
   transform-origin: 100% 0%;
 }
 
+/* Pinned rather than laid out: an auto-height box would take the picture's own
+   aspect ratio, overflow the layer, and leave `object-fit` with nothing to do. */
 .anchor-layer img {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   object-fit: contain;
@@ -93,6 +96,22 @@ body {
 .anchor-layer.is-full {
   opacity: 1;
   transform: scale(1);
+}
+
+/* The anchor is the brightest picture in the talk and the copy lands on top of
+   it. Text-shadow alone is not enough against white crystal at stage distance,
+   so the full-frame state carries its own scrim. */
+.anchor-layer.is-full::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.72) 0%,
+    rgba(0, 0, 0, 0.45) 22%,
+    rgba(0, 0, 0, 0) 58%
+  );
 }
 
 /* Parked in the upper-right so the new picture owns the frame but the
@@ -138,6 +157,52 @@ body {
   display: block;
   margin-top: 0.55em;
   max-width: 28ch;
+  font-size: var(--type-body);
+  font-weight: 400;
+  color: var(--ink-muted);
+}
+
+/* Opening plate. Sits where the first copy line will land, so the press that
+   reveals that line simply trades one for the other. */
+.title-card {
+  position: absolute;
+  left: 6vw;
+  right: 6vw;
+  bottom: 10vh;
+  z-index: var(--z-copy);
+  display: flex;
+  flex-direction: column;
+  color: var(--ink);
+  text-shadow: 0 2px 24px rgba(0, 0, 0, 0.85), 0 0 60px rgba(0, 0, 0, 0.6);
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity 1.2s ease, transform 1.2s ease;
+}
+
+.title-card.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.title-eyebrow {
+  font-size: var(--type-label);
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.title-name {
+  margin-top: 0.15em;
+  max-width: 18ch;
+  font-size: var(--type-hero);
+  font-weight: 600;
+  line-height: 1.05;
+  letter-spacing: -0.01em;
+}
+
+.title-byline {
+  margin-top: 0.5em;
   font-size: var(--type-body);
   font-weight: 400;
   color: var(--ink-muted);
@@ -620,6 +685,7 @@ body.is-hunting #stage-canvas {
 
 @media (prefers-reduced-motion: reduce) {
   .beat-copy,
+  .title-card,
   .beat-label,
   .photo-layer,
   .video-layer,

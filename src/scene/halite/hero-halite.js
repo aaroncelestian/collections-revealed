@@ -1453,7 +1453,17 @@ export async function startHaliteHero(canvas, meta = {}) {
     setPaused,
     setPanMode,
     setRendering(on) {
-      rendering = !!on;
+      const next = !!on;
+      // The blend back onto the scripted camera is driven a frame at a time, and
+      // frames stop the moment this scene goes off stage. Land it now, or the
+      // sequence stays paused and the crystal is frozen when it returns.
+      if (!next && blending) {
+        blending = false;
+        applyStoryCamera();
+        playStory();
+        userSpin = true;
+      }
+      rendering = next;
     },
     dispose() {
       window.removeEventListener("resize", resize);
