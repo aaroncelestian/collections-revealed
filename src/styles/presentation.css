@@ -628,10 +628,90 @@ body {
   border-radius: 3px;
 }
 
+.hud-jump {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-top: 0.35rem;
+  pointer-events: auto;
+}
+
+.hud-act-keys {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+
+.hud-act-keys button {
+  min-width: 1.55rem;
+  padding: 0.18rem 0.35rem;
+  font: inherit;
+  font-size: 0.7rem;
+  font-weight: 700;
+  line-height: 1.2;
+  color: rgba(255, 255, 255, 0.75);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.hud-act-keys button:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.hud-act-keys button.is-current {
+  color: var(--bg);
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.hud-beat-jump {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.hud-beat-jump-label {
+  flex: none;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.hud-beat-jump select {
+  flex: 1;
+  min-width: 0;
+  max-width: 100%;
+  padding: 0.2rem 0.35rem;
+  font: inherit;
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.85);
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.hud-beat-jump select:focus {
+  outline: 1px solid var(--accent);
+  outline-offset: 1px;
+}
+
 #hud-hint {
   margin-top: 0.3rem;
   color: rgba(255, 255, 255, 0.4);
   font-size: 0.7rem;
+}
+
+.hud-build {
+  color: rgba(255, 255, 255, 0.28);
+  font-size: 0.65rem;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
 }
 
 .presenter-hud.is-hidden {

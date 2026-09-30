@@ -66,6 +66,9 @@ export class PresentationApp {
     title: HTMLElement
     cue: HTMLElement
     ask: HTMLElement
+    build: HTMLElement
+    actKeys: HTMLElement
+    beatSelect: HTMLSelectElement
     root: HTMLElement
   }
 
@@ -91,8 +94,13 @@ export class PresentationApp {
       title: must('hud-title'),
       cue: must('hud-cue'),
       ask: must('hud-ask'),
+      build: must('hud-build'),
+      actKeys: must('hud-act-keys'),
+      beatSelect: must('hud-beat-select') as HTMLSelectElement,
       root: must('presenter-hud'),
     }
+    this.hud.build.textContent = `build ${__BUILD_ID__}`
+    this.buildJumpControls()
 
     this.overlay = new OverlayManager()
     this.overlay.preloadVideos(BEATS.map((b) => b.videoSrc))
@@ -337,6 +345,41 @@ export class PresentationApp {
 
   // ── Presenter HUD ──────────────────────────────────────────────────────
 
+  /** Act chips + beat menu for rehearsal jumps. Built once from the catalog. */
+  private buildJumpControls() {
+    for (const act of ACTS) {
+      const button = document.createElement('button')
+      button.type = 'button'
+      button.textContent = String(act.key)
+      button.title = `Act ${act.key} · ${act.title}`
+      button.dataset.actKey = String(act.key)
+      button.addEventListener('click', (event) => {
+        event.preventDefault()
+        this.goTo(actStartIndex(act.key), -1)
+      })
+      this.hud.actKeys.append(button)
+    }
+
+    for (const act of ACTS) {
+      const group = document.createElement('optgroup')
+      group.label = `${act.key} · ${act.title}`
+      for (const beat of BEATS.filter((b) => b.act === act.id)) {
+        const option = document.createElement('option')
+        option.value = String(beat.index)
+        option.textContent = `${beat.index + 1}. ${beat.title}`
+        group.append(option)
+      }
+      this.hud.beatSelect.append(group)
+    }
+
+    this.hud.beatSelect.addEventListener('change', () => {
+      const index = Number(this.hud.beatSelect.value)
+      if (!Number.isFinite(index)) return
+      this.goTo(index, -1)
+      this.hud.beatSelect.blur()
+    })
+  }
+
   private paintHud(beat: BeatDefinition, frame: BeatFrame) {
     const act = ACTS.find((a) => a.id === beat.act)
     const steps = stepCount(beat)
@@ -355,6 +398,11 @@ export class PresentationApp {
     const ask = activeAsk(beat, this.stepIndex)
     this.hud.ask.textContent = ask ?? ''
     this.hud.ask.hidden = !ask
+
+    this.hud.beatSelect.value = String(beat.index)
+    for (const button of this.hud.actKeys.querySelectorAll('button')) {
+      button.classList.toggle('is-current', button.dataset.actKey === String(act?.key))
+    }
 
     this.paintClock()
   }
