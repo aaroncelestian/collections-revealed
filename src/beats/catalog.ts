@@ -61,7 +61,7 @@ const ZOOM_LADDER: ZoomFrame[] = [
 ]
 
 /**
- * 17 beats, 7 acts, ~15:00 of stage time.
+ * 17 beats, 7 acts, ~14:35 of stage time.
  *
  * The Searles Lake crystal is the hub: it opens the talk, returns at every act
  * break, and closes it. Everything else is a departure from that one object.
@@ -142,27 +142,17 @@ const BEATS_RAW: BeatDefinition[] = [
     act: 'place',
     id: 'searles-field',
     title: 'The Pink Water',
-    cue: 'Film, then click through the field stills fast. Do not explain the colour — the ending needs it.',
-    // ~22 s of film, then five quick presses of real place photos, last one parks pink.
-    seconds: 55,
-    // Same pattern as salt-world: stage photo so stills can take over after the clip.
+    cue: 'Click through the field stills fast. Do not explain the colour — the ending needs it.',
+    // Opens on the wide lakebed; four presses park on pink. No film — the old
+    // clip was Boulby, not Searles.
+    seconds: 40,
     stage: 'photo',
     anchor: 'hidden',
     scene: 'none',
     fit: 'cover',
     photoSrc: '/assets/images/searles-lakebed.jpg',
     photoAlt: 'The dry salt crust of Searles Lake stretching to distant mountains',
-    videoSrc: '/assets/video/brine-lake.mp4',
     steps: [
-      {
-        label: 'Wide lakebed',
-        playVideo: false,
-        fit: 'cover',
-        photoSrc: '/assets/images/searles-lakebed.jpg',
-        photoAlt: 'The dry salt crust of Searles Lake stretching to distant mountains',
-        headline: undefined,
-        supporting: undefined,
-      },
       {
         label: 'On the flat',
         // Portrait selfie in a landscape run — letterbox rather than crop the Sierra.
@@ -540,7 +530,7 @@ const BEATS_RAW: BeatDefinition[] = [
         label: 'Found one',
         hunt: true,
         headline: 'Found one.',
-        supporting: 'One cell, in one drop, in one crystal.',
+        supporting: 'And a kilometre down, Boulby is teeming with life.',
       },
       // ── The way out. One press each, every move runs on its own. ────────
       {

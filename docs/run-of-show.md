@@ -1,6 +1,6 @@
 # Life in Salt — run of show
 
-17 beats, 7 acts, ~15:00 of stage time against a 15-minute slot. Room of ~100.
+17 beats, 7 acts, ~14:35 of stage time against a 15-minute slot. Room of ~100.
 The overrun cushion sits in the closing pull-back, which is the first thing to
 trim if the room runs long: the hunt can end on "Found one" and go straight to
 the last two frames.
@@ -52,23 +52,21 @@ Say nothing for a five count. Let them look.
 "Halite. Rock salt. Searles Lake, California." Stop there. No trapped water,
 no life — the zoom earns that.
 
-### Act 2 — The Place (0:55, 1:40)
+### Act 2 — The Place (0:55, 1:25)
 
 **0:55 · Where is Searles Lake?** — globe spins, crystal shrinks to a corner
 inset. Press drops the pin. "Three hours north of where we are standing."
 
-**1:40 · The Pink Water** — the brine-lake film, silent, ~22 seconds. Sierra to
-salt flat to pink. Say nothing over it; let it land.
-Then click through the field stills fast — one press each, almost no talk:
-lakebed, you on the flat, the painted rocks, the pink pool, then the close pink
-filaments.
+**1:40 · The Pink Water** — opens on the wide lakebed still. Click through the
+field photos fast — one press each, almost no talk: you on the flat, the painted
+rocks, the pink pool, then the close pink filaments.
 On that last frame: "The water that is left is pink." / "Hold on to that colour.
 We come back to it."
 Do **not** explain the pink here. The ending needs it unexplained.
 
-### Act 3 — The Zoom (2:35, 1:30)
+### Act 3 — The Zoom (2:20, 1:30)
 
-**2:35 · Zoom Ladder** — four frames, three presses, one continuous push. The camera
+**2:20 · Zoom Ladder** — four frames, three presses, one continuous push. The camera
 zooms and then holds, so keep saying *this is still the same rock*.
 
 - opens at 3.2 mm across, scale bar visible
@@ -81,24 +79,24 @@ zooms and then holds, so keep saying *this is still the same rock*.
 - press → the bar snaps in. "Four tenths of a millimetre. About one and a half
   grains of table salt, side by side."
 
-**3:35 · Fluid Inclusions** — press labels the pockets. "Every little box is a
+**3:20 · Fluid Inclusions** — press labels the pockets. "Every little box is a
 drop of that lake, sealed in salt." Water only — not life.
 
-### Act 4 — The Life (4:05, 1:30)
+### Act 4 — The Life (3:50, 1:30)
 
-**4:05 · Something Moves** — the microbe clip, full bleed, **silent, no
+**3:50 · Something Moves** — the microbe clip, full bleed, **silent, no
 caption, no headline**. This is the first answer to the cold open, and it must
 be the quietest slide in the talk. Say nothing for at least eight seconds. Let
 someone in the room notice first.
 Press: *Something in there is moving.* Press: *That is a living cell, inside
 the salt.*
 
-**5:00 · Back to the Rock** — the crystal returns full frame. Point at it.
+**4:45 · Back to the Rock** — the crystal returns full frame. Point at it.
 "Same rock. You have been looking at it this whole time."
 
-### Act 5 — The Reach (5:35, 2:15)
+### Act 5 — The Reach (5:20, 2:15)
 
-**5:35 · Searching for Life in Salt Crystals** — the full 1:57 film, with
+**5:20 · Searching for Life in Salt Crystals** — the full 1:57 film, with
 sound. Set it up in one line, then stop talking. It lands because they have
 already seen the cell.
 
@@ -107,9 +105,9 @@ require. It also carries its narration as burned-in on-screen text, so it still
 reads if the house audio fails. If sound is blocked the app retries muted by
 itself — do not stop to fix it.
 
-### Act 6 — The Depth (7:50, 4:20)
+### Act 6 — The Depth (7:35, 4:20)
 
-**7:50 · California to the North Sea** — resets the room after two passive
+**7:35 · California to the North Sea** — resets the room after two passive
 minutes.
 > **ASK:** "Count me down from five, out loud, everybody."
 > Press. Big numbers appear. Count *with* them, do not lead.
@@ -117,7 +115,7 @@ minutes.
 > Press again to land: "Boulby Mine, England. The tunnels run out under the
 > North Sea."
 
-**8:35 · Descent** — one press, then about **35 seconds of unbroken falling**
+**8:20 · Descent** — one press, then about **35 seconds of unbroken falling**
 and nothing for you to do. The camera drops out of orbit onto Yorkshire, the
 frame goes black as it reaches the ground, and it comes back already dropping
 down the shaft with the depth readout climbing to 1,100 m.
@@ -127,7 +125,7 @@ down the shaft with the depth readout climbing to 1,100 m.
 > When it stops: "Eleven hundred metres. More than three Eiffel Towers,
 > stacked." Press to open out into the salt chamber.
 
-**9:33 · Salt World** — opens on the drive out through the tunnels, running
+**9:18 · Salt World** — opens on the drive out through the tunnels, running
 with sound. Say nothing for the first three seconds; the line comes up on its
 own. Then three presses: stalactites, the green door, lights off. The first
 press ends the clip and holds the ceiling still — needles of salt in the dark.
@@ -135,19 +133,19 @@ Land hard on the darkness — "close your eyes, open them, no difference" — an
 hold it. The room is already dark by now, so these land faster than they read
 on paper.
 
-**10:18 · Finding the Water** — four screens, three presses: the sampling setup,
+**10:03 · Finding the Water** — four screens, three presses: the sampling setup,
 the drilling clip, salt in hand, then the real sample bottle we carried out.
 
-**11:10 · The Brine Turns Pink** — the thesis. Slow down.
+**10:55 · The Brine Turns Pink** — the thesis. Slow down.
 "The brine came out clear."
 > **ASK:** "Nothing was added to this bottle. What do you think happened?"
 > Take two or three answers. Press: the bottle crossfades to pink.
 > "Hours later it was pink. Nothing was added. Something grew."
 > Press: "The pink is alive."
 
-### Act 7 — The Return (12:10, 2:50)
+### Act 7 — The Return (11:55, 2:40)
 
-**12:10 · Drive the Microscope** — after the film and after Boulby. Hand the
+**11:55 · Drive the Microscope** — after the film and after Boulby. Hand the
 live crystal to the room, then let the last three presses carry the room out.
 The beat opens already inside the inclusion, in the water, with the cells in
 shot, and drifts there for as long as you hold it. Press once to take the
@@ -156,8 +154,8 @@ keep talking through the press.
 > **ASK:** "You steer. Left, right, further in. Shout when you see one move."
 > Drag to turn it, scroll to push in, drag the focus rack on the left.
 > Take directions from the room; do not drive to a destination you already
-> know. Give it 45 seconds. Press when someone spots one: "Found one. One cell,
-> in one drop, in one crystal."
+> know. Give it 45 seconds. Press when someone spots one: "Found one. And a
+> kilometre down, Boulby is teeming with life."
 
 Then the way out, one press each. Every move runs itself — say nothing over the
 first one, and let each picture arrive before you speak.
@@ -174,11 +172,11 @@ The last shot holds — the planets keep orbiting — so you can talk over it fo
 long as you like. Stepping back and pressing again replays each move from the
 start, so it is safe to rehearse.
 
-**13:50 · Look Again** — the identical cold-open frame, unchanged.
+**13:35 · Look Again** — the identical cold-open frame, unchanged.
 Say the last line slowly: "The pink you saw in the very first picture — that
 was the life."
 
-**14:20 · Send-off** — "35 million specimens. Every single one still has
+**14:05 · Send-off** — "35 million specimens. Every single one still has
 something to say."
 
 ## The four interaction beats
@@ -190,9 +188,9 @@ immediately by one.
 | When | What | Costs | If it falls flat |
 | --- | --- | --- | --- |
 | 0:00 | Show of hands (secret, not alive) | 15 s | Move on; the microbe clip answers it |
-| 3:05 | Guess the scale | 25 s | Take one guess instead of three, then reveal |
-| 7:50 | Count the dive down | 15 s | Count alone; the plunge fires on zero regardless |
-| 12:10 | Drive the microscope | 45 s | Drive it yourself and narrate — the hunt is the point, not who steers |
+| 2:50 | Guess the scale | 25 s | Take one guess instead of three, then reveal |
+| 7:35 | Count the dive down | 15 s | Count alone; the plunge fires on zero regardless |
+| 11:55 | Drive the microscope | 45 s | Drive it yourself and narrate — the hunt is the point, not who steers |
 
 All four are presenter-led. Nothing depends on the audience having a phone, and
 nothing breaks if the room stays quiet.

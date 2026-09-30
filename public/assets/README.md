@@ -18,7 +18,6 @@ missing, plus anything here that nothing points at.
 | `images/boulby-brine-bottle.jpg` | the bottle we carried out | |
 | `video/searching-for-life.mp4` | the Mars film, plays with sound | generated |
 | `video/bacteria.mp4` | the reveal — microbes in an inclusion | |
-| `video/brine-lake.mp4` | Act 2 field film — Sierra to pink water | |
 | `images/searles-lakebed.jpg` | Act 2 still — dry lakebed | from `assets/lake_wide_shot.jpeg` |
 | `images/searles-aaron.jpg` | Act 2 still — on the flat | from `assets/aaron_lake.jpeg` |
 | `images/searles-rock-art.jpg` | Act 2 still — painted rocks | from `assets/rock_art.jpg` |
@@ -53,6 +52,7 @@ Kept from the earlier cut of the talk: `fallbacks/bacteria.jpg`,
 `images/boulby-halite-lab.jpg`, `images/boulby-salt-road.jpg`,
 `images/boulby-team.jpg`, `images/boulby-team-surface.jpg`,
 `images/fluid-inclusion-micro.jpg`, `images/halite-inclusions.jpg`,
-`images/hopper-crystal.jpg`, `images/shamu-dhm.jpg`.
+`images/hopper-crystal.jpg`, `images/shamu-dhm.jpg`,
+`video/brine-lake.mp4`.
 
 Story: https://aaroncelestian.substack.com/p/what-woke-up
