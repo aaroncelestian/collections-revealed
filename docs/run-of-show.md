@@ -162,8 +162,8 @@ first one, and let each picture arrive before you speak.
 
 > Press: the camera takes itself back and pulls out of the crystal over five
 > seconds, until the whole 2 mm cube is in frame. *"One crystal."*
-> Press: the crystal dissolves into the Earth at surface range with Searles
-> still pinned, and backs off to a ball in space over six seconds.
+> Press: the crystal dissolves into the Earth at surface range with Boulby
+> pinned, and backs off to a ball in space over six seconds.
 > *"One planet we know it happens on."*
 > Press: the planet becomes one of eight, and the camera climbs to the whole
 > system over fifteen seconds. *"So we go looking on the others."*

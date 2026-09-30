@@ -549,7 +549,7 @@ const BEATS_RAW: BeatDefinition[] = [
       },
       {
         // Cross-dissolves on to the planet at the size the crystal left, then
-        // keeps backing off. Searles is still pinned on it.
+        // keeps backing off. Boulby is pinned — we just left the mine.
         label: 'Out to the planet',
         scene: 'globe',
         scenePhase: 'earth-out',

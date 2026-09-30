@@ -67,13 +67,13 @@ const GLOBE_POSES: Record<string, PhasePose> = {
   'boulby-surface': { distance: 2.5, lonLat: BOULBY, spin: false },
   /**
    * The closing pull-back. Opens with the planet overfilling the frame, the
-   * Searles pin still on it, and backs off slowly until Earth is a ball in
+   * Boulby pin still on it, and backs off slowly until Earth is a ball in
    * space — where `SolarSystem` picks the same ball up and keeps going.
    *
    * Held still rather than spun: the hand-over to the solar system is a
    * cross-dissolve between two Earths, and they have to face the same way.
    */
-  'earth-out': { distance: 14, from: 1.9, lonLat: SEARLES, spin: false, pullSeconds: 6 },
+  'earth-out': { distance: 14, from: 1.9, lonLat: BOULBY, spin: false, pullSeconds: 6 },
 }
 
 /** Distance the closing pull-back ends on, for the solar system to match. */
@@ -553,7 +553,7 @@ export function startGlobeDive(
     // Stepping back, or jumping to an earlier act with a digit key, has to
     // clear it — otherwise Act 2 opens with the route to England already drawn
     // across the Pacific, giving away a reveal that is still six minutes out.
-    if (next !== 'arc' && next !== 'boulby-surface') {
+    if (next !== 'arc' && next !== 'boulby-surface' && next !== 'earth-out') {
       arcProgress = 0
       arcRunning = false
       drawArc(0)
@@ -576,6 +576,18 @@ export function startGlobeDive(
       drawArc(arcPoints.length)
       arcHead.visible = false
       boulbyPin.visible = true
+    }
+    // Closing pull-back: face Boulby, keep its pin, hide Searles so the room
+    // reads the zoom-out as leaving the mine, not California.
+    if (next === 'earth-out') {
+      arcProgress = 0
+      arcRunning = false
+      drawArc(0)
+      arcHead.visible = false
+      boulbyPin.visible = true
+      searlesPin.visible = false
+    } else {
+      searlesPin.visible = true
     }
   }
 
