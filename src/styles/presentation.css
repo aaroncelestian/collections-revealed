@@ -630,6 +630,33 @@ body {
   border-radius: 3px;
 }
 
+/* WebKit can refuse a keyboard-triggered fullscreen request but always honours
+   a click, so this is the dependable route into fullscreen on Safari. The HUD
+   is pointer-events: none, hence the opt back in. */
+.hud-fullscreen {
+  align-self: flex-start;
+  margin-top: 0.4rem;
+  padding: 0.2rem 0.45rem;
+  font: inherit;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.75);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.hud-fullscreen:hover {
+  color: #fff;
+}
+
+/* A hidden HUD must not leave an invisible click target on the stage. */
+.presenter-hud.is-hidden .hud-fullscreen {
+  pointer-events: none;
+}
+
 .hud-jump {
   display: flex;
   flex-direction: column;

@@ -21,7 +21,7 @@ import { startHaliteHero } from '../scene/halite/hero-halite.js'
 import { startGlobeDive, type GlobeDiveHandle } from '../scene/GlobeDive'
 import { startSolarSystem, type SolarSystemHandle } from '../scene/SolarSystem'
 import { publicAsset } from '../lib/publicAsset'
-import { toggleFullscreen } from '../lib/fullscreen'
+import { isFullscreen, toggleFullscreen } from '../lib/fullscreen'
 
 type HeroHandle = {
   setVisible: (visible: boolean) => void
@@ -69,6 +69,7 @@ export class PresentationApp {
     build: HTMLElement
     actKeys: HTMLElement
     beatSelect: HTMLSelectElement
+    fullscreen: HTMLButtonElement
     root: HTMLElement
   }
 
@@ -97,10 +98,15 @@ export class PresentationApp {
       build: must('hud-build'),
       actKeys: must('hud-act-keys'),
       beatSelect: must('hud-beat-select') as HTMLSelectElement,
+      fullscreen: must('hud-fullscreen') as HTMLButtonElement,
       root: must('presenter-hud'),
     }
     this.hud.build.textContent = `build ${__BUILD_ID__}`
     this.buildJumpControls()
+
+    this.hud.fullscreen.addEventListener('click', this.onFullscreenClick)
+    document.addEventListener('fullscreenchange', this.paintFullscreenButton)
+    document.addEventListener('webkitfullscreenchange', this.paintFullscreenButton)
 
     this.overlay = new OverlayManager()
     this.overlay.preloadVideos(BEATS.map((b) => b.videoSrc))
@@ -116,6 +122,18 @@ export class PresentationApp {
     // The cold open is DOM only, so put it up now rather than behind WebGL boot.
     this.goTo(0, -1)
     void this.boot()
+  }
+
+  /** A click is the gesture WebKit always accepts for a fullscreen request. */
+  private readonly onFullscreenClick = () => {
+    toggleFullscreen()
+    // Keeps a stray Space or arrow from re-triggering the button instead of
+    // advancing the talk.
+    this.hud.fullscreen.blur()
+  }
+
+  private readonly paintFullscreenButton = () => {
+    this.hud.fullscreen.textContent = isFullscreen() ? 'Exit full screen (F)' : 'Full screen (F)'
   }
 
   private readonly onVisibilityChange = () => {
@@ -453,6 +471,9 @@ export class PresentationApp {
   dispose() {
     this.unbindControls?.()
     document.removeEventListener('visibilitychange', this.onVisibilityChange)
+    this.hud.fullscreen.removeEventListener('click', this.onFullscreenClick)
+    document.removeEventListener('fullscreenchange', this.paintFullscreenButton)
+    document.removeEventListener('webkitfullscreenchange', this.paintFullscreenButton)
     if (this.clockHandle !== null) clearInterval(this.clockHandle)
     for (const timer of this.fadeOutTimers.values()) clearTimeout(timer)
     this.fadeOutTimers.clear()

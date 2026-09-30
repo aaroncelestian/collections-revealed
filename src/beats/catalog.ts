@@ -545,7 +545,7 @@ const BEATS_RAW: BeatDefinition[] = [
         pullBack: true,
         ask: 'SAY nothing. Let it fall away.',
         headline: 'One crystal.',
-        supporting: 'Two millimeters of salt, with a lake still sealed inside it.',
+        supporting: 'Two millimeters of salt, with an ocean sealed inside.',
       },
       {
         // Cross-dissolves on to the planet at the size the crystal left, then
@@ -579,7 +579,8 @@ const BEATS_RAW: BeatDefinition[] = [
     scene: 'none',
     fit: ANCHOR_FIT,
     headline: 'Look again.',
-    supporting: 'The pink you saw in the very first picture — that was the life.',
+    supporting:
+      'The pink you saw in the very first picture — that is what we think alien life most likely looks like.',
   },
   {
     index: 16,

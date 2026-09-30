@@ -19,7 +19,11 @@ export function isFullscreen(): boolean {
   return Boolean(document.fullscreenElement || doc.webkitFullscreenElement)
 }
 
-/** Must be called from a user gesture or the browser refuses. */
+/**
+ * Must be called from a user gesture. WebKit is stricter than Blink about
+ * which gestures qualify and can refuse a bare keypress, so a refusal is
+ * logged rather than swallowed — otherwise pressing F looks like dead code.
+ */
 export function toggleFullscreen(): void {
   const doc = document as WebkitDocument
 
@@ -31,9 +35,12 @@ export function toggleFullscreen(): void {
 
   const root = document.documentElement as WebkitElement
   if (root.requestFullscreen) {
-    // Rejects when the gesture has already expired; nothing useful to do.
-    root.requestFullscreen().catch(() => {})
+    root.requestFullscreen().catch((err: unknown) => {
+      console.warn('[fullscreen] refused; use the HUD button instead', err)
+    })
+  } else if (root.webkitRequestFullscreen) {
+    root.webkitRequestFullscreen()
   } else {
-    root.webkitRequestFullscreen?.()
+    console.warn('[fullscreen] no Fullscreen API on this browser')
   }
 }
