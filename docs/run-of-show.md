@@ -42,7 +42,7 @@ these and turns red when you are more than 15 seconds behind.
 ### Act 1 — The Object (0:00, 0:55)
 
 **0:00 · Cold Open** — full-frame crystal, silence, title plate low-left:
-*Collections Revealed / Life in Salt / Aaron Celestian, PhD*.
+*Collections Revealed / Can a Rock Keep a Secret? / Aaron Celestian, PhD*.
 Say nothing for a five count. Let them look.
 > **ASK:** "Hands up if you think a rock can keep a secret."
 > Count the room out loud — "six, nine, about a dozen of you."

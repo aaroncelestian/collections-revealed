@@ -84,7 +84,7 @@ const BEATS_RAW: BeatDefinition[] = [
     fit: ANCHOR_FIT,
     titleCard: {
       eyebrow: 'Collections Revealed',
-      title: 'Life in Salt',
+      title: 'Can a Rock Keep a Secret?',
       byline: 'Aaron Celestian, PhD',
     },
     steps: [
