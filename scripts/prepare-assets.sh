@@ -68,4 +68,22 @@ else
   echo "   skip (source boulby_Drive--720.mov not found)"
 fi
 
+echo "==> Searles field stills"
+field() {
+  local src="$1" out="$2"
+  if [ -f "$src" ]; then
+    sips --setProperty format jpeg \
+         --setProperty formatOptions 86 \
+         "$src" --out "$IMG/$out" >/dev/null
+    echo "   $out"
+  else
+    echo "   skip $out (source not found)"
+  fi
+}
+field "$SRC/lake_wide_shot.jpeg" "searles-lakebed.jpg"
+field "$SRC/aaron_lake.jpeg" "searles-aaron.jpg"
+field "$SRC/rock_art.jpg" "searles-rock-art.jpg"
+field "$SRC/pink_water.jpg" "searles-pink-water.jpg"
+field "$SRC/pink_bacteria_strands.jpg" "searles-pink-strands.jpg"
+
 echo "==> done"

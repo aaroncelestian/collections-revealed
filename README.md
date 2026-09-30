@@ -34,12 +34,12 @@ Append `?audience=1` to the URL to hide the HUD on a house feed.
 ## Structure
 
 The crystal is a hub, not scenery: it opens the talk, returns at every act
-break, and closes it. 17 beats in 7 acts, 14:59.
+break, and closes it. 17 beats in 7 acts, 15:14.
 
 | Act | Beats | Runs |
 | --- | --- | --- |
 | 1 The Object | cold open, name the object | 1:30 |
-| 2 The Place | globe, brine-lake film | 1:25 |
+| 2 The Place | globe, brine-lake film, field stills | 1:40 |
 | 3 The Zoom | zoom ladder, fluid inclusions | 1:30 |
 | 4 The Life | microbe clip, back to the rock | 1:30 |
 | 5 The Reach | the Mars film | 2:15 |

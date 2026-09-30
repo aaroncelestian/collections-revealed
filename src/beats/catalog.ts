@@ -61,7 +61,7 @@ const ZOOM_LADDER: ZoomFrame[] = [
 ]
 
 /**
- * 17 beats, 7 acts, ~14:59 of stage time.
+ * 17 beats, 7 acts, ~15:14 of stage time.
  *
  * The Searles Lake crystal is the hub: it opens the talk, returns at every act
  * break, and closes it. Everything else is a departure from that one object.
@@ -147,17 +147,53 @@ const BEATS_RAW: BeatDefinition[] = [
     act: 'place',
     id: 'searles-field',
     title: 'The Pink Water',
-    cue: 'Let the film run. Sierra to salt flat to pink. Do not explain the colour — the ending needs it.',
-    // ~22 s of film, then room to park the pink mystery on the last frame.
-    seconds: 40,
-    stage: 'video',
+    cue: 'Film, then click through the field stills fast. Do not explain the colour — the ending needs it.',
+    // ~22 s of film, then five quick presses of real place photos, last one parks pink.
+    seconds: 55,
+    // Same pattern as salt-world: stage photo so stills can take over after the clip.
+    stage: 'photo',
     anchor: 'hidden',
     scene: 'none',
     fit: 'cover',
+    photoSrc: '/assets/images/searles-lakebed.jpg',
+    photoAlt: 'The dry salt crust of Searles Lake stretching to distant mountains',
     videoSrc: '/assets/video/brine-lake.mp4',
     steps: [
       {
+        label: 'Wide lakebed',
+        playVideo: false,
+        fit: 'cover',
+        photoSrc: '/assets/images/searles-lakebed.jpg',
+        photoAlt: 'The dry salt crust of Searles Lake stretching to distant mountains',
+        headline: undefined,
+        supporting: undefined,
+      },
+      {
+        label: 'On the flat',
+        // Portrait selfie in a landscape run — letterbox rather than crop the Sierra.
+        fit: 'contain',
+        photoSrc: '/assets/images/searles-aaron.jpg',
+        photoAlt: 'Aaron on the Searles Lake salt flat, Sierra Nevada on the horizon',
+      },
+      {
+        label: 'Rock art',
+        fit: 'cover',
+        photoSrc: '/assets/images/searles-rock-art.jpg',
+        photoAlt: 'Painted boulder faces among desert scrub near the lake',
+      },
+      {
+        label: 'Pink water',
+        // Portrait pool shot — contain so the colour fills without cropping the crust.
+        fit: 'contain',
+        photoSrc: '/assets/images/searles-pink-water.jpg',
+        photoAlt: 'A vivid pink brine pool rimmed with white salt crust',
+        headline: 'The water that is left is pink.',
+      },
+      {
         label: 'Park the mystery',
+        fit: 'cover',
+        photoSrc: '/assets/images/searles-pink-strands.jpg',
+        photoAlt: 'Close view of pink filaments in shallow brine on the salt flat',
         headline: 'The water that is left is pink.',
         supporting: 'Hold on to that colour. We come back to it.',
       },
