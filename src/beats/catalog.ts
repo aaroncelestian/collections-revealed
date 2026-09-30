@@ -61,7 +61,7 @@ const ZOOM_LADDER: ZoomFrame[] = [
 ]
 
 /**
- * 18 beats, 7 acts, ~14:45 of stage time.
+ * 17 beats, 7 acts, ~14:59 of stage time.
  *
  * The Searles Lake crystal is the hub: it opens the talk, returns at every act
  * break, and closes it. Everything else is a departure from that one object.
@@ -145,53 +145,16 @@ const BEATS_RAW: BeatDefinition[] = [
   {
     index: 3,
     act: 'place',
-    id: 'why-dry',
-    title: 'Why is it dry?',
-    cue: 'Three beats: storms arrive, mountains take the rain, lake evaporates.',
-    seconds: 40,
-    stage: 'diagram',
-    diagram: 'rain-shadow',
-    diagramStage: 0,
-    // The diagram is dense enough on its own; the anchor inset fights its
-    // upper-right labels. Continuity is already carried by the beat before.
-    anchor: 'hidden',
-    scene: 'none',
-    headline: 'Why is it dry?',
-    steps: [
-      {
-        label: 'Storms arrive',
-        diagramStage: 1,
-        headline: 'Why is it dry?',
-        supporting: 'Storms roll in off the Pacific.',
-      },
-      {
-        label: 'Mountains take the rain',
-        diagramStage: 2,
-        headline: 'Why is it dry?',
-        supporting: 'The Sierra Nevada takes the rain before it ever gets there.',
-      },
-      {
-        label: 'Lake evaporates',
-        diagramStage: 3,
-        headline: 'So the lake dried up.',
-        supporting: 'What it left behind was salt. A lot of salt.',
-      },
-    ],
-  },
-  {
-    index: 4,
-    act: 'place',
-    id: 'pink-brine',
+    id: 'searles-field',
     title: 'The Pink Water',
-    cue: 'Plant the colour. Do not explain it yet — the ending needs it.',
-    seconds: 35,
-    stage: 'photo',
+    cue: 'Let the film run. Sierra to salt flat to pink. Do not explain the colour — the ending needs it.',
+    // ~22 s of film, then room to park the pink mystery on the last frame.
+    seconds: 40,
+    stage: 'video',
     anchor: 'hidden',
     scene: 'none',
     fit: 'cover',
-    photoSrc: '/assets/stand-ins/pink-brine-field.svg',
-    photoAlt: 'A vivid pink brine pool sitting on a white salt flat',
-    headline: 'The water that is left is pink.',
+    videoSrc: '/assets/video/brine-lake.mp4',
     steps: [
       {
         label: 'Park the mystery',
@@ -203,7 +166,7 @@ const BEATS_RAW: BeatDefinition[] = [
 
   // ─── Act 3 · The Zoom ──────────────────────────────────────────────────
   {
-    index: 5,
+    index: 4,
     act: 'zoom',
     id: 'zoom-ladder',
     title: 'Zoom Ladder',
@@ -242,7 +205,7 @@ const BEATS_RAW: BeatDefinition[] = [
     ],
   },
   {
-    index: 6,
+    index: 5,
     act: 'zoom',
     id: 'inclusions',
     title: 'Fluid Inclusions',
@@ -269,7 +232,7 @@ const BEATS_RAW: BeatDefinition[] = [
 
   // ─── Act 4 · The Life ──────────────────────────────────────────────────
   {
-    index: 7,
+    index: 6,
     act: 'life',
     id: 'reveal',
     title: 'Something Moves',
@@ -292,7 +255,7 @@ const BEATS_RAW: BeatDefinition[] = [
     ],
   },
   {
-    index: 8,
+    index: 7,
     act: 'life',
     id: 'still-the-same-rock',
     title: 'Back to the Rock',
@@ -308,7 +271,7 @@ const BEATS_RAW: BeatDefinition[] = [
 
   // ─── Act 5 · The Reach ─────────────────────────────────────────────────
   {
-    index: 9,
+    index: 8,
     act: 'reach',
     id: 'mars-film',
     title: 'Searching for Life in Salt Crystals',
@@ -326,7 +289,7 @@ const BEATS_RAW: BeatDefinition[] = [
 
   // ─── Act 6 · The Depth ─────────────────────────────────────────────────
   {
-    index: 10,
+    index: 9,
     act: 'depth',
     id: 'the-dive',
     title: 'California to the North Sea',
@@ -355,7 +318,7 @@ const BEATS_RAW: BeatDefinition[] = [
     ],
   },
   {
-    index: 11,
+    index: 10,
     act: 'depth',
     id: 'descent',
     title: 'Descent',
@@ -379,7 +342,7 @@ const BEATS_RAW: BeatDefinition[] = [
     ],
   },
   {
-    index: 12,
+    index: 11,
     act: 'depth',
     id: 'salt-world',
     title: 'Salt World',
@@ -422,7 +385,7 @@ const BEATS_RAW: BeatDefinition[] = [
     ],
   },
   {
-    index: 13,
+    index: 12,
     act: 'depth',
     id: 'finding-salt',
     title: 'Finding the Water',
@@ -472,7 +435,7 @@ const BEATS_RAW: BeatDefinition[] = [
     ],
   },
   {
-    index: 14,
+    index: 13,
     act: 'depth',
     id: 'brine-turns-pink',
     title: 'The Brine Turns Pink',
@@ -512,7 +475,7 @@ const BEATS_RAW: BeatDefinition[] = [
 
   // ─── Act 7 · The Return ────────────────────────────────────────────────
   {
-    index: 15,
+    index: 14,
     act: 'return',
     id: 'hunt',
     title: 'Drive the Microscope',
@@ -578,7 +541,7 @@ const BEATS_RAW: BeatDefinition[] = [
     ],
   },
   {
-    index: 16,
+    index: 15,
     act: 'return',
     id: 'the-reread',
     title: 'Look Again',
@@ -592,7 +555,7 @@ const BEATS_RAW: BeatDefinition[] = [
     supporting: 'The pink you saw in the very first picture — that was the life.',
   },
   {
-    index: 17,
+    index: 16,
     act: 'return',
     id: 'send-off',
     title: 'Send-off',

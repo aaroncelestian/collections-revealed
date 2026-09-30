@@ -34,17 +34,17 @@ Append `?audience=1` to the URL to hide the HUD on a house feed.
 ## Structure
 
 The crystal is a hub, not scenery: it opens the talk, returns at every act
-break, and closes it. 18 beats in 7 acts, 14:54.
+break, and closes it. 17 beats in 7 acts, 14:59.
 
 | Act | Beats | Runs |
 | --- | --- | --- |
 | 1 The Object | cold open, name the object | 1:30 |
-| 2 The Place | globe, rain shadow, pink brine | 2:00 |
+| 2 The Place | globe, brine-lake film | 1:25 |
 | 3 The Zoom | zoom ladder, fluid inclusions | 1:30 |
 | 4 The Life | microbe clip, back to the rock | 1:30 |
 | 5 The Reach | the Mars film | 2:15 |
 | 6 The Depth | dive, descent, Boulby, brine turns pink | 4:09 |
-| 7 The Return | live 3D hunt, the re-read, send-off | 2:00 |
+| 7 The Return | live 3D hunt, the re-read, send-off | 2:40 |
 
 Beats live in [`src/beats/catalog.ts`](src/beats/catalog.ts). That file is the
 script — copy, timings, assets and interaction cues are all in one place.
@@ -103,7 +103,7 @@ Under `src/overlay/`:
   bar. Field widths come from the burned-in bars in the source TIFFs
   (3.2 mm, 1.1 mm, 0.42 mm, 0.42 mm). Frame 03 is where the microscope stage
   moved, so it dissolves in rather than popping the new picture on screen.
-- `RainShadowDiagram` — inline SVG, revealed in three stages.
+- `RainShadowDiagram` — inline SVG rain-shadow stages (kept, not currently wired).
 - `CompareLayer` — before/after crossfade for the brine bottle.
 - `InteractionCue` — the countdown and the reveal flash.
 
@@ -113,7 +113,7 @@ Under `src/overlay/`:
 the anchor still, the four zoom JPEGs, and the Mars film as faststart MP4 with a
 poster frame. It is idempotent.
 
-Four visuals are still clearly-labelled stand-in SVGs under
+Two visuals are still clearly-labelled stand-in SVGs under
 `public/assets/stand-ins/` — see the end of the run of show for what to shoot
 and how to swap them in.
 

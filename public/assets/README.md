@@ -18,6 +18,7 @@ missing, plus anything here that nothing points at.
 | `images/boulby-brine-bottle.jpg` | the bottle we carried out | |
 | `video/searching-for-life.mp4` | the Mars film, plays with sound | generated |
 | `video/bacteria.mp4` | the reveal — microbes in an inclusion | |
+| `video/brine-lake.mp4` | Act 2 field film — Sierra to pink water | |
 | `video/sampling.mp4` | drilling the seam | |
 | `hero/halite-theatre.json` | Theatre.js timeline for the live crystal | |
 
@@ -28,7 +29,6 @@ means dropping a file in and changing one path in `src/beats/catalog.ts`.
 
 | File | Wants |
 | --- | --- |
-| `stand-ins/pink-brine-field.svg` | the pink brine in the field at Searles |
 | `stand-ins/brine-bottle-field.svg` | the sample bottle as collected |
 | `stand-ins/brine-bottle-lab.svg` | the same bottle, hours later, pink |
 
@@ -44,9 +44,10 @@ Kept from the earlier cut of the talk: `fallbacks/bacteria.jpg`,
 `fallbacks/mars.jpg`, `images/boulby-darkness.jpg`,
 `images/boulby-green-chamber.jpg`, `images/boulby-surface.jpg`,
 `images/boulby-tunnel.jpg`, `stand-ins/searles-lakebed.svg`,
+`stand-ins/pink-brine-field.svg`,
 `images/boulby-halite-lab.jpg`, `images/boulby-salt-road.jpg`,
 `images/boulby-team.jpg`, `images/boulby-team-surface.jpg`,
 `images/fluid-inclusion-micro.jpg`, `images/halite-inclusions.jpg`,
-`images/hopper-crystal.jpg`, `images/shamu-dhm.jpg`, `video/brine-lake.mp4`.
+`images/hopper-crystal.jpg`, `images/shamu-dhm.jpg`.
 
 Story: https://aaroncelestian.substack.com/p/what-woke-up
