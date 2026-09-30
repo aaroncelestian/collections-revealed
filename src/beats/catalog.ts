@@ -434,7 +434,7 @@ const BEATS_RAW: BeatDefinition[] = [
         label: 'Roll the drilling clip',
         playVideo: true,
         fit: 'cover',
-        caption: 'Drilling into a 250-million-year-old seam.',
+        caption: 'Sampling a 250-million-year-old ocean.',
         headline: undefined,
         supporting: undefined,
       },

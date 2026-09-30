@@ -126,7 +126,9 @@ body {
 
 .anchor-layer.is-hidden {
   opacity: 0;
-  transform: scale(1.04);
+  /* No scale punch — scaling up while leaving made the crystal flash on cuts
+     into video (Act 4 → Mars film). */
+  transform: scale(1);
 }
 
 /* ── Copy ───────────────────────────────────────────────────────────── */
