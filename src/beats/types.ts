@@ -133,11 +133,11 @@ export interface RevealStep {
 
 export interface ZoomFrame {
   src: string
-  /** True width of the frame in micrometres, read off the burned-in bar. */
+  /** True width of the frame in micrometers, read off the burned-in bar. */
   fieldUm: number
   alt: string
   /**
-   * Top-left of this frame in the ladder's shared micrometre space
+   * Top-left of this frame in the ladder's shared micrometer space
    * (origin is the top-left of the widest frame). Frames that sit here
    * zoom as one picture instead of crossfading.
    */

@@ -354,13 +354,13 @@ export class OverlayManager {
 
   // ── Depth readout ─────────────────────────────────────────────────────
 
-  setDepth(metres: number | null) {
-    if (metres === null) {
+  setDepth(meters: number | null) {
+    if (meters === null) {
       this.depthEl.hidden = true
       return
     }
     this.depthEl.hidden = false
-    this.depthValue.textContent = Math.round(metres).toLocaleString('en-US')
+    this.depthValue.textContent = Math.round(meters).toLocaleString('en-US')
   }
 
   private clearTransient() {

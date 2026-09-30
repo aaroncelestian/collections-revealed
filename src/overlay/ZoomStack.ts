@@ -15,7 +15,7 @@ interface Plate {
   /** Decoded source. Kept out of the layout so Chrome never textures a giant bitmap. */
   img: HTMLImageElement
   canvas: HTMLCanvasElement
-  /** Height in the shared micrometre space. */
+  /** Height in the shared micrometer space. */
   hUm: number
   /** Dissolve weight. Only a `crossfade` plate ever leaves 1. */
   alpha: number
@@ -31,7 +31,7 @@ interface View {
 /**
  * The zoom ladder as one picture.
  *
- * Every frame is placed in a shared micrometre space. A press moves the camera
+ * Every frame is placed in a shared micrometer space. A press moves the camera
  * from the current view to the next frame and then holds there. Only the
  * camera's own frame and coarser ones beneath it paint, and a finer frame waits
  * until the camera has arrived at its scale, so a wide view never shows a
@@ -254,7 +254,7 @@ export class ZoomStack {
     const boxW = rect.width > 1 ? rect.width : 1
     const boxH = rect.height > 1 ? rect.height : 1
     // Stay under Chrome's texture limit on a retina screen. The canvas is the
-    // stage, not the micrometre world, so 2× is already sharp.
+    // stage, not the micrometer world, so 2× is already sharp.
     const dpr = Math.min(window.devicePixelRatio || 1, 2)
     const bw = Math.max(1, Math.round(boxW * dpr))
     const bh = Math.max(1, Math.round(boxH * dpr))

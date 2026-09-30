@@ -1507,7 +1507,7 @@ export async function startHaliteHero(canvas, meta = {}) {
           targetMaxblur = Math.min(targetMaxblur, 0.008);
         }
       } else if (pullingBack) {
-        // Focus rides the crystal centre the whole way out, and the iris
+        // Focus rides the crystal center the whole way out, and the iris
         // follows the field of view, which is opening out on its own.
       } else if (isDiveCamera(seqPos)) {
         // Lock focus plane to the look target; open iris only as we settle

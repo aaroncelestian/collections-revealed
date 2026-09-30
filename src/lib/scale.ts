@@ -1,4 +1,4 @@
-/** Shared micrometre scale-bar maths for the 3D hero and the 2D zoom ladder. */
+/** Shared micrometer scale-bar math for the 3D hero and the 2D zoom ladder. */
 
 /** Snap a raw length to a readable 1 / 2 / 5 x 10^n bar length. */
 export function niceScaleUm(raw: number): number {

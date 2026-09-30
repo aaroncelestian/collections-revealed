@@ -37,7 +37,7 @@ means dropping a file in and changing one path in `src/beats/catalog.ts`.
 | `stand-ins/brine-bottle-lab.svg` | the same bottle, hours later, pink |
 
 The bottle pair must be shot identically — same bottle, fill line, light and
-angle — because the beat crossfades one into the other and the colour change is
+angle — because the beat crossfades one into the other and the color change is
 the only thing that should move. `images/boulby-brine-bottle.jpg` is the real
 "before"; a matching pink shot of that same bottle retires both stand-ins.
 

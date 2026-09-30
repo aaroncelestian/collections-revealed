@@ -334,7 +334,7 @@ body {
 
 /* ── Zoom ladder ────────────────────────────────────────────────────── */
 
-/* One shared picture. The world is in micrometres (1px = 1µm) and the camera
+/* One shared picture. The world is in micrometers (1px = 1µm) and the camera
    transform maps the current view onto this box. */
 .zoom-box {
   position: relative;

@@ -3,7 +3,7 @@ import { setLayerVisible } from './layerVisibility'
 
 /**
  * Two photographs of the same subject, crossfaded in place. Used for the brine
- * bottle: identical framing, identical fill line, only the colour changes — so
+ * bottle: identical framing, identical fill line, only the color changes — so
  * the change is unmistakable and nothing else draws the eye.
  */
 export class CompareLayer {

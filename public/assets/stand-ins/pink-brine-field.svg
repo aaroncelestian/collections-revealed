@@ -19,7 +19,7 @@
   <path d="M0 402 L260 350 L520 392 L780 336 L1060 388 L1340 344 L1620 396 L1920 358 L1920 470 L0 470 Z" fill="#6a7a8e"/>
   <rect y="450" width="1920" height="630" fill="url(#crust)"/>
 
-  <!-- Brine pool: the colour is the point -->
+  <!-- Brine pool: the color is the point -->
   <path d="M250 640 C 470 574, 900 566, 1180 604 C 1470 644, 1710 706, 1690 802 C 1668 906, 1300 972, 960 966 C 620 960, 300 902, 232 812 C 186 750, 196 676, 250 640 Z" fill="url(#brine)"/>
   <path d="M320 664 C 520 616, 880 610, 1120 644" stroke="#ffd0e0" stroke-width="7" fill="none" opacity="0.55" stroke-linecap="round"/>
   <path d="M430 880 C 700 918, 1080 916, 1330 874" stroke="#ff9cc0" stroke-width="5" fill="none" opacity="0.4" stroke-linecap="round"/>

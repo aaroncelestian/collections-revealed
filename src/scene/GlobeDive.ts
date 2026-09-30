@@ -9,7 +9,7 @@ import type { GlobePhase } from '../beats/types'
 
 const GLOBE_R = 1
 
-/** Metres of real rock per world unit in the shaft, so 1,100 m is 110 units. */
+/** Meters of real rock per world unit in the shaft, so 1,100 m is 110 units. */
 const SHAFT_M_PER_UNIT = 10
 const SHAFT_DEPTH_M = 1100
 const SHAFT_UNITS = SHAFT_DEPTH_M / SHAFT_M_PER_UNIT
@@ -39,7 +39,7 @@ const SHAFT_SECONDS = 30
 const APPROACH_RATE = 2.1
 
 interface PhasePose {
-  /** Camera distance from globe centre. */
+  /** Camera distance from globe center. */
   distance: number
   lonLat: [number, number] | null
   spin: boolean
@@ -132,7 +132,7 @@ function saltTexture(): THREE.CanvasTexture {
   }
 
   // Crystalline blotching. A smooth wall at a constant distance from a single
-  // lamp renders as one flat colour, so the surface has to carry the interest.
+  // lamp renders as one flat color, so the surface has to carry the interest.
   for (let i = 0; i < 1600; i++) {
     const v = Math.floor(196 + rand() * 58)
     ctx.fillStyle = `rgba(${v}, ${v - 6}, ${v - 22}, ${0.06 + rand() * 0.16})`
@@ -172,13 +172,13 @@ export interface GlobeDiveHandle {
 
 export interface GlobeDiveOptions {
   /** Fired every frame during the shaft descent with the current depth. */
-  onDepth?: (metres: number | null) => void
+  onDepth?: (meters: number | null) => void
   /** Full-screen element used to hide the scene swap at the top of the shaft. */
   fadeEl?: HTMLElement
 }
 
 /**
- * Searles Lake to a kilometre under the North Sea, in one continuous move.
+ * Searles Lake to a kilometer under the North Sea, in one continuous move.
  *
  * Two scenes share one renderer: a vector globe for the surface journey, and a
  * procedural shaft for the descent. The swap is hidden behind a short DOM fade
@@ -377,7 +377,7 @@ export function startGlobeDive(
   // Almost no fill. What the headlamp does not reach stays black.
   const SHAFT_AMBIENT = 0.1
   const SHAFT_LAMP = 3.4
-  // Cold blue-grey in the shaft, warm and pale once the salt is in shot.
+  // Cold blue-gray in the shaft, warm and pale once the salt is in shot.
   const AMBIENT_ROCK = new THREE.Color(0x6d7f92)
   const AMBIENT_SALT = new THREE.Color(0xe4ded0)
   const ambient = new THREE.AmbientLight(0x6d7f92, SHAFT_AMBIENT)

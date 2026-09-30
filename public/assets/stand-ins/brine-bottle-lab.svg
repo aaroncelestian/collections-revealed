@@ -32,7 +32,7 @@
   <path d="M884 326 L1036 326 L1036 384 C 1036 404, 1108 452, 1108 520 L1108 836 C 1108 872, 1080 894, 1046 894 L874 894 C 840 894, 812 872, 812 836 L812 520 C 812 452, 884 404, 884 384 Z"
         fill="#0d1219" stroke="#7f8d9c" stroke-width="5"/>
 
-  <!-- Same bottle, same fill line. Only the colour changed. -->
+  <!-- Same bottle, same fill line. Only the color changed. -->
   <path d="M818 560 L1102 560 L1102 836 C 1102 868, 1078 888, 1046 888 L874 888 C 842 888, 818 868, 818 836 Z" fill="url(#liquidL)"/>
   <path d="M818 560 L1102 560 L1102 578 L818 578 Z" fill="#ffd3e3" opacity="0.5"/>
 

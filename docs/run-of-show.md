@@ -2,7 +2,7 @@
 
 17 beats, 7 acts, ~14:35 of stage time against a 15-minute slot. Room of ~100.
 The overrun cushion sits in the closing pull-back, which is the first thing to
-trim if the room runs long: the hunt can end on "Found one" and go straight to
+trim if the room runs long: the hunt can end on "Found it" and go straight to
 the last two frames.
 
 The Searles Lake halite crystal is the hub. It opens the talk, returns at every
@@ -60,7 +60,7 @@ inset. Press drops the pin. "Three hours north of where we are standing."
 **1:40 · The Pink Water** — opens on the wide lakebed still. Click through the
 field photos fast — one press each, almost no talk: you on the flat, the painted
 rocks, the pink pool, then the close pink filaments.
-On that last frame: "The water that is left is pink." / "Hold on to that colour.
+On that last frame: "The water that is left is pink." / "Hold on to that color.
 We come back to it."
 Do **not** explain the pink here. The ending needs it unexplained.
 
@@ -76,7 +76,7 @@ zooms and then holds, so keep saying *this is still the same rock*.
   while the camera keeps pushing
   > **ASK:** "How wide is this picture, really? Take three guesses, out loud."
   > Take exactly three. Repeat each one back so the room hears them.
-- press → the bar snaps in. "Four tenths of a millimetre. About one and a half
+- press → the bar snaps in. "Four tenths of a millimeter. About one and a half
   grains of table salt, side by side."
 
 **3:20 · Fluid Inclusions** — press labels the pockets. "Every little box is a
@@ -122,7 +122,7 @@ down the shaft with the depth readout climbing to 1,100 m.
 > **BRING THE HOUSE LIGHTS DOWN over the fall.** This is the only stretch long
 > enough to do it in, and arriving underground in a dark room is the point.
 > Say nothing. Do not talk over the numbers.
-> When it stops: "Eleven hundred metres. More than three Eiffel Towers,
+> When it stops: "Eleven hundred meters. More than three Eiffel Towers,
 > stacked." Press to open out into the salt chamber.
 
 **9:18 · Salt World** — opens on the drive out through the tunnels, running
@@ -154,8 +154,8 @@ keep talking through the press.
 > **ASK:** "You steer. Left, right, further in. Shout when you see one move."
 > Drag to turn it, scroll to push in, drag the focus rack on the left.
 > Take directions from the room; do not drive to a destination you already
-> know. Give it 45 seconds. Press when someone spots one: "Found one. And a
-> kilometre down, Boulby is teeming with life."
+> know. Give it 45 seconds. Press when someone spots one: "Found it. And a
+> kilometer down, Boulby is teeming with life."
 
 Then the way out, one press each. Every move runs itself — say nothing over the
 first one, and let each picture arrive before you speak.

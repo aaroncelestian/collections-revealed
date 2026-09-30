@@ -2,7 +2,7 @@
 
 Presenter-driven stage build for NHM **Collections Revealed**. A 15-minute scale
 journey anchored on one halite crystal from Searles Lake — place and zoom first,
-then living cells, Mars, and a kilometre under the North Sea, then back to the
+then living cells, Mars, and a kilometer under the North Sea, then back to the
 same rock. Story from [What Woke Up](https://aaroncelestian.substack.com/p/what-woke-up).
 
 **Rehearsing? Read [`docs/run-of-show.md`](docs/run-of-show.md)** — beat times,

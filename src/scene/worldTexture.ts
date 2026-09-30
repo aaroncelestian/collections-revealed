@@ -10,7 +10,7 @@ import * as THREE from 'three'
  *
  * The palette is deliberately a muted cartographic Earth rather than a
  * satellite one. Two reasons: the stage is near-black behind elegant type and a
- * saturated globe fights it, and land colour here is a function of latitude
+ * saturated globe fights it, and land color here is a function of latitude
  * alone, so anything more literal would be quietly making up biomes.
  */
 
@@ -40,7 +40,7 @@ const BORDER = '#cfe0ea'
 const ICE = '#e9eff3'
 
 /**
- * Land colour by latitude. Approximate zonal biomes — ice, tundra, boreal,
+ * Land color by latitude. Approximate zonal biomes — ice, tundra, boreal,
  * temperate, the two arid belts, tropics — mirrored across the equator.
  */
 const LAND_BY_LAT: Array<[number, string]> = [
@@ -236,7 +236,7 @@ async function paintWorldTextures(anisotropy: number): Promise<WorldTextureSet> 
   const lakes = pathFor(world.lakes, COLOR_W, COLOR_H)
   const borders = linePathFor(world.borders, COLOR_W, COLOR_H)
 
-  // ── Colour ────────────────────────────────────────────────────────────
+  // ── Color ────────────────────────────────────────────────────────────
   const { c: colorCanvas, ctx } = canvas2d(COLOR_W, COLOR_H)
 
   const oceanGrad = ctx.createLinearGradient(0, 0, 0, COLOR_H)

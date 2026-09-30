@@ -34,7 +34,7 @@ const ZOOM_LADDER: ZoomFrame[] = [
     fieldUm: 3200,
     xUm: 0,
     yUm: 0,
-    alt: 'A single halite crystal under the microscope, about three millimetres across',
+    alt: 'A single halite crystal under the microscope, about three millimeters across',
   },
   {
     src: '/assets/images/zoom/halite-zoom-02.jpg',
@@ -142,7 +142,7 @@ const BEATS_RAW: BeatDefinition[] = [
     act: 'place',
     id: 'searles-field',
     title: 'The Pink Water',
-    cue: 'Click through the field stills fast. Do not explain the colour — the ending needs it.',
+    cue: 'Click through the field stills fast. Do not explain the color — the ending needs it.',
     // Opens on the wide lakebed; four presses park on pink. No film — the old
     // clip was Boulby, not Searles.
     seconds: 40,
@@ -168,7 +168,7 @@ const BEATS_RAW: BeatDefinition[] = [
       },
       {
         label: 'Pink water',
-        // Portrait pool shot — contain so the colour fills without cropping the crust.
+        // Portrait pool shot — contain so the color fills without cropping the crust.
         fit: 'contain',
         photoSrc: '/assets/images/searles-pink-water.jpg',
         photoAlt: 'A vivid pink brine pool rimmed with white salt crust',
@@ -180,7 +180,7 @@ const BEATS_RAW: BeatDefinition[] = [
         photoSrc: '/assets/images/searles-pink-strands.jpg',
         photoAlt: 'Close view of pink filaments in shallow brine on the salt flat',
         headline: 'The water that is left is pink.',
-        supporting: 'Hold on to that colour. We come back to it.',
+        supporting: 'Hold on to that color. We come back to it.',
       },
     ],
   },
@@ -220,7 +220,7 @@ const BEATS_RAW: BeatDefinition[] = [
         label: 'Reveal the scale',
         showScale: true,
         flash: true,
-        headline: 'Four tenths of a millimetre.',
+        headline: 'Four tenths of a millimeter.',
         supporting: 'About one and a half grains of table salt, side by side.',
       },
     ],
@@ -352,13 +352,13 @@ const BEATS_RAW: BeatDefinition[] = [
     scenePhase: 'shaft',
     anchor: 'hidden',
     headline: 'Down.',
-    supporting: 'Eleven hundred metres. More than three Eiffel Towers, stacked.',
+    supporting: 'Eleven hundred meters. More than three Eiffel Towers, stacked.',
     steps: [
       {
         label: 'Reach the salt seam',
         scenePhase: 'seam',
         headline: 'Into a sea that dried up 250 million years ago.',
-        supporting: 'Now it is a layer of salt, a kilometre down.',
+        supporting: 'Now it is a layer of salt, a kilometer down.',
       },
     ],
   },
@@ -400,7 +400,7 @@ const BEATS_RAW: BeatDefinition[] = [
         photoSrc: '/assets/images/boulby-green-door.jpeg',
         photoAlt: 'Industrial safe-haven door numbered 17 in a green-lit salt chamber',
         headline: 'Some chambers are sealed.',
-        supporting: 'Refuge, a kilometre under the North Sea.',
+        supporting: 'Refuge, a kilometer under the North Sea.',
       },
       {
         label: 'Lights off',
@@ -466,7 +466,7 @@ const BEATS_RAW: BeatDefinition[] = [
     act: 'depth',
     id: 'brine-turns-pink',
     title: 'The Brine Turns Pink',
-    cue: 'This is the thesis. Slow down. Let the colour change land.',
+    cue: 'This is the thesis. Slow down. Let the color change land.',
     ask: 'ASK: nothing was added to this bottle. What do you think happened?',
     seconds: 60,
     stage: 'compare',
@@ -491,11 +491,11 @@ const BEATS_RAW: BeatDefinition[] = [
       {
         // Aaron: confirm the exact wording you want here. The ending hangs on
         // this line, and it is the claim the cold-open image cashes in.
-        label: 'Name the colour',
+        label: 'Name the color',
         comparePhase: 'after',
         flash: true,
         headline: 'The pink is alive.',
-        supporting: 'That colour is made by microbes that can only live in salt.',
+        supporting: 'That color is made by microbes that can only live in salt.',
       },
     ],
   },
@@ -527,10 +527,10 @@ const BEATS_RAW: BeatDefinition[] = [
         supporting: undefined,
       },
       {
-        label: 'Found one',
+        label: 'Found it',
         hunt: true,
-        headline: 'Found one.',
-        supporting: 'And a kilometre down, Boulby is teeming with life.',
+        headline: 'Found it.',
+        supporting: 'And a kilometer down, Boulby is teeming with life.',
       },
       // ── The way out. One press each, every move runs on its own. ────────
       {
@@ -545,7 +545,7 @@ const BEATS_RAW: BeatDefinition[] = [
         pullBack: true,
         ask: 'SAY nothing. Let it fall away.',
         headline: 'One crystal.',
-        supporting: 'Two millimetres of salt, with a lake still sealed inside it.',
+        supporting: 'Two millimeters of salt, with a lake still sealed inside it.',
       },
       {
         // Cross-dissolves on to the planet at the size the crystal left, then
@@ -641,7 +641,7 @@ export const IMAGE_SOURCES: string[] = BEATS.flatMap((beat) =>
 /** Total stage budget in seconds, used by the HUD pace indicator. */
 export const TALK_SECONDS = BEATS.reduce((sum, b) => sum + b.seconds, 0)
 
-/** Cumulative seconds elapsed before each beat starts, for drift maths. */
+/** Cumulative seconds elapsed before each beat starts, for drift math. */
 export const BEAT_START_SECONDS: number[] = (() => {
   const out: number[] = []
   let running = 0
