@@ -1,9 +1,9 @@
 # Collections Revealed — Life in Salt
 
 Presenter-driven stage build for NHM **Collections Revealed**. A 15-minute scale
-journey anchored on one halite crystal from Searles Lake, out to micrometres,
-living cells, Mars, and a kilometre under the North Sea, then back to the same
-rock. Story from [What Woke Up](https://aaroncelestian.substack.com/p/what-woke-up).
+journey anchored on one halite crystal from Searles Lake — place and zoom first,
+then living cells, Mars, and a kilometre under the North Sea, then back to the
+same rock. Story from [What Woke Up](https://aaroncelestian.substack.com/p/what-woke-up).
 
 **Rehearsing? Read [`docs/run-of-show.md`](docs/run-of-show.md)** — beat times,
 cue lines, and the four audience-interaction scripts.
@@ -34,17 +34,18 @@ Append `?audience=1` to the URL to hide the HUD on a house feed.
 ## Structure
 
 The crystal is a hub, not scenery: it opens the talk, returns at every act
-break, and closes it. 17 beats in 7 acts, 15:14.
+break, and closes it. 17 beats in 7 acts, ~15:00. Act 1 names the rock only;
+life inside waits for Act 4.
 
 | Act | Beats | Runs |
 | --- | --- | --- |
-| 1 The Object | cold open, name the object | 1:30 |
+| 1 The Object | cold open, name the object | 0:55 |
 | 2 The Place | globe, brine-lake film, field stills | 1:40 |
 | 3 The Zoom | zoom ladder, fluid inclusions | 1:30 |
 | 4 The Life | microbe clip, back to the rock | 1:30 |
 | 5 The Reach | the Mars film | 2:15 |
-| 6 The Depth | dive, descent, Boulby, brine turns pink | 4:09 |
-| 7 The Return | live 3D hunt, the re-read, send-off | 2:40 |
+| 6 The Depth | dive, descent, Boulby, brine turns pink | 4:20 |
+| 7 The Return | live 3D hunt, the re-read, send-off | 2:50 |
 
 Beats live in [`src/beats/catalog.ts`](src/beats/catalog.ts). That file is the
 script — copy, timings, assets and interaction cues are all in one place.

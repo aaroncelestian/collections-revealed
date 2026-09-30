@@ -10,8 +10,8 @@ missing, plus anything here that nothing points at.
 | `images/zoom/halite-zoom-01..04.jpg` | zoom ladder (3.2 mm / 1.1 mm / 0.42 mm / 0.42 mm) | generated |
 | `images/searching-for-life-poster.jpg` | Mars film poster | generated |
 | `video/boulby-drive.mp4` | salt world, the drive in — plays with sound | generated |
-| `images/boulby-stalactites.jpg` | salt world, the still it falls back to | |
-| `images/boulby-wood-cribs.jpg` | salt world, closed tunnels | |
+| `images/boulby-stalactites.jpg` | salt world — drive fallback + ceiling still | |
+| `images/boulby-green-door.jpeg` | salt world — sealed chamber | from `assets/green_door_escape_room.jpeg` |
 | `images/boulby-aaron-scott.jpg` | salt world, lights off | |
 | `images/boulby-sampling.jpg` | finding the water | |
 | `images/boulby-specimen.jpg` | salt in hand | |
@@ -48,8 +48,8 @@ Kept from the earlier cut of the talk: `fallbacks/bacteria.jpg`,
 `fallbacks/collection.jpg`, `fallbacks/field.jpg`, `fallbacks/halite.jpg`,
 `fallbacks/mars.jpg`, `images/boulby-darkness.jpg`,
 `images/boulby-green-chamber.jpg`, `images/boulby-surface.jpg`,
-`images/boulby-tunnel.jpg`, `stand-ins/searles-lakebed.svg`,
-`stand-ins/pink-brine-field.svg`,
+`images/boulby-tunnel.jpg`, `images/boulby-wood-cribs.jpg`,
+`stand-ins/searles-lakebed.svg`, `stand-ins/pink-brine-field.svg`,
 `images/boulby-halite-lab.jpg`, `images/boulby-salt-road.jpg`,
 `images/boulby-team.jpg`, `images/boulby-team-surface.jpg`,
 `images/fluid-inclusion-micro.jpg`, `images/halite-inclusions.jpg`,

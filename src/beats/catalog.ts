@@ -61,10 +61,12 @@ const ZOOM_LADDER: ZoomFrame[] = [
 ]
 
 /**
- * 17 beats, 7 acts, ~15:14 of stage time.
+ * 17 beats, 7 acts, ~15:00 of stage time.
  *
  * The Searles Lake crystal is the hub: it opens the talk, returns at every act
  * break, and closes it. Everything else is a departure from that one object.
+ * Act 1 names the rock only — what is sealed inside waits for the zoom and the
+ * microbe reveal.
  */
 const BEATS_RAW: BeatDefinition[] = [
   // ─── Act 1 · The Object ────────────────────────────────────────────────
@@ -73,9 +75,9 @@ const BEATS_RAW: BeatDefinition[] = [
     act: 'object',
     id: 'cold-open',
     title: 'Cold Open',
-    cue: 'Say nothing for five seconds. Let them look.',
-    ask: 'ASK: Something in this rock is alive. Hands up if you believe me. Count the room out loud.',
-    seconds: 55,
+    cue: 'Say nothing for five seconds. Let them look. Do not say what is inside.',
+    ask: 'ASK: Hands up if you think a rock can keep a secret. Count the room out loud.',
+    seconds: 35,
     stage: 'anchor',
     anchor: 'full',
     scene: 'none',
@@ -87,13 +89,13 @@ const BEATS_RAW: BeatDefinition[] = [
     },
     steps: [
       {
-        label: 'Answer the show of hands',
-        // The plate clears as the first line lands, so the crystal is alone
-        // on screen for the rest of the act.
+        label: 'Clear the plate',
+        // The plate clears so the crystal is alone — no answer yet. The zoom
+        // and the microbe clip cash this in.
         titleCard: undefined,
-        headline: 'Something in here is alive.',
-        supporting: 'And it has been for a very long time.',
-        ask: 'SAY: the hands that went up were right.',
+        headline: undefined,
+        supporting: undefined,
+        ask: 'SAY: hold that thought.',
       },
     ],
   },
@@ -102,21 +104,14 @@ const BEATS_RAW: BeatDefinition[] = [
     act: 'object',
     id: 'the-claim',
     title: 'Name the Object',
-    cue: 'Name it plainly. Halite. Rock salt. From a lake in California.',
-    seconds: 35,
+    cue: 'Name it plainly. Halite. Rock salt. Stop there — do not open the crystal yet.',
+    seconds: 20,
     stage: 'anchor',
     anchor: 'full',
     scene: 'none',
     fit: ANCHOR_FIT,
     headline: 'Halite. Rock salt.',
     supporting: 'Searles Lake, California.',
-    steps: [
-      {
-        label: 'What it kept',
-        headline: 'Halite. Rock salt.',
-        supporting: 'It grew in a lake that dried up, and it kept a little of that lake inside.',
-      },
-    ],
   },
 
   // ─── Act 2 · The Place ─────────────────────────────────────────────────
@@ -245,7 +240,7 @@ const BEATS_RAW: BeatDefinition[] = [
     act: 'zoom',
     id: 'inclusions',
     title: 'Fluid Inclusions',
-    cue: 'Name the pockets. Every rectangle is a drop of the old lake.',
+    cue: 'Name the pockets only. Water, not life — that comes next.',
     seconds: 30,
     stage: 'zoom',
     anchor: 'hidden',
@@ -272,7 +267,7 @@ const BEATS_RAW: BeatDefinition[] = [
     act: 'life',
     id: 'reveal',
     title: 'Something Moves',
-    cue: 'Silence. No caption, no headline. Let the room find it themselves.',
+    cue: 'First time you answer the cold open. Silence. No caption. Let the room find it.',
     seconds: 55,
     stage: 'video',
     anchor: 'hidden',
@@ -382,12 +377,11 @@ const BEATS_RAW: BeatDefinition[] = [
     act: 'depth',
     id: 'salt-world',
     title: 'Salt World',
-    cue: 'The drive rolls on arrival, with sound. Two presses cut to the stills. Land hard on the darkness.',
-    // Opens on the drive out through the tunnels, then the same two presses as
-    // before. The first press ends the clip, so it never runs under the beats
-    // that follow. `photoSrc` here is the still the beat falls back to if the
-    // clip will not play.
-    seconds: 34,
+    cue: 'Drive rolls with sound. First press lands the stalactites. Then the green door. Land hard on the darkness.',
+    // Opens on the drive out through the tunnels. First press ends the clip
+    // and holds the scary ceiling still; the next two stills follow. `photoSrc`
+    // is also the fallback if the clip will not play.
+    seconds: 45,
     stage: 'photo',
     anchor: 'hidden',
     scene: 'none',
@@ -395,21 +389,28 @@ const BEATS_RAW: BeatDefinition[] = [
     photoSrc: '/assets/images/boulby-stalactites.jpg',
     photoAlt: 'Halite soda-straw stalactites hanging from the mine ceiling',
     videoSrc: '/assets/video/boulby-drive.mp4',
-    // Runs with the engine and the tunnel noise. 46 seconds against a 34
+    // Runs with the engine and the tunnel noise. 46 seconds against a 45
     // second beat, so it does not loop — the first press cuts it off long
     // before the end, and a loop seam under the sound would be audible.
     audio: true,
     copyDelayMs: 3000,
     headline: 'Salt grows down here.',
-    supporting: 'Even the ceiling is crystal.',
+    supporting: undefined,
     steps: [
       {
-        label: 'Closed tunnels',
+        label: 'Ceiling of salt',
         playVideo: false,
-        photoSrc: '/assets/images/boulby-wood-cribs.jpg',
-        photoAlt: 'Wooden crib supports and mesh in a damaged mine tunnel',
-        headline: 'Some tunnels are closed off.',
-        supporting: 'Ancient water is eating the rock from the inside.',
+        photoSrc: '/assets/images/boulby-stalactites.jpg',
+        photoAlt: 'Halite soda-straw stalactites hanging from the mine ceiling',
+        headline: 'Even the ceiling is crystal.',
+        supporting: 'Needles of salt, growing in the dark.',
+      },
+      {
+        label: 'Sealed chamber',
+        photoSrc: '/assets/images/boulby-green-door.jpeg',
+        photoAlt: 'Industrial safe-haven door numbered 17 in a green-lit salt chamber',
+        headline: 'Some chambers are sealed.',
+        supporting: 'Refuge, a kilometre under the North Sea.',
       },
       {
         label: 'Lights off',
