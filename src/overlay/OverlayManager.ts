@@ -102,6 +102,9 @@ export class OverlayManager {
     this.setCompare(frame, stage === 'compare')
     void this.setVideo(frame, videoActive, token)
 
+    // Compare parks its subject on the right; keep the line from running wide.
+    this.copyEl.classList.toggle('is-beside', stage === 'compare')
+
     this.setTitleCard(frame)
     this.setCopy(frame)
     this.setLabels(frame)

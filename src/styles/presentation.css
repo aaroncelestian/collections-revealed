@@ -151,6 +151,12 @@ body {
   transition: opacity 0.8s ease, transform 0.8s ease;
 }
 
+/* Beside a right-parked subject (compare bottles): stay in the open left. */
+.beat-copy.is-beside {
+  right: auto;
+  max-width: min(14ch, 36vw);
+}
+
 .beat-copy.is-visible {
   opacity: 1;
   transform: translateY(0);
