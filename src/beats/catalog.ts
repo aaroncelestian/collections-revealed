@@ -257,7 +257,7 @@ const BEATS_RAW: BeatDefinition[] = [
     act: 'life',
     id: 'reveal',
     title: 'Something Moves',
-    cue: 'First time you answer the cold open. Silence. No caption. Let the room find it.',
+    cue: 'First time you answer the cold open. Silence for five seconds — the first caption fires itself. Let the room find it.',
     seconds: 55,
     stage: 'video',
     anchor: 'hidden',
@@ -267,6 +267,8 @@ const BEATS_RAW: BeatDefinition[] = [
     steps: [
       {
         label: 'First caption',
+        // Lands itself so the presenter can keep watching the room.
+        autoMs: 5000,
         caption: 'Something in there is moving.',
       },
       {

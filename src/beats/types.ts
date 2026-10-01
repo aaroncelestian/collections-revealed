@@ -129,6 +129,11 @@ export interface RevealStep {
   playVideo?: boolean
   /** Pulse the screen as this reveal lands. */
   flash?: boolean
+  /**
+   * Fire this step on its own this many ms after the previous frame lands.
+   * A presenter press still advances immediately and cancels the wait.
+   */
+  autoMs?: number
 }
 
 export interface ZoomFrame {

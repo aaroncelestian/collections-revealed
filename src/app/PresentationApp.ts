@@ -79,6 +79,8 @@ export class PresentationApp {
   private timerStart: number | null = null
   private timerPausedAt = 0
   private clockHandle: number | null = null
+  /** Pending auto-fire for a reveal step that carries `autoMs`. */
+  private autoAdvanceTimer: number | null = null
 
   constructor(
     heroCanvas: HTMLCanvasElement,
@@ -231,6 +233,11 @@ export class PresentationApp {
 
   private goTo(beatIndex: number, stepIndex: number, options: { replayCues?: boolean } = {}) {
     if (beatIndex < 0 || beatIndex >= BEAT_COUNT) return
+    const samePlace = this.beatIndex === beatIndex && this.stepIndex === stepIndex
+    const replayCues = options.replayCues ?? true
+    // A silent same-place repaint (tab return) must leave a running wait alone.
+    if (!samePlace || replayCues) this.clearAutoAdvance()
+
     this.beatIndex = beatIndex
     this.stepIndex = stepIndex
 
@@ -242,8 +249,31 @@ export class PresentationApp {
     if (this.timerStart === null && (beatIndex > 0 || stepIndex > -1)) this.startTimer()
 
     this.routeScene(frame)
-    this.paintOverlay(frame, options.replayCues ?? true)
+    this.paintOverlay(frame, replayCues)
     this.paintHud(beat, frame)
+    if (!samePlace || replayCues) this.scheduleAutoAdvance(beat, stepIndex)
+  }
+
+  /** Cancel a waiting auto-reveal so a press or jump does not double-fire. */
+  private clearAutoAdvance() {
+    if (this.autoAdvanceTimer === null) return
+    clearTimeout(this.autoAdvanceTimer)
+    this.autoAdvanceTimer = null
+  }
+
+  /** If the next reveal step asks to fire itself, wait and then advance once. */
+  private scheduleAutoAdvance(beat: BeatDefinition, stepIndex: number) {
+    const next = beat.steps?.[stepIndex + 1]
+    const delay = next?.autoMs
+    if (delay === undefined) return
+
+    const targetBeat = this.beatIndex
+    const targetStep = stepIndex + 1
+    this.autoAdvanceTimer = window.setTimeout(() => {
+      this.autoAdvanceTimer = null
+      if (this.beatIndex !== targetBeat || this.stepIndex !== stepIndex) return
+      this.goTo(targetBeat, targetStep)
+    }, delay)
   }
 
   // ── Scene routing ──────────────────────────────────────────────────────
@@ -475,6 +505,7 @@ export class PresentationApp {
     document.removeEventListener('fullscreenchange', this.paintFullscreenButton)
     document.removeEventListener('webkitfullscreenchange', this.paintFullscreenButton)
     if (this.clockHandle !== null) clearInterval(this.clockHandle)
+    this.clearAutoAdvance()
     for (const timer of this.fadeOutTimers.values()) clearTimeout(timer)
     this.fadeOutTimers.clear()
     this.hero?.dispose()
