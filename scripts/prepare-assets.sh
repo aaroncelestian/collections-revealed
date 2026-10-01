@@ -81,7 +81,7 @@ field() {
   fi
 }
 field "$SRC/lake_wide_shot.jpeg" "searles-lakebed.jpg"
-field "$SRC/aaron_lake.jpeg" "searles-aaron.jpg"
+field "$SRC/drilling.jpeg" "searles-drilling.jpg"
 field "$SRC/rock_art.jpg" "searles-rock-art.jpg"
 field "$SRC/pink_water.jpg" "searles-pink-water.jpg"
 field "$SRC/pink_bacteria_strands.jpg" "searles-pink-strands.jpg"

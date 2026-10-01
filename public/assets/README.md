@@ -19,7 +19,7 @@ missing, plus anything here that nothing points at.
 | `video/searching-for-life.mp4` | the Mars film, plays with sound | generated |
 | `video/bacteria.mp4` | the reveal — microbes in an inclusion | |
 | `images/searles-lakebed.jpg` | Act 2 still — dry lakebed | from `assets/lake_wide_shot.jpeg` |
-| `images/searles-aaron.jpg` | Act 2 still — on the flat | from `assets/aaron_lake.jpeg` |
+| `images/searles-drilling.jpg` | Act 2 still — drilling the flat | from `assets/drilling.jpeg` |
 | `images/searles-rock-art.jpg` | Act 2 still — painted rocks | from `assets/rock_art.jpg` |
 | `images/searles-pink-water.jpg` | Act 2 still — pink pool | from `assets/pink_water.jpg` |
 | `images/searles-pink-strands.jpg` | Act 2 still — pink filaments | from `assets/pink_bacteria_strands.jpg` |

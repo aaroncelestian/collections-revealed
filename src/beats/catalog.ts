@@ -154,11 +154,13 @@ const BEATS_RAW: BeatDefinition[] = [
     photoAlt: 'The dry salt crust of Searles Lake stretching to distant mountains',
     steps: [
       {
-        label: 'On the flat',
-        // Portrait selfie in a landscape run — letterbox rather than crop the Sierra.
+        label: 'Drilling the flat',
+        // Portrait frame in a landscape run — letterbox rather than crop the rig
+        // off the right-hand edge.
         fit: 'contain',
-        photoSrc: '/assets/images/searles-aaron.jpg',
-        photoAlt: 'Aaron on the Searles Lake salt flat, Sierra Nevada on the horizon',
+        photoSrc: '/assets/images/searles-drilling.jpg',
+        photoAlt:
+          'A drill rig on the Searles Lake salt flat, beside a long line of dark core spoil marked with red flags',
       },
       {
         label: 'Rock art',

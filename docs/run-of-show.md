@@ -58,8 +58,8 @@ no life — the zoom earns that.
 inset. Press drops the pin. "Three hours north of where we are standing."
 
 **1:40 · The Pink Water** — opens on the wide lakebed still. Click through the
-field photos fast — one press each, almost no talk: you on the flat, the painted
-rocks, the pink pool, then the close pink filaments.
+field photos fast — one press each, almost no talk: the rig drilling the flat, the
+painted rocks, the pink pool, then the close pink filaments.
 On that last frame: "The water that is left is pink." / "Hold on to that color.
 We come back to it."
 Do **not** explain the pink here. The ending needs it unexplained.
