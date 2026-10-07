@@ -357,9 +357,14 @@ function CrystalMesh({
   )
 }
 
+/** Hero keeps its NaCl lattice through peri and the constellation pull-back. */
+function showHaliteLattice(phase: Phase, isHero: boolean) {
+  return isHero && (phase === 'peri' || phase === 'peers' || phase === 'sky')
+}
+
 /**
  * Rock-salt NaCl lattice sized to sit inside the unit cube habit.
- * Shown on the peri close-up so the structure reads through a glass shell.
+ * Shown on peri and through the sky zoom-out so the structure rides with Halite.
  */
 function HaliteLattice() {
   const atoms = useMemo(() => {
@@ -661,10 +666,12 @@ function MineralBody({
           <CrystalMesh
             habit={body.habit}
             color={body.color}
-            emissive={isHero && phase === 'peri' ? Math.min(emissive, 0.35) : emissive}
-            opacity={isHero && phase === 'peri' ? 0.22 : 0.92}
+            emissive={
+              showHaliteLattice(phase, isHero) ? Math.min(emissive, 0.35) : emissive
+            }
+            opacity={showHaliteLattice(phase, isHero) ? 0.22 : 0.92}
           />
-          {isHero && phase === 'peri' ? <HaliteLattice /> : null}
+          {showHaliteLattice(phase, isHero) ? <HaliteLattice /> : null}
         </>
       ) : (
         body.tier === 'field' &&
@@ -1135,6 +1142,8 @@ function easeInOutCubic(t: number) {
 }
 
 const CAM_EASE_SEC = 2.45
+/** Dolly-out from the NaCl close-up into the full constellation. */
+const PERI_TO_SKY_SEC = 4.1
 /** Longer ease for sky ↔ reveal ↔ cabinets nested-doll handoff. */
 const REVEAL_CAM_EASE_SEC = 3.2
 /** Pan-up to overlook the glowing drawer (2× the original pan duration). */
@@ -1492,6 +1501,7 @@ function goalForPhase(phase: Phase, skyYaw: number): { pos: THREE.Vector3; look:
 }
 
 function camEaseSec(from: Phase, to: Phase) {
+  if (from === 'peri' && to === 'sky') return PERI_TO_SKY_SEC
   if (
     (from === 'sky' && to === 'reveal') ||
     (from === 'reveal' && to === 'cabinets') ||
@@ -1547,6 +1557,8 @@ function CameraRig({
   const revealEnter = useRef(false)
   const walkActive = useRef(false)
   const booted = useRef(false)
+  /** Hold look on Halite while dollying from peri → sky. */
+  const pullFromHero = useRef(false)
 
   useFrame((_, dt) => {
     const persp = camera as THREE.PerspectiveCamera
@@ -1575,6 +1587,7 @@ function CameraRig({
       if (phase === 'sky') look.current.set(0, 0.2, 0)
       else if (phase === 'peers') look.current.copy(HERO.pos)
       hallWalkActive = false
+      pullFromHero.current = false
       if (!settled.current) {
         settled.current = true
         onSettle?.(true)
@@ -1595,6 +1608,7 @@ function CameraRig({
       revealEnter.current = false
       walkActive.current = false
       hallWalkActive = false
+      pullFromHero.current = false
 
       if (focus) {
         toPos.current.set(focus.pos.x + 1.6, focus.pos.y + 0.9, focus.pos.z + 2.4)
@@ -1622,6 +1636,19 @@ function CameraRig({
         toLook.current.copy(WALK_END.look)
         hallWalkX = camera.position.x
         easeDur.current = WALK_SEC
+      } else if (phase === 'sky' && prevPhase.current === 'peri') {
+        // Dolly out from the NaCl: keep Halite framed, pull back along the view ray.
+        pullFromHero.current = true
+        const dir = camera.position.clone().sub(HERO.pos)
+        if (dir.lengthSq() < 1e-8) dir.set(0.2, 0.42, 2.35)
+        dir.normalize()
+        skyYaw.current = Math.atan2(dir.x, dir.z)
+        if (!Number.isFinite(skyYaw.current)) skyYaw.current = Math.atan2(-9.6, 10.8)
+        const g = goalForPhase('sky', skyYaw.current)
+        const dolly = HERO.pos.clone().addScaledVector(dir, 11.5)
+        toPos.current.copy(dolly).lerp(g.pos, 0.4)
+        toLook.current.copy(HERO.pos)
+        easeDur.current = PERI_TO_SKY_SEC
       } else {
         if (phase === 'sky') {
           skyYaw.current = Math.atan2(camera.position.x - 0, camera.position.z - 0)
@@ -1751,12 +1778,14 @@ function CameraRig({
       }
     } else if (!focus && (phase === 'sky' || phase === 'return') && progress.current >= 1) {
       hallWalkActive = false
+      if (pullFromHero.current) pullFromHero.current = false
       if (!reduced) skyYaw.current -= dt * SKY_SPIN_RAD_PER_SEC
       const g = goalForPhase(phase === 'return' ? 'return' : 'sky', skyYaw.current)
       toPos.current.copy(g.pos)
       toLook.current.copy(g.look)
-      camera.position.lerp(toPos.current, 1 - Math.exp(-1.6 * dt))
-      look.current.lerp(toLook.current, 1 - Math.exp(-1.6 * dt))
+      // Soft handoff: look drifts from Halite toward the constellation center.
+      camera.position.lerp(toPos.current, 1 - Math.exp(-1.15 * dt))
+      look.current.lerp(toLook.current, 1 - Math.exp(-0.85 * dt))
       if (persp.fov !== baseFov.current) {
         persp.fov = THREE.MathUtils.damp(persp.fov, 42, 3, dt)
         persp.updateProjectionMatrix()
@@ -1764,10 +1793,23 @@ function CameraRig({
     } else if (progress.current < 1) {
       hallWalkActive = phase === 'instrument'
       if (!focus && (phase === 'sky' || phase === 'return') && !reduced) {
-        skyYaw.current -= dt * SKY_SPIN_RAD_PER_SEC
+        // Keep spin quiet while dollying out of the NaCl so the zoom reads clean.
+        const spinScale = pullFromHero.current ? 0.12 : 1
+        skyYaw.current -= dt * SKY_SPIN_RAD_PER_SEC * spinScale
         const g = goalForPhase(phase === 'return' ? 'return' : 'sky', skyYaw.current)
-        toPos.current.copy(g.pos)
-        toLook.current.copy(g.look)
+        if (pullFromHero.current) {
+          // Ease the orbit target in late so the first part is a true pull-back.
+          const u = easeInOutCubic(progress.current)
+          const dir = fromPos.current.clone().sub(HERO.pos)
+          if (dir.lengthSq() < 1e-8) dir.set(0.2, 0.42, 2.35)
+          dir.normalize()
+          const dolly = HERO.pos.clone().addScaledVector(dir, 11.5)
+          toPos.current.copy(dolly).lerp(g.pos, Math.max(0, (u - 0.35) / 0.65))
+          toLook.current.copy(HERO.pos)
+        } else {
+          toPos.current.copy(g.pos)
+          toLook.current.copy(g.look)
+        }
       }
       const dur = easeDur.current
       progress.current = Math.min(1, progress.current + dt / dur)
@@ -1775,7 +1817,9 @@ function CameraRig({
       camera.position.lerpVectors(fromPos.current, toPos.current, u)
       look.current.lerpVectors(fromLook.current, toLook.current, u)
       if (phase === 'instrument') hallWalkX = camera.position.x
-      const goalFov = phase === 'reveal' ? 42 : phase === 'turn' ? 38 : 42
+      // Slight FOV widen as we leave the unit cell for the sky.
+      const goalFov =
+        phase === 'reveal' ? 42 : phase === 'turn' ? 38 : pullFromHero.current ? 46 : 42
       if (persp.fov !== goalFov) {
         persp.fov = THREE.MathUtils.lerp(baseFov.current, goalFov, u)
         persp.updateProjectionMatrix()
