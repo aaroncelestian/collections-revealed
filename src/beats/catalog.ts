@@ -138,12 +138,6 @@ const BEATS_RAW: BeatDefinition[] = [
         supporting: undefined,
       },
       {
-        label: 'The turn',
-        scenePhase: 'turn',
-        headline: 'The specimen is already in a drawer.',
-        supporting: undefined,
-      },
-      {
         label: 'Dive',
         scenePhase: 'dive',
         headline: undefined,

@@ -48,15 +48,15 @@ Say nothing for a five count. Let them look.
 > Count the room out loud — "six, nine, about a dozen of you."
 > Press. Plate clears. "Hold that thought." Do **not** say alive yet.
 
-**0:35 · Pull Back** — leave the pink photo for the 3D constellation. Six
+**0:35 · Pull Back** — leave the pink photo for the 3D constellation. Five
 presses after the Halite close-up lands:
 - Halite close-up (cubic crystal, uses as labels)
 - Constellation — "Minerals are in nearly everything."
 - Nest into one glowing drawer — "One drawer."
 - Pull to the aisle — "Not a warehouse."
 - Walk the row — "150,000 specimens. A materials library."
-- Hold on the dive drawer — "The specimen is already in a drawer."
-- Press into Dive; the plunge auto-advances when the wash completes.
+- Press into Dive (skip the hold / “already in a drawer” beat); the plunge
+  auto-advances when the wash completes.
 
 **~2:05 · Name the Object** — pink crystal returns.
 "Halite. Rock salt. Searles Lake, California." Stop there. No trapped water,
