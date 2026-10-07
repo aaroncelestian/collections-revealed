@@ -29,3 +29,19 @@ export function orientationFor(lon: number, lat: number): THREE.Quaternion {
   const roll = Math.atan2(north.x, north.y)
   return q.premultiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 0, 1), roll))
 }
+
+/**
+ * Tip the north pole away from the camera. Flat equator-on framing hides relief
+ * in the flight path; a few degrees of pitch keeps north-up while opening the
+ * northern Atlantic. Shared so the globe → solar dissolve stays face-matched.
+ */
+export const POLE_TILT_RAD = THREE.MathUtils.degToRad(-10)
+const POLE_TILT_Q = new THREE.Quaternion().setFromAxisAngle(
+  new THREE.Vector3(1, 0, 0),
+  POLE_TILT_RAD,
+)
+
+/** Face a lon/lat, then tip north away from the lens. */
+export function faceGlobe(lon: number, lat: number): THREE.Quaternion {
+  return POLE_TILT_Q.clone().multiply(orientationFor(lon, lat))
+}

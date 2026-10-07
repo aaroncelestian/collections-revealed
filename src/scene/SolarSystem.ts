@@ -1,6 +1,6 @@
 import * as THREE from 'three'
 import { EARTH_OUT_DISTANCE } from './GlobeDive'
-import { BOULBY, orientationFor } from './places'
+import { BOULBY, faceGlobe } from './places'
 import { atmosphereShell, starfield } from './space'
 import { buildWorldTextures } from './worldTexture'
 import type { SolarPhase } from '../beats/types'
@@ -293,13 +293,11 @@ export function startSolarSystem(canvas: HTMLCanvasElement): SolarSystemHandle {
       .normalize()
 
     if (earthMesh) {
-      // Same face as GlobeDive's earth-out (Boulby). Searles here used to match
-      // an older pull-back that centred California; after that pose moved to
-      // England the dissolve was recentering North America mid-fade.
+      // Same face as GlobeDive's earth-out (Boulby + pole tip). Searles here
+      // used to match an older pull-back that centred California; after that
+      // pose moved to England the dissolve was recentering North America.
       const face = new THREE.Matrix4().lookAt(closeDir, ORIGIN, WORLD_UP)
-      earthMesh.quaternion
-        .setFromRotationMatrix(face)
-        .multiply(orientationFor(BOULBY[0], BOULBY[1]))
+      earthMesh.quaternion.setFromRotationMatrix(face).multiply(faceGlobe(BOULBY[0], BOULBY[1]))
     }
   }
 

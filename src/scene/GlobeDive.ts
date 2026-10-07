@@ -2,7 +2,7 @@ import * as THREE from 'three'
 import { Line2 } from 'three/addons/lines/Line2.js'
 import { LineGeometry } from 'three/addons/lines/LineGeometry.js'
 import { LineMaterial } from 'three/addons/lines/LineMaterial.js'
-import { BOULBY, SEARLES, lonLatToVec3, orientationFor } from './places'
+import { BOULBY, SEARLES, faceGlobe, lonLatToVec3 } from './places'
 import { atmosphereShell, starfield } from './space'
 import { buildWorldTextures } from './worldTexture'
 import type { GlobePhase } from '../beats/types'
@@ -420,7 +420,7 @@ export function startGlobeDive(
   let pullSeconds = 0
   let pullElapsed = 0
   let pullFrom = distance
-  const quat = orientationFor(GLOBE_POSES.world.lonLat![0], GLOBE_POSES.world.lonLat![1])
+  const quat = faceGlobe(GLOBE_POSES.world.lonLat![0], GLOBE_POSES.world.lonLat![1])
   const targetQuat = quat.clone()
   const arcFromQuat = new THREE.Quaternion()
   const arcToQuat = new THREE.Quaternion()
@@ -568,7 +568,7 @@ export function startGlobeDive(
     pullSeconds = pose.pullSeconds ?? 0
     pullElapsed = 0
     spin = pose.spin
-    if (pose.lonLat) targetQuat.copy(orientationFor(pose.lonLat[0], pose.lonLat[1]))
+    if (pose.lonLat) targetQuat.copy(faceGlobe(pose.lonLat[0], pose.lonLat[1]))
     // A pose that jumps its altitude is a cut, not a flight, so it jumps its
     // facing too. Slerping instead would whip the globe round at surface
     // range, under the dissolve, where the turn is all the room can see.
@@ -596,7 +596,7 @@ export function startGlobeDive(
       // for England. updateGlobe drives the turn off arc progress so the
       // mid-Atlantic hang and the growing path stay locked together.
       arcFromQuat.copy(quat)
-      arcToQuat.copy(orientationFor(BOULBY[0], BOULBY[1]))
+      arcToQuat.copy(faceGlobe(BOULBY[0], BOULBY[1]))
       targetQuat.copy(arcToQuat)
     }
     if (next === 'boulby-surface') {
