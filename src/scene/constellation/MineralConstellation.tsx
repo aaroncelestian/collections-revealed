@@ -232,10 +232,12 @@ function CrystalMesh({
   habit,
   color,
   emissive = 0.55,
+  opacity = 0.92,
 }: {
   habit: Habit
   color: string
   emissive?: number
+  opacity?: number
 }) {
   const material = (
     <meshStandardMaterial
@@ -245,7 +247,8 @@ function CrystalMesh({
       roughness={0.28}
       metalness={0.35}
       transparent
-      opacity={0.92}
+      opacity={opacity}
+      depthWrite={opacity > 0.5}
     />
   )
   if (habit === 'cube') {
@@ -350,6 +353,96 @@ function CrystalMesh({
           opacity={0.92}
         />
       </mesh>
+    </group>
+  )
+}
+
+/**
+ * Rock-salt NaCl lattice sized to sit inside the unit cube habit.
+ * Shown on the peri close-up so the structure reads through a glass shell.
+ */
+function HaliteLattice() {
+  const atoms = useMemo(() => {
+    const out: { key: string; pos: [number, number, number]; element: 'Na' | 'Cl' }[] = []
+    // 3×3×3 ion grid ≈ two unit cells along an edge; fits inside the 1×1×1 cube.
+    const n = 3
+    const span = 0.7
+    for (let i = 0; i < n; i++) {
+      for (let j = 0; j < n; j++) {
+        for (let k = 0; k < n; k++) {
+          const x = (i / (n - 1) - 0.5) * span
+          const y = (j / (n - 1) - 0.5) * span
+          const z = (k / (n - 1) - 0.5) * span
+          const element: 'Na' | 'Cl' = (i + j + k) % 2 === 0 ? 'Na' : 'Cl'
+          out.push({ key: `${i}-${j}-${k}`, pos: [x, y, z], element })
+        }
+      }
+    }
+    return out
+  }, [])
+
+  const bonds = useMemo(() => {
+    const out: { key: string; mid: [number, number, number]; len: number; quat: THREE.Quaternion }[] =
+      []
+    const yUp = new THREE.Vector3(0, 1, 0)
+    const dir = new THREE.Vector3()
+    const step = 0.7 / 2
+    for (let i = 0; i < 3; i++) {
+      for (let j = 0; j < 3; j++) {
+        for (let k = 0; k < 3; k++) {
+          const ax = (i / 2 - 0.5) * 0.7
+          const ay = (j / 2 - 0.5) * 0.7
+          const az = (k / 2 - 0.5) * 0.7
+          const neighbors: [number, number, number][] = []
+          if (i < 2) neighbors.push([ax + step, ay, az])
+          if (j < 2) neighbors.push([ax, ay + step, az])
+          if (k < 2) neighbors.push([ax, ay, az + step])
+          for (const [bx, by, bz] of neighbors) {
+            dir.set(bx - ax, by - ay, bz - az)
+            const len = dir.length()
+            dir.normalize()
+            const quat = new THREE.Quaternion().setFromUnitVectors(yUp, dir)
+            out.push({
+              key: `${i}${j}${k}-${bx.toFixed(2)}-${by.toFixed(2)}-${bz.toFixed(2)}`,
+              mid: [(ax + bx) / 2, (ay + by) / 2, (az + bz) / 2],
+              len,
+              quat,
+            })
+          }
+        }
+      }
+    }
+    return out
+  }, [])
+
+  return (
+    <group>
+      {bonds.map((b) => (
+        <mesh key={b.key} position={b.mid} quaternion={b.quat} scale={[1, b.len / 0.35, 1]}>
+          <cylinderGeometry args={[0.012, 0.012, 0.35, 6]} />
+          <meshStandardMaterial
+            color="#9aa3b0"
+            emissive="#4a5564"
+            emissiveIntensity={0.25}
+            roughness={0.5}
+            metalness={0.2}
+            transparent
+            opacity={0.55}
+          />
+        </mesh>
+      ))}
+      {atoms.map((a) => (
+        <mesh key={a.key} position={a.pos}>
+          <sphereGeometry args={[a.element === 'Na' ? 0.065 : 0.085, 14, 14]} />
+          <meshStandardMaterial
+            color={a.element === 'Na' ? '#d8dee8' : '#5cb87a'}
+            emissive={a.element === 'Na' ? '#8a96a8' : '#2a6b44'}
+            emissiveIntensity={0.45}
+            roughness={0.32}
+            metalness={a.element === 'Na' ? 0.45 : 0.12}
+          />
+        </mesh>
+      ))}
     </group>
   )
 }
@@ -564,7 +657,15 @@ function MineralBody({
         </mesh>
       )}
       {showCrystal ? (
-        <CrystalMesh habit={body.habit} color={body.color} emissive={emissive} />
+        <>
+          <CrystalMesh
+            habit={body.habit}
+            color={body.color}
+            emissive={isHero && phase === 'peri' ? Math.min(emissive, 0.35) : emissive}
+            opacity={isHero && phase === 'peri' ? 0.22 : 0.92}
+          />
+          {isHero && phase === 'peri' ? <HaliteLattice /> : null}
+        </>
       ) : (
         body.tier === 'field' &&
         phase === 'peers' && (

@@ -18,7 +18,10 @@
       "name": "Halite",
       "apps": [
         "Fluid inclusions",
-        "Astrobiology"
+        "Astrobiology",
+        "Table salt",
+        "Chem feedstock",
+        "Molten-salt heat storage"
       ],
       "domain": "other",
       "tier": "hero",

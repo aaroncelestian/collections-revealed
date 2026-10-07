@@ -100,7 +100,7 @@ const BEATS_RAW: BeatDefinition[] = [
     scene: 'constellation',
     scenePhase: 'peri',
     headline: 'Halite',
-    supporting: 'Fluid inclusions · astrobiology',
+    supporting: 'sodium chloride',
     steps: [
       {
         label: 'Constellation',
