@@ -96,9 +96,10 @@ drop of that lake, sealed in salt." Water only — not life.
 
 ### Act 4 — The Life (3:50, 1:30)
 
-**3:50 · Something Moves** — the microbe clip, full bleed, **silent, no
-caption, no headline**. This is the first answer to the cold open, and it must
-be the quietest slide in the talk. Say nothing for at least eight seconds. Let
+**3:50 · Something Moves** — press zooms into the inclusion frame, then
+dissolves onto the microbe clip. Full bleed, **silent, no caption, no
+headline**. This is the first answer to the cold open, and it must be the
+quietest slide in the talk. Say nothing for at least eight seconds. Let
 someone in the room notice first.
 Press: *Something in there is moving.* Press: *That is a living cell, inside
 the salt.*

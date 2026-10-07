@@ -320,6 +320,12 @@ body {
   opacity: 1;
 }
 
+/* Stay above the microbe clip while the inclusion ladder punches in. */
+.zoom-layer.is-handing-off {
+  z-index: calc(var(--z-picture) + 1);
+  transition: none;
+}
+
 .video-layer {
   opacity: 0;
   transition: opacity 0.7s ease;

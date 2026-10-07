@@ -40,6 +40,8 @@ export class OverlayManager {
   private copyShown = false
   private titleKey = ''
   private titleShown = false
+  /** Prior beat stage — detects the zoom-ladder → microbe-clip handoff. */
+  private lastStage: string | null = null
 
   constructor() {
     this.copyEl = el('beat-copy')
@@ -96,11 +98,20 @@ export class OverlayManager {
 
     this.anchor.set(beat.anchor ?? 'hidden', beat.fit ?? 'contain')
 
+    const zoomToVideo =
+      this.lastStage === 'zoom' && stage === 'video' && videoActive
+
     this.setPhoto(frame, stage === 'photo' && !videoActive)
-    this.setZoom(frame, stage === 'zoom')
     this.setDiagram(frame, stage === 'diagram')
     this.setCompare(frame, stage === 'compare')
-    void this.setVideo(frame, videoActive, token)
+
+    if (zoomToVideo) {
+      // Keep the inclusion frame up and punch into the microbe clip.
+      void this.handoffZoomToVideo(frame, token)
+    } else {
+      this.setZoom(frame, stage === 'zoom')
+      void this.setVideo(frame, videoActive, token)
+    }
 
     // Compare parks its subject on the right; keep the line from running wide.
     this.copyEl.classList.toggle('is-beside', stage === 'compare')
@@ -108,6 +119,14 @@ export class OverlayManager {
     this.setTitleCard(frame)
     this.setCopy(frame)
     this.setLabels(frame)
+    this.lastStage = stage
+  }
+
+  /** Fluid-inclusions ladder → bacteria clip: zoom in, then dissolve. */
+  private async handoffZoomToVideo(frame: BeatFrame, token: number) {
+    void this.setVideo(frame, true, token)
+    await this.zoom.punchIntoVideo()
+    if (token !== this.renderToken) return
   }
 
   // ── Layers ────────────────────────────────────────────────────────────

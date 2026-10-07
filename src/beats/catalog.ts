@@ -146,7 +146,6 @@ const BEATS_RAW: BeatDefinition[] = [
     scene: 'none',
     fit: ANCHOR_FIT,
     headline: 'Halite. Rock salt.',
-    supporting: 'Searles Lake, California.',
   },
 
   // ─── Act 2 · The Place ─────────────────────────────────────────────────

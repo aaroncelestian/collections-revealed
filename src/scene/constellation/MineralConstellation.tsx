@@ -1,4 +1,13 @@
-import { Suspense, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
+import {
+  Suspense,
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+} from 'react'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { Html, OrbitControls, Stars } from '@react-three/drei'
 import * as THREE from 'three'
@@ -1583,18 +1592,8 @@ function CameraRig({
       }
     }
 
-    if (!scripted) {
-      if (phase === 'sky') look.current.set(0, 0.2, 0)
-      else if (phase === 'peers') look.current.copy(HERO.pos)
-      hallWalkActive = false
-      pullFromHero.current = false
-      if (!settled.current) {
-        settled.current = true
-        onSettle?.(true)
-      }
-      return
-    }
-
+    // Arm phase changes even if OrbitControls is briefly enabled — otherwise
+    // peri→sky never starts its dolly and the view snaps.
     const phaseChanged = phase !== prevPhase.current
     const focusChanged = focusId !== prevFocus.current
 
@@ -1688,6 +1687,26 @@ function CameraRig({
       if (phase === 'reveal' && !revealEnter.current) {
         revealBlend = 1
       }
+    }
+
+    // Orbit only after the scripted ease finishes. Mid-dolly always stays driven.
+    const orbitOwnsCamera =
+      !scripted &&
+      progress.current >= 1 &&
+      !pullFromHero.current &&
+      !revealEnter.current &&
+      !walkActive.current &&
+      phase !== 'dive'
+
+    if (orbitOwnsCamera) {
+      if (phase === 'sky') look.current.set(0, 0.2, 0)
+      else if (phase === 'peers') look.current.copy(HERO.pos)
+      hallWalkActive = false
+      if (!settled.current) {
+        settled.current = true
+        onSettle?.(true)
+      }
+      return
     }
 
     if (!focus && phase === 'dive') {
@@ -1910,14 +1929,18 @@ function Scene({
   onDiveProgress?: (wash: number, done: boolean) => void
 }) {
   const inHall = inHallPhase(phase)
-  const [camSettled, setCamSettled] = useState(true)
+  // Start unsettled so OrbitControls cannot steal the first peri→sky dolly frame.
+  const [camSettled, setCamSettled] = useState(false)
   const canOrbit = phase === 'sky' || phase === 'peers'
   const orbit = active && canOrbit && !focusId && !reduced && camSettled
+  // Keep CameraRig driving the camera until the dolly settles — orbit only after.
   const scripted = !orbit
   const litIds = litIdsForPhase(phase)
   const dimField = litIds != null
 
-  useEffect(() => {
+  // Layout (before paint / useFrame) so sky never enables orbit on the same
+  // commit as the phase change — that was snapping the view instead of zooming.
+  useLayoutEffect(() => {
     setCamSettled(reduced)
   }, [phase, focusId, reduced])
 

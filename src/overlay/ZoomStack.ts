@@ -4,6 +4,10 @@ import { setLayerVisible } from './layerVisibility'
 
 /** How long one push takes before the picture holds. */
 const PUSH_MS = 1700
+/** Dolly from the inclusion ladder into the microbe clip. */
+const HANDOFF_MS = 1600
+/** Optical zoom factor for the zoom → video handoff. */
+const HANDOFF_ZOOM = 2.6
 /** Where in the push a dissolve starts and ends, as a fraction of the ease. */
 const FADE_IN = 0.2
 const FADE_OUT = 0.85
@@ -133,9 +137,77 @@ export class ZoomStack {
   setVisible(visible: boolean) {
     const was = this.onStage
     this.onStage = visible
+    if (!visible) {
+      cancelAnimationFrame(this.raf)
+      this.root.classList.remove('is-handing-off')
+      this.root.style.opacity = ''
+    }
     setLayerVisible(this.root, visible)
     // Coming onto the ladder from another beat should land, not fly in.
     if (visible && !was) this.snapOnShow = true
+  }
+
+  /**
+   * Keep punching into the current frame, then fade the ladder away — used
+   * when the microbe clip takes over so the cut reads as a zoom, not a jump.
+   */
+  punchIntoVideo(factor = HANDOFF_ZOOM, ms = HANDOFF_MS): Promise<void> {
+    return new Promise((resolve) => {
+      if (this.current < 0 || this.view.w <= 1) {
+        this.setVisible(false)
+        resolve()
+        return
+      }
+
+      cancelAnimationFrame(this.raf)
+      this.setScaleVisible(false)
+      this.fading = null
+      this.root.classList.add('is-handing-off')
+      this.root.style.opacity = '1'
+
+      const from = { ...this.view }
+      const toW = from.w / factor
+      const toH = from.h / factor
+      const to = {
+        x: from.x + (from.w - toW) / 2,
+        y: from.y + (from.h - toH) / 2,
+        w: toW,
+        h: toH,
+      }
+      const dur = this.reducedMotion ? 180 : ms
+      const start = performance.now()
+
+      const step = (now: number) => {
+        const t = Math.min(1, (now - start) / dur)
+        const e = easeInOut(t)
+        const w = Math.exp(Math.log(from.w) + (Math.log(to.w) - Math.log(from.w)) * e)
+        const h = w * (to.h / to.w)
+        const fromCx = from.x + from.w / 2
+        const fromCy = from.y + from.h / 2
+        const toCx = to.x + to.w / 2
+        const toCy = to.y + to.h / 2
+        this.view = {
+          x: fromCx + (toCx - fromCx) * e - w / 2,
+          y: fromCy + (toCy - fromCy) * e - h / 2,
+          w,
+          h,
+        }
+        // Hold full opacity through the first third, then dissolve onto the clip.
+        const fade =
+          t < 0.32 ? 1 : 1 - easeInOut(Math.min(1, (t - 0.32) / 0.68))
+        this.root.style.opacity = fade.toFixed(3)
+        this.apply()
+        if (t < 1) {
+          this.raf = requestAnimationFrame(step)
+          return
+        }
+        this.root.style.opacity = ''
+        this.root.classList.remove('is-handing-off')
+        this.setVisible(false)
+        resolve()
+      }
+      this.raf = requestAnimationFrame(step)
+    })
   }
 
   private frameRect(index: number): View {
