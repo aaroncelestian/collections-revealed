@@ -461,14 +461,43 @@ function HaliteLattice() {
   )
 }
 
-function labelDistanceFactor(phase: Phase, focused: boolean) {
-  // Keep CSS scale near 1 so labels rasterize at their font size instead of
-  // being blown up from 11px (drei Html uses transform: scale).
-  if (focused) return 2.8
-  if (phase === 'peri') return 1.9
-  if (phase === 'peers') return 5.4
-  if (closeSkyPhase(phase)) return 6.2
-  return 9
+/** Phase-based endpoints for Html distanceFactor (drei scales ≈ factor / distance). */
+function labelFactorRange(phase: Phase, focused: boolean): { near: number; far: number } {
+  if (focused) return { near: 2.8, far: 2.8 }
+  if (phase === 'peers') return { near: 1.9, far: 5.4 }
+  if (closeSkyPhase(phase)) return { near: 1.9, far: 6.2 }
+  // peri ↔ sky: ease with the camera so labels don't blow up when phase flips early.
+  return { near: 1.9, far: 9 }
+}
+
+/**
+ * Keep Html labels stable through the peri→sky dolly. A hard phase switch used
+ * to jump distanceFactor from 1.9 → 9 while the camera was still close.
+ */
+function useAdaptiveDistanceFactor(phase: Phase, focused: boolean, anchor: THREE.Vector3) {
+  const { camera } = useThree()
+  const { near, far } = labelFactorRange(phase, focused)
+  const [factor, setFactor] = useState(near)
+  const last = useRef(near)
+
+  useFrame(() => {
+    if (focused || near === far) {
+      if (last.current !== near) {
+        last.current = near
+        setFactor(near)
+      }
+      return
+    }
+    const dist = camera.position.distanceTo(anchor)
+    const t = THREE.MathUtils.smoothstep(2.2, 11.5, dist)
+    const next = THREE.MathUtils.lerp(near, far, t)
+    if (Math.abs(next - last.current) > 0.06) {
+      last.current = next
+      setFactor(next)
+    }
+  })
+
+  return factor
 }
 
 function MoonSystem({
@@ -478,7 +507,9 @@ function MoonSystem({
   showLabels,
   reduced,
   count,
-  distanceFactor,
+  phase,
+  focused,
+  anchor,
 }: {
   apps: string[]
   color: string
@@ -486,20 +517,23 @@ function MoonSystem({
   showLabels: boolean
   reduced: boolean
   count: number
-  distanceFactor: number
+  phase: Phase
+  focused: boolean
+  anchor: THREE.Vector3
 }) {
   const group = useRef<THREE.Group>(null)
+  const distanceFactor = useAdaptiveDistanceFactor(phase, focused, anchor)
   const moons = useMemo(() => {
     const n = Math.max(count, apps.length)
     return Array.from({ length: n }, (_, i) => {
       const app = apps[i % apps.length]
       const u = hash01(`${app}-${i}`)
       const incl = (u - 0.5) * 0.9
-      const phase = (i / n) * Math.PI * 2 + u
+      const phase0 = (i / n) * Math.PI * 2 + u
       const r = radius * (0.85 + u * 0.45)
       const speed = 0.18 + u * 0.35
       const size = 0.035 + (i % 3) * 0.012
-      return { app, incl, phase, r, speed, size, label: i < apps.length }
+      return { app, incl, phase: phase0, r, speed, size, label: i < apps.length }
     })
   }, [apps, count, radius])
 
@@ -634,6 +668,8 @@ function MineralBody({
             ? 0.55
             : 0.28
 
+  const nameDistanceFactor = useAdaptiveDistanceFactor(phase, focused || lit, body.pos)
+
   useFrame((_, dt) => {
     if (!root.current || reduced || !visible) return
     root.current.rotation.y += dt * (isHero || lit ? 0.15 : isPeer ? 0.1 : 0.05)
@@ -699,14 +735,16 @@ function MineralBody({
           showLabels={Boolean(showMoons && (isHero || isPeer || focused || lit))}
           reduced={reduced}
           count={moonCount}
-          distanceFactor={labelDistanceFactor(phase, focused || lit)}
+          phase={phase}
+          focused={focused || lit}
+          anchor={body.pos}
         />
       )}
       {showLabel && (
         <Html
           position={[0, 1.55, 0]}
           center
-          distanceFactor={labelDistanceFactor(phase, focused || lit)}
+          distanceFactor={nameDistanceFactor}
           style={{ pointerEvents: 'none' }}
           wrapperClass={styles.constellationNameLabel}
         >
