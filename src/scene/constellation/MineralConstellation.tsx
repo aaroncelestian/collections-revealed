@@ -1535,6 +1535,7 @@ function CameraRig({
   scripted,
   onSettle,
   onDiveProgress,
+  onOrbitTarget,
 }: {
   phase: Phase
   focusId: string | null
@@ -1543,6 +1544,8 @@ function CameraRig({
   onSettle?: (settled: boolean) => void
   /** 0–1 wash coverage during the plunge (0 while panning). */
   onDiveProgress?: (wash: number, done: boolean) => void
+  /** Keep OrbitControls pivoted where the dolly landed (avoids a snap). */
+  onOrbitTarget?: (target: [number, number, number]) => void
 }) {
   const { camera } = useThree()
   const focus = BODIES.find((b) => b.id === focusId) ?? null
@@ -1560,6 +1563,9 @@ function CameraRig({
   const prevPhase = useRef(phase)
   const prevFocus = useRef(focusId)
   const skyYaw = useRef(Math.atan2(-9.6, 10.8))
+  /** Orbit radius / height — adopted from the peri→sky dolly end pose. */
+  const skyOrbitR = useRef(SKY_R)
+  const skyOrbitY = useRef(SKY_Y)
   const settled = useRef(true)
   const baseFov = useRef(42)
   const easeDur = useRef(CAM_EASE_SEC)
@@ -1637,17 +1643,20 @@ function CameraRig({
         easeDur.current = WALK_SEC
       } else if (phase === 'sky' && prevPhase.current === 'peri') {
         // Dolly out from the NaCl: keep Halite framed, pull back along the view ray.
+        // Land on that framing — do not blend toward the old default sky seat.
         pullFromHero.current = true
         const dir = camera.position.clone().sub(HERO.pos)
         if (dir.lengthSq() < 1e-8) dir.set(0.2, 0.42, 2.35)
         dir.normalize()
         skyYaw.current = Math.atan2(dir.x, dir.z)
         if (!Number.isFinite(skyYaw.current)) skyYaw.current = Math.atan2(-9.6, 10.8)
-        const g = goalForPhase('sky', skyYaw.current)
-        const dolly = HERO.pos.clone().addScaledVector(dir, 11.5)
-        toPos.current.copy(dolly).lerp(g.pos, 0.4)
+        const dolly = HERO.pos.clone().addScaledVector(dir, 12.2)
+        skyOrbitR.current = Math.hypot(dolly.x, dolly.z)
+        skyOrbitY.current = dolly.y
+        toPos.current.copy(dolly)
         toLook.current.copy(HERO.pos)
         easeDur.current = PERI_TO_SKY_SEC
+        onOrbitTarget?.([HERO.pos.x, HERO.pos.y, HERO.pos.z])
       } else {
         if (phase === 'sky') {
           skyYaw.current = Math.atan2(camera.position.x - 0, camera.position.z - 0)
@@ -1699,8 +1708,7 @@ function CameraRig({
       phase !== 'dive'
 
     if (orbitOwnsCamera) {
-      if (phase === 'sky') look.current.set(0, 0.2, 0)
-      else if (phase === 'peers') look.current.copy(HERO.pos)
+      // Leave look alone — OrbitControls is pivoted on the landed target.
       hallWalkActive = false
       if (!settled.current) {
         settled.current = true
@@ -1797,35 +1805,39 @@ function CameraRig({
       }
     } else if (!focus && (phase === 'sky' || phase === 'return') && progress.current >= 1) {
       hallWalkActive = false
-      if (pullFromHero.current) pullFromHero.current = false
+      if (pullFromHero.current) {
+        // Freeze the orbit on the pose we just dolly’d to — no jump to the old seat.
+        pullFromHero.current = false
+        skyYaw.current = Math.atan2(camera.position.x, camera.position.z)
+        skyOrbitR.current = Math.max(6, Math.hypot(camera.position.x, camera.position.z))
+        skyOrbitY.current = camera.position.y
+        toPos.current.copy(camera.position)
+        toLook.current.copy(look.current)
+        onOrbitTarget?.([look.current.x, look.current.y, look.current.z])
+      }
       if (!reduced) skyYaw.current -= dt * SKY_SPIN_RAD_PER_SEC
-      const g = goalForPhase(phase === 'return' ? 'return' : 'sky', skyYaw.current)
-      toPos.current.copy(g.pos)
-      toLook.current.copy(g.look)
-      // Soft handoff: look drifts from Halite toward the constellation center.
-      camera.position.lerp(toPos.current, 1 - Math.exp(-1.15 * dt))
-      look.current.lerp(toLook.current, 1 - Math.exp(-0.85 * dt))
-      if (persp.fov !== baseFov.current) {
-        persp.fov = THREE.MathUtils.damp(persp.fov, 42, 3, dt)
+      // Orbit in place at the landed radius; keep looking where the dolly left us.
+      toPos.current.set(
+        Math.sin(skyYaw.current) * skyOrbitR.current,
+        skyOrbitY.current,
+        Math.cos(skyYaw.current) * skyOrbitR.current,
+      )
+      camera.position.lerp(toPos.current, 1 - Math.exp(-1.6 * dt))
+      look.current.lerp(toLook.current, 1 - Math.exp(-1.6 * dt))
+      if (persp.fov !== 46 && persp.fov !== 42) {
+        persp.fov = THREE.MathUtils.damp(persp.fov, 46, 3, dt)
         persp.updateProjectionMatrix()
       }
     } else if (progress.current < 1) {
       hallWalkActive = phase === 'instrument'
       if (!focus && (phase === 'sky' || phase === 'return') && !reduced) {
         // Keep spin quiet while dollying out of the NaCl so the zoom reads clean.
-        const spinScale = pullFromHero.current ? 0.12 : 1
-        skyYaw.current -= dt * SKY_SPIN_RAD_PER_SEC * spinScale
-        const g = goalForPhase(phase === 'return' ? 'return' : 'sky', skyYaw.current)
         if (pullFromHero.current) {
-          // Ease the orbit target in late so the first part is a true pull-back.
-          const u = easeInOutCubic(progress.current)
-          const dir = fromPos.current.clone().sub(HERO.pos)
-          if (dir.lengthSq() < 1e-8) dir.set(0.2, 0.42, 2.35)
-          dir.normalize()
-          const dolly = HERO.pos.clone().addScaledVector(dir, 11.5)
-          toPos.current.copy(dolly).lerp(g.pos, Math.max(0, (u - 0.35) / 0.65))
           toLook.current.copy(HERO.pos)
+          // Hold the pull-back target steady — don't chase the old sky ring mid-dolly.
         } else {
+          skyYaw.current -= dt * SKY_SPIN_RAD_PER_SEC
+          const g = goalForPhase(phase === 'return' ? 'return' : 'sky', skyYaw.current)
           toPos.current.copy(g.pos)
           toLook.current.copy(g.look)
         }
@@ -1931,6 +1943,11 @@ function Scene({
   const inHall = inHallPhase(phase)
   // Start unsettled so OrbitControls cannot steal the first peri→sky dolly frame.
   const [camSettled, setCamSettled] = useState(false)
+  const [orbitTarget, setOrbitTarget] = useState<[number, number, number]>([
+    HERO.pos.x,
+    HERO.pos.y,
+    HERO.pos.z,
+  ])
   const canOrbit = phase === 'sky' || phase === 'peers'
   const orbit = active && canOrbit && !focusId && !reduced && camSettled
   // Keep CameraRig driving the camera until the dolly settles — orbit only after.
@@ -1942,6 +1959,11 @@ function Scene({
   // commit as the phase change — that was snapping the view instead of zooming.
   useLayoutEffect(() => {
     setCamSettled(reduced)
+    if (phase === 'peers') {
+      setOrbitTarget([HERO.pos.x, HERO.pos.y, HERO.pos.z])
+    } else if (phase !== 'sky') {
+      setOrbitTarget([0, 0.2, 0])
+    }
   }, [phase, focusId, reduced])
 
   return (
@@ -1991,6 +2013,7 @@ function Scene({
         scripted={scripted}
         onSettle={setCamSettled}
         onDiveProgress={onDiveProgress}
+        onOrbitTarget={setOrbitTarget}
       />
 
       {/* Unmount sky after reveal nest so instrument/hall isn't paying for ~100 crystals */}
@@ -2022,7 +2045,7 @@ function Scene({
         minDistance={phase === 'peers' ? 3.5 : 6}
         maxDistance={phase === 'peers' ? 14 : 28}
         maxPolarAngle={Math.PI * 0.48}
-        target={phase === 'peers' ? HERO.pos.toArray() : [0, 0.2, 0]}
+        target={orbitTarget}
       />
     </>
   )
