@@ -1,5 +1,6 @@
 import { execSync } from 'node:child_process'
 import { readFileSync } from 'node:fs'
+import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
 
 function buildId(): string {
@@ -25,6 +26,7 @@ function buildId(): string {
 export default defineConfig({
   // GitHub Pages serves this repo from /collections-revealed/. Local dev stays relative.
   base: process.env.PAGES_BASE || './',
+  plugins: [react()],
   define: {
     __BUILD_ID__: JSON.stringify(buildId()),
   },

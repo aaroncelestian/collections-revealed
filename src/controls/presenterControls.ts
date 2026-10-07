@@ -14,7 +14,7 @@ type Listener = (command: PresenterCommand) => void
  *
  * `next` and `prev` are the only two signals a basic clicker sends, and they
  * carry the whole talk — reveal steps inside a beat consume them first, then
- * beats. Digits jump to act starts rather than beats, because 17 beats no
+ * beats. Digits jump to act starts rather than beats, because 18 beats no
  * longer fit on ten number keys.
  */
 /** A held key or a bouncy clicker must never jump three beats at once. */

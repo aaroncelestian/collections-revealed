@@ -1,0 +1,91 @@
+.constellation {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+  background: #030303;
+}
+
+.constellationWash {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+  opacity: 0;
+  background: #fff6d8;
+}
+
+.constellationHint {
+  position: absolute;
+  left: 50%;
+  bottom: clamp(14px, 2.4vh, 28px);
+  z-index: 3;
+  transform: translateX(-50%);
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  font-family: 'IBM Plex Sans', 'Segoe UI', sans-serif;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(236, 228, 210, 0.48);
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.constellationHint[data-idle] {
+  pointer-events: none;
+  cursor: default;
+}
+
+.constellationNameLabel {
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.constellationNameLabel div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  color: rgba(245, 238, 220, 0.9);
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  text-shadow: 0 0 18px rgba(0, 0, 0, 0.85);
+}
+
+.constellationNameLabel div[data-hero] {
+  font-size: 32px;
+}
+
+.constellationNameLabel em {
+  font-style: normal;
+  font-family: 'IBM Plex Sans', 'Segoe UI', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(236, 228, 210, 0.45);
+}
+
+.constellationNameLabel strong {
+  font-weight: 650;
+}
+
+.constellationMoonLabel {
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.constellationMoonLabel span {
+  display: inline-block;
+  font-family: 'IBM Plex Sans', 'Segoe UI', sans-serif;
+  font-size: 15px;
+  letter-spacing: 0.02em;
+  color: rgba(236, 228, 210, 0.72);
+  text-shadow: 0 0 12px rgba(0, 0, 0, 0.9);
+}

@@ -11,6 +11,7 @@ import {
   stepCount,
   type BeatDefinition,
   type BeatFrame,
+  type ConstellationPhase,
   type GlobePhase,
   type SceneKind,
   type SolarPhase,
@@ -20,8 +21,22 @@ import { bindPresenterControls, type PresenterCommand } from '../controls/presen
 import { startHaliteHero } from '../scene/halite/hero-halite.js'
 import { startGlobeDive, type GlobeDiveHandle } from '../scene/GlobeDive'
 import { startSolarSystem, type SolarSystemHandle } from '../scene/SolarSystem'
+import {
+  startConstellation,
+  type ConstellationHandle,
+} from '../scene/constellation/mountConstellation'
 import { publicAsset } from '../lib/publicAsset'
 import { isFullscreen, toggleFullscreen } from '../lib/fullscreen'
+
+const CONSTELLATION_PHASES = new Set<string>([
+  'peri',
+  'sky',
+  'reveal',
+  'cabinets',
+  'instrument',
+  'turn',
+  'dive',
+])
 
 type HeroHandle = {
   setVisible: (visible: boolean) => void
@@ -51,6 +66,7 @@ export class PresentationApp {
   private hero: HeroHandle | null = null
   private globe: GlobeDiveHandle | null = null
   private solar: SolarSystemHandle | null = null
+  private constellation: ConstellationHandle | null = null
   private hunting = false
   private readonly fadeOutTimers = new Map<SceneKind, number>()
 
@@ -58,6 +74,7 @@ export class PresentationApp {
   private readonly heroCanvas: HTMLCanvasElement
   private readonly globeCanvas: HTMLCanvasElement
   private readonly solarCanvas: HTMLCanvasElement
+  private readonly constellationHost: HTMLElement
 
   private readonly hud: {
     clock: HTMLElement
@@ -85,11 +102,13 @@ export class PresentationApp {
   constructor(
     heroCanvas: HTMLCanvasElement,
     globeCanvas: HTMLCanvasElement,
-    solarCanvas: HTMLCanvasElement
+    solarCanvas: HTMLCanvasElement,
+    constellationHost: HTMLElement,
   ) {
     this.heroCanvas = heroCanvas
     this.globeCanvas = globeCanvas
     this.solarCanvas = solarCanvas
+    this.constellationHost = constellationHost
     this.hud = {
       clock: must('hud-clock'),
       drift: must('hud-drift'),
@@ -155,6 +174,12 @@ export class PresentationApp {
     this.solar.setVisible(false)
     this.solar.setRendering(false)
 
+    this.constellation = startConstellation(this.constellationHost, {
+      onDiveComplete: () => this.onConstellationDiveComplete(),
+    })
+    this.constellation.setVisible(false)
+    this.constellation.setRendering(false)
+
     try {
       this.hero = (await startHaliteHero(this.heroCanvas, {
         theatreUrl: publicAsset('/hero/halite-theatre.json'),
@@ -172,6 +197,13 @@ export class PresentationApp {
     // Route the scene for wherever the presenter has got to. Boot is slow enough
     // that they may already have moved, and snapping back to beat 1 loses them.
     this.goTo(this.beatIndex, this.stepIndex, { replayCues: false })
+  }
+
+  /** Drawer plunge finished — land on Name the Object without replaying cold open. */
+  private onConstellationDiveComplete() {
+    const claim = BEATS.findIndex((b) => b.id === 'the-claim')
+    if (claim < 0) return
+    this.goTo(claim, -1)
   }
 
   // ── Presenter intents ──────────────────────────────────────────────────
@@ -284,6 +316,7 @@ export class PresentationApp {
     document.body.classList.toggle('scene-hero', wanted === 'hero')
     document.body.classList.toggle('scene-globe', wanted === 'globe')
     document.body.classList.toggle('scene-solar', wanted === 'solar')
+    document.body.classList.toggle('scene-constellation', wanted === 'constellation')
 
     const heroOn = wanted === 'hero'
     // Hand the crystal back before the frames stop, so the scripted camera has
@@ -307,11 +340,24 @@ export class PresentationApp {
     this.solar?.setVisible(solarOn)
     this.holdThroughFade('solar', solarOn, (on) => this.solar?.setRendering(on))
 
+    const constellationOn = wanted === 'constellation'
+    this.constellation?.setVisible(constellationOn)
+    this.holdThroughFade('constellation', constellationOn, (on) =>
+      this.constellation?.setRendering(on),
+    )
+
     if (globeOn && frame.scenePhase) {
       // A countdown step holds its scene change until the room reaches zero.
       if (frame.countFrom === undefined) this.globe?.setPhase(frame.scenePhase as GlobePhase)
     }
     if (solarOn && frame.scenePhase) this.solar?.setPhase(frame.scenePhase as SolarPhase)
+    if (
+      constellationOn &&
+      frame.scenePhase &&
+      CONSTELLATION_PHASES.has(frame.scenePhase)
+    ) {
+      this.constellation?.setPhase(frame.scenePhase as ConstellationPhase)
+    }
 
     if (heroOn) {
       // Hunting first: it pauses the scripted camera, and the inside hold has
@@ -511,6 +557,7 @@ export class PresentationApp {
     this.hero?.dispose()
     this.globe?.dispose()
     this.solar?.dispose()
+    this.constellation?.dispose()
   }
 }
 

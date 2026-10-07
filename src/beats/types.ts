@@ -36,7 +36,17 @@ export type StageKind =
   | 'scene'
 
 /** Which WebGL scene the canvas renders, if any. */
-export type SceneKind = 'none' | 'hero' | 'globe' | 'solar'
+export type SceneKind = 'none' | 'hero' | 'globe' | 'solar' | 'constellation'
+
+/** Named camera / drawer state inside the mineral constellation intro. */
+export type ConstellationPhase =
+  | 'peri'
+  | 'sky'
+  | 'reveal'
+  | 'cabinets'
+  | 'instrument'
+  | 'turn'
+  | 'dive'
 
 /** Where the Searles Lake crystal sits. It never unmounts, it only moves. */
 export type AnchorPlacement = 'hidden' | 'full' | 'inset'
@@ -59,7 +69,7 @@ export type SolarPhase = 'earth' | 'system'
  * A named camera state inside whichever scene the beat has up. Each scene
  * ignores the names that are not its own.
  */
-export type ScenePhase = GlobePhase | SolarPhase
+export type ScenePhase = GlobePhase | SolarPhase | ConstellationPhase
 
 export interface BeatLabel {
   text: string

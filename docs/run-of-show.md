@@ -1,9 +1,9 @@
 # Life in Salt — run of show
 
-17 beats, 7 acts, ~14:35 of stage time against a 15-minute slot. Room of ~100.
-The overrun cushion sits in the closing pull-back, which is the first thing to
-trim if the room runs long: the hunt can end on "Found it" and go straight to
-the last two frames.
+18 beats, 7 acts, ~16:05 of stage time against a 15-minute slot. Room of ~100.
+The overrun cushion sits in the closing pull-back and, if needed, the cabinet
+aisle walk. The hunt can end on "Found it" and go straight to the last two
+frames.
 
 The Searles Lake halite crystal is the hub. It opens the talk, returns at every
 act break, and closes it. The cold open is silent and pink — you do **not** say
@@ -39,7 +39,7 @@ skip three beats.
 Times are where each beat *should start*. The HUD shows your drift against
 these and turns red when you are more than 15 seconds behind.
 
-### Act 1 — The Object (0:00, 0:55)
+### Act 1 — The Object (0:00, 2:25)
 
 **0:00 · Cold Open** — full-frame crystal, silence, title plate low-left:
 *Collections Revealed / Can a Rock Keep a Secret? / Aaron Celestian, PhD*.
@@ -48,26 +48,38 @@ Say nothing for a five count. Let them look.
 > Count the room out loud — "six, nine, about a dozen of you."
 > Press. Plate clears. "Hold that thought." Do **not** say alive yet.
 
-**0:35 · Name the Object** — same frame.
+**0:35 · Pull Back** — leave the pink photo for the 3D constellation. Six
+presses after the Halite close-up lands:
+- Halite close-up (cubic crystal, uses as labels)
+- Constellation — "Minerals are in nearly everything."
+- Nest into one glowing drawer — "One drawer."
+- Pull to the aisle — "Not a warehouse."
+- Walk the row — "150,000 specimens. A materials library."
+- Hold on the dive drawer — "The specimen is already in a drawer."
+- Press into Dive; the plunge auto-advances when the wash completes.
+
+**~2:05 · Name the Object** — pink crystal returns.
 "Halite. Rock salt. Searles Lake, California." Stop there. No trapped water,
 no life — the zoom earns that.
 
-### Act 2 — The Place (0:55, 1:25)
+### Act 2 — The Place (2:25, 1:25)
 
-**0:55 · Where is Searles Lake?** — globe spins, crystal shrinks to a corner
+**2:25 · Where is Searles Lake?** — globe spins, crystal shrinks to a corner
 inset. Press drops the pin. "Three hours north of where we are standing."
 
-**1:40 · The Pink Water** — opens on the wide lakebed still. Click through the
+**3:10 · The Pink Water** — opens on the wide lakebed still. Click through the
 field photos fast — one press each, almost no talk: the rig drilling the flat, the
 painted rocks, the pink pool, then the close pink filaments.
 On that last frame: "The water that is left is pink." / "Hold on to that color.
 We come back to it."
 Do **not** explain the pink here. The ending needs it unexplained.
 
-### Act 3 — The Zoom (2:20, 1:30)
+### Act 3 — The Zoom (3:50, 1:30)
 
-**2:20 · Zoom Ladder** — four frames, three presses, one continuous push. The camera
+**3:50 · Zoom Ladder** — four frames, three presses, one continuous push. The camera
 zooms and then holds, so keep saying *this is still the same rock*.
+(Later act clocks in this doc still track the pre-cabinet pacing; trust the HUD
+`BEAT_START_SECONDS` for drift after this point.)
 
 - opens at 3.2 mm across, scale bar visible
 - press → 1.1 mm

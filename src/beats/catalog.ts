@@ -61,7 +61,7 @@ const ZOOM_LADDER: ZoomFrame[] = [
 ]
 
 /**
- * 17 beats, 7 acts, ~14:35 of stage time.
+ * 18 beats, 7 acts, ~16:05 of stage time (includes the cabinet pull-back).
  *
  * The Searles Lake crystal is the hub: it opens the talk, returns at every act
  * break, and closes it. Everything else is a departure from that one object.
@@ -102,6 +102,58 @@ const BEATS_RAW: BeatDefinition[] = [
   {
     index: 1,
     act: 'object',
+    id: 'cabinet-pull',
+    title: 'Pull Back',
+    cue: 'Halite close-up, then pull into the constellation, one drawer, the hall, and dive.',
+    seconds: 90,
+    stage: 'scene',
+    anchor: 'hidden',
+    scene: 'constellation',
+    scenePhase: 'peri',
+    headline: 'Halite',
+    supporting: 'Fluid inclusions · astrobiology',
+    steps: [
+      {
+        label: 'Constellation',
+        scenePhase: 'sky',
+        headline: 'Minerals are in nearly everything.',
+        supporting: undefined,
+      },
+      {
+        label: 'One drawer',
+        scenePhase: 'reveal',
+        headline: 'One drawer.',
+        supporting: undefined,
+      },
+      {
+        label: 'Cabinets',
+        scenePhase: 'cabinets',
+        headline: 'Not a warehouse.',
+        supporting: undefined,
+      },
+      {
+        label: 'Instrument',
+        scenePhase: 'instrument',
+        headline: '150,000 specimens. A materials library.',
+        supporting: undefined,
+      },
+      {
+        label: 'The turn',
+        scenePhase: 'turn',
+        headline: 'The specimen is already in a drawer.',
+        supporting: undefined,
+      },
+      {
+        label: 'Dive',
+        scenePhase: 'dive',
+        headline: undefined,
+        supporting: undefined,
+      },
+    ],
+  },
+  {
+    index: 2,
+    act: 'object',
     id: 'the-claim',
     title: 'Name the Object',
     cue: 'Name it plainly. Halite. Rock salt. Stop there — do not open the crystal yet.',
@@ -116,7 +168,7 @@ const BEATS_RAW: BeatDefinition[] = [
 
   // ─── Act 2 · The Place ─────────────────────────────────────────────────
   {
-    index: 2,
+    index: 3,
     act: 'place',
     id: 'where',
     title: 'Where is Searles Lake?',
@@ -138,7 +190,7 @@ const BEATS_RAW: BeatDefinition[] = [
     ],
   },
   {
-    index: 3,
+    index: 4,
     act: 'place',
     id: 'searles-field',
     title: 'The Pink Water',
@@ -189,7 +241,7 @@ const BEATS_RAW: BeatDefinition[] = [
 
   // ─── Act 3 · The Zoom ──────────────────────────────────────────────────
   {
-    index: 4,
+    index: 5,
     act: 'zoom',
     id: 'zoom-ladder',
     title: 'Zoom Ladder',
@@ -228,7 +280,7 @@ const BEATS_RAW: BeatDefinition[] = [
     ],
   },
   {
-    index: 5,
+    index: 6,
     act: 'zoom',
     id: 'inclusions',
     title: 'Fluid Inclusions',
@@ -255,7 +307,7 @@ const BEATS_RAW: BeatDefinition[] = [
 
   // ─── Act 4 · The Life ──────────────────────────────────────────────────
   {
-    index: 6,
+    index: 7,
     act: 'life',
     id: 'reveal',
     title: 'Something Moves',
@@ -280,7 +332,7 @@ const BEATS_RAW: BeatDefinition[] = [
     ],
   },
   {
-    index: 7,
+    index: 8,
     act: 'life',
     id: 'still-the-same-rock',
     title: 'Back to the Rock',
@@ -296,7 +348,7 @@ const BEATS_RAW: BeatDefinition[] = [
 
   // ─── Act 5 · The Reach ─────────────────────────────────────────────────
   {
-    index: 8,
+    index: 9,
     act: 'reach',
     id: 'mars-film',
     title: 'Searching for Life in Salt Crystals',
@@ -314,7 +366,7 @@ const BEATS_RAW: BeatDefinition[] = [
 
   // ─── Act 6 · The Depth ─────────────────────────────────────────────────
   {
-    index: 9,
+    index: 10,
     act: 'depth',
     id: 'the-dive',
     title: 'California to the North Sea',
@@ -343,7 +395,7 @@ const BEATS_RAW: BeatDefinition[] = [
     ],
   },
   {
-    index: 10,
+    index: 11,
     act: 'depth',
     id: 'descent',
     title: 'Descent',
@@ -367,7 +419,7 @@ const BEATS_RAW: BeatDefinition[] = [
     ],
   },
   {
-    index: 11,
+    index: 12,
     act: 'depth',
     id: 'salt-world',
     title: 'Salt World',
@@ -416,7 +468,7 @@ const BEATS_RAW: BeatDefinition[] = [
     ],
   },
   {
-    index: 12,
+    index: 13,
     act: 'depth',
     id: 'finding-salt',
     title: 'Finding the Water',
@@ -466,7 +518,7 @@ const BEATS_RAW: BeatDefinition[] = [
     ],
   },
   {
-    index: 13,
+    index: 14,
     act: 'depth',
     id: 'brine-turns-pink',
     title: 'The Brine Turns Pink',
@@ -506,7 +558,7 @@ const BEATS_RAW: BeatDefinition[] = [
 
   // ─── Act 7 · The Return ────────────────────────────────────────────────
   {
-    index: 14,
+    index: 15,
     act: 'return',
     id: 'hunt',
     title: 'Drive the Microscope',
@@ -572,7 +624,7 @@ const BEATS_RAW: BeatDefinition[] = [
     ],
   },
   {
-    index: 15,
+    index: 16,
     act: 'return',
     id: 'the-reread',
     title: 'Look Again',
@@ -587,7 +639,7 @@ const BEATS_RAW: BeatDefinition[] = [
       'The pink you saw in the very first picture — that is what we think alien life most likely looks like.',
   },
   {
-    index: 16,
+    index: 17,
     act: 'return',
     id: 'send-off',
     title: 'Send-off',
