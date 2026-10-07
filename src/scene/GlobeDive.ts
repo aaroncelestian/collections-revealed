@@ -38,6 +38,28 @@ const SHAFT_SECONDS = 30
 /** How fast the camera closes on a phase's altitude. Lower is slower. */
 const APPROACH_RATE = 2.1
 
+/** Stage time for the California → England flight path to draw. */
+const ARC_SECONDS = 4.2
+
+/**
+ * Map arc-draw progress onto a globe turn that hangs on the mid-Atlantic.
+ *
+ * A plain Searles→Boulby slerp keyed 1:1 still spends most of the flight
+ * looking along the chord (California already on the limb, path foreshortened
+ * into a straight line). Dwelling near the midpoint keeps the bow face-on
+ * while the line grows, then finishes the turn onto England as it lands.
+ */
+function arcTurn(progress: number): number {
+  const p = THREE.MathUtils.clamp(progress, 0, 1)
+  if (p <= 0.35) {
+    const t = p / 0.35
+    return 0.5 * (t * t * (3 - 2 * t))
+  }
+  if (p <= 0.65) return 0.5
+  const t = (p - 0.65) / 0.35
+  return 0.5 + 0.5 * (t * t * (3 - 2 * t))
+}
+
 interface PhasePose {
   /** Camera distance from globe center. */
   distance: number
@@ -63,7 +85,8 @@ interface PhasePose {
 const GLOBE_POSES: Record<string, PhasePose> = {
   world: { distance: 3.3, lonLat: [-70, 20], spin: true },
   searles: { distance: 2.55, lonLat: SEARLES, spin: false },
-  arc: { distance: 3.0, lonLat: null, spin: false },
+  // Pulled out a touch so both ends of the flight stay on the ball while it turns.
+  arc: { distance: 3.25, lonLat: null, spin: false },
   'boulby-surface': { distance: 2.5, lonLat: BOULBY, spin: false },
   /**
    * The closing pull-back. Opens with the planet overfilling the frame, the
@@ -399,6 +422,8 @@ export function startGlobeDive(
   let pullFrom = distance
   const quat = orientationFor(GLOBE_POSES.world.lonLat![0], GLOBE_POSES.world.lonLat![1])
   const targetQuat = quat.clone()
+  const arcFromQuat = new THREE.Quaternion()
+  const arcToQuat = new THREE.Quaternion()
   globeGroup.quaternion.copy(quat)
   let spin = true
 
@@ -567,8 +592,12 @@ export function startGlobeDive(
       arcMat.opacity = ARC_OPACITY
       arcHead.visible = true
       boulbyPin.visible = false
-      // The globe turns to England at exactly the pace the arc draws.
-      targetQuat.copy(orientationFor(BOULBY[0], BOULBY[1]))
+      // Capture the facing we leave on (Searles after the countdown) and aim
+      // for England. updateGlobe drives the turn off arc progress so the
+      // mid-Atlantic hang and the growing path stay locked together.
+      arcFromQuat.copy(quat)
+      arcToQuat.copy(orientationFor(BOULBY[0], BOULBY[1]))
+      targetQuat.copy(arcToQuat)
     }
     if (next === 'boulby-surface') {
       arcProgress = 1
@@ -597,19 +626,24 @@ export function startGlobeDive(
     }
 
     if (arcRunning) {
-      arcProgress = Math.min(1, arcProgress + dt / 3.6)
+      arcProgress = Math.min(1, arcProgress + dt / ARC_SECONDS)
       const count = Math.max(2, Math.floor(arcProgress * ARC_SEGMENTS))
       drawArc(count)
       arcHead.position.copy(arcPoints[Math.min(count, arcPoints.length - 1)])
+      // Turn with the path, not ahead of it: the free approach slerp used to
+      // park on England in ~1.5s while the line still had two seconds to go.
+      quat.slerpQuaternions(arcFromQuat, arcToQuat, arcTurn(arcProgress))
       if (arcProgress >= 1) {
         arcRunning = false
         arcHead.visible = false
         boulbyPin.visible = true
+        quat.copy(arcToQuat)
       }
+    } else {
+      const ease = 1 - Math.exp(-APPROACH_RATE * dt)
+      quat.slerp(targetQuat, ease)
     }
 
-    const ease = 1 - Math.exp(-APPROACH_RATE * dt)
-    quat.slerp(targetQuat, ease)
     globeGroup.quaternion.copy(quat)
     camera.up.set(0, 1, 0)
 

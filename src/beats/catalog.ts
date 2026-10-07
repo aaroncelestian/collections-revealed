@@ -279,6 +279,10 @@ const BEATS_RAW: BeatDefinition[] = [
     steps: [
       {
         label: 'Label the pockets',
+        // Fires itself after the inclusion frame lands so the ladder→labels
+        // move reads as one transition (3.7.0 → 3.7.1), not two presses.
+        // Slightly longer than ZoomStack's push so the camera has settled.
+        autoMs: 2000,
         labels: [
           { text: 'trapped lake water', x: 22, y: 30, delayMs: 300 },
           { text: 'sealed for thousands of years', x: 58, y: 68, delayMs: 1100 },

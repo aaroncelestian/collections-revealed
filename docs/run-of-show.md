@@ -91,8 +91,9 @@ zooms and then holds, so keep saying *this is still the same rock*.
 - press → the bar snaps in. "Four tenths of a millimeter. About one and a half
   grains of table salt, side by side."
 
-**3:20 · Fluid Inclusions** — press labels the pockets. "Every little box is a
-drop of that lake, sealed in salt." Water only — not life.
+**3:20 · Fluid Inclusions** — one press from the ladder: the frame lands, then
+the pocket labels fire themselves (~2s). "Every little box is a drop of that
+lake, sealed in salt." Water only — not life.
 
 ### Act 4 — The Life (3:50, 1:30)
 
