@@ -87,17 +87,6 @@ const BEATS_RAW: BeatDefinition[] = [
       title: 'Can a Rock Keep a Secret?',
       byline: 'Aaron Celestian, PhD',
     },
-    steps: [
-      {
-        label: 'Clear the plate',
-        // The plate clears so the crystal is alone — no answer yet. The zoom
-        // and the microbe clip cash this in.
-        titleCard: undefined,
-        headline: undefined,
-        supporting: undefined,
-        ask: 'SAY: hold that thought.',
-      },
-    ],
   },
   {
     index: 1,

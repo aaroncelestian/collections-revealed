@@ -46,7 +46,7 @@ these and turns red when you are more than 15 seconds behind.
 Say nothing for a five count. Let them look.
 > **ASK:** "Hands up if you think a rock can keep a secret."
 > Count the room out loud — "six, nine, about a dozen of you."
-> Press. Plate clears. "Hold that thought." Do **not** say alive yet.
+> Press once to leave into Pull Back (no clear-plate hold). Do **not** say alive yet.
 
 **0:35 · Pull Back** — leave the pink photo for the 3D constellation. Five
 presses after the Halite close-up lands:
