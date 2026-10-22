@@ -1193,12 +1193,12 @@ const CAM_EASE_SEC = 2.45
 const PERI_TO_SKY_SEC = 4.1
 /** Longer ease for sky ↔ reveal ↔ cabinets nested-doll handoff. */
 const REVEAL_CAM_EASE_SEC = 3.2
-/** Ease from the aisle onto the open mouth before the push in. */
+/** Rise in the aisle until the open drawer is below the lens. */
 const DIVE_PAN_SEC = 2.7
-/** Dolly through the mouth into the tray. */
+/** Drop through the open top into the tray. */
 const DIVE_PLUNGE_SEC = 2.0
 /** Field of view once the lens is inside the tray. */
-const DIVE_INSIDE_FOV = 42
+const DIVE_INSIDE_FOV = 46
 const SKY_R = 14.4
 const SKY_Y = 3.1
 /** Match OrbitControls autoRotate (positive speed → rotateLeft → decreasing theta). */
@@ -1249,18 +1249,21 @@ const CABINETS_AISLE = {
   look: new THREE.Vector3(0, 1.15, 14.5),
 }
 
+/** Open-tray center — same offset as the nested constellation in the first drawer. */
+const DIVE_TRAY = new THREE.Vector3(DIVE_MOUTH.x, DIVE_MOUTH.y + 0.06, DIVE_MOUTH.z - 0.48)
+
 /**
- * Centered in front of the open mouth. Staying above the cabinet made the
- * plunge hit the top of the drawer instead of the opening.
+ * Rise above the aisle and look down into the open tray.
+ * Aiming at the front lip reads as the top of the drawer; the tray is behind it.
  */
 const DIVE_PAN = {
-  pos: new THREE.Vector3(DIVE_MOUTH.x, DIVE_MOUTH.y + 0.42, DIVE_MOUTH.z + 2.15),
-  look: new THREE.Vector3(DIVE_MOUTH.x, DIVE_MOUTH.y - 0.02, DIVE_MOUTH.z - 0.45),
+  pos: new THREE.Vector3(DIVE_MOUTH.x + 0.1, DIVE_MOUTH.y + 5.8, 18.6),
+  look: DIVE_TRAY.clone(),
 }
-/** Just past the lip, looking down the tray at the crystals. */
+/** Down through the open top, still looking at the crystals — not through the back wall. */
 const DIVE_PLUNGE = {
-  pos: new THREE.Vector3(DIVE_MOUTH.x, DIVE_MOUTH.y + 0.04, DIVE_MOUTH.z - 0.05),
-  look: new THREE.Vector3(DIVE_MOUTH.x, DIVE_MOUTH.y - 0.05, DIVE_MOUTH.z - 0.7),
+  pos: new THREE.Vector3(DIVE_TRAY.x, DIVE_TRAY.y + 0.16, DIVE_TRAY.z + 0.06),
+  look: new THREE.Vector3(DIVE_TRAY.x, DIVE_TRAY.y - 0.02, DIVE_TRAY.z - 0.16),
 }
 
 /** Aisle walk from room entry toward the dive drawer on the right. */
@@ -1802,17 +1805,16 @@ function CameraRig({
           const v = easeInOutCubic(diveClock.current / panDur)
           camera.position.lerpVectors(fromPos.current, midPos.current, v)
           look.current.lerpVectors(fromLook.current, midLook.current, v)
-          persp.fov = THREE.MathUtils.lerp(baseFov.current, 36, v)
+          persp.fov = THREE.MathUtils.lerp(baseFov.current, 38, v)
           onDiveProgress?.(0, false)
         } else {
           const raw = Math.min(1, (diveClock.current - panDur) / plungeDur)
           const v = easeInOutCubic(raw)
           camera.position.lerpVectors(midPos.current, toPos.current, v)
           look.current.lerpVectors(midLook.current, toLook.current, v)
-          persp.fov = THREE.MathUtils.lerp(36, DIVE_INSIDE_FOV, v)
-          // Hold the interior in frame, then wash once the lens is inside the tray.
-          const wash = Math.min(1, easeInOutCubic(Math.max(0, (raw - 0.78) / 0.22)))
-          document.documentElement.dataset.diveCam = `${camera.position.x.toFixed(2)},${camera.position.y.toFixed(2)},${camera.position.z.toFixed(2)},${persp.fov.toFixed(0)}`
+          persp.fov = THREE.MathUtils.lerp(38, DIVE_INSIDE_FOV, v)
+          // Let the drop into the tray read, then wash.
+          const wash = Math.min(1, easeInOutCubic(Math.max(0, (raw - 0.72) / 0.28)))
           onDiveProgress?.(wash, raw >= 1)
           if (raw >= 1 && !settled.current) {
             settled.current = true
