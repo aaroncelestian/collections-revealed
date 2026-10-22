@@ -93,7 +93,7 @@ const BEATS_RAW: BeatDefinition[] = [
     act: 'object',
     id: 'cabinet-pull',
     title: 'Pull Back',
-    cue: 'Halite close-up, then pull into the constellation, one drawer, the hall, and dive.',
+    cue: 'Halite close-up, then pull into the constellation, one drawer, the hall, and dive. Press after the plunge to start the intro film.',
     seconds: 90,
     stage: 'scene',
     anchor: 'hidden',
@@ -134,8 +134,25 @@ const BEATS_RAW: BeatDefinition[] = [
       },
     ],
   },
+  // ─── Act 5 · The Reach (parked here as the intro) ──────────────────────
   {
     index: 2,
+    act: 'reach',
+    id: 'mars-film',
+    title: 'Searching for Life in Salt Crystals',
+    cue: 'The intro. Let the film play. Do not talk over it. Next press names the crystal.',
+    seconds: 135,
+    stage: 'video',
+    anchor: 'hidden',
+    scene: 'none',
+    // Burned-in narration text sits close to frame edges — never crop this one.
+    fit: 'contain',
+    videoSrc: '/assets/video/searching-for-life.mp4',
+    poster: '/assets/images/searching-for-life-poster.jpg',
+    audio: true,
+  },
+  {
+    index: 3,
     act: 'object',
     id: 'the-claim',
     title: 'Name the Object',
@@ -150,7 +167,7 @@ const BEATS_RAW: BeatDefinition[] = [
 
   // ─── Act 2 · The Place ─────────────────────────────────────────────────
   {
-    index: 3,
+    index: 4,
     act: 'place',
     id: 'where',
     title: 'Where is Searles Lake?',
@@ -172,7 +189,7 @@ const BEATS_RAW: BeatDefinition[] = [
     ],
   },
   {
-    index: 4,
+    index: 5,
     act: 'place',
     id: 'searles-field',
     title: 'The Pink Water',
@@ -223,7 +240,7 @@ const BEATS_RAW: BeatDefinition[] = [
 
   // ─── Act 3 · The Zoom ──────────────────────────────────────────────────
   {
-    index: 5,
+    index: 6,
     act: 'zoom',
     id: 'zoom-ladder',
     title: 'Zoom Ladder',
@@ -262,7 +279,7 @@ const BEATS_RAW: BeatDefinition[] = [
     ],
   },
   {
-    index: 6,
+    index: 7,
     act: 'zoom',
     id: 'inclusions',
     title: 'Fluid Inclusions',
@@ -280,7 +297,7 @@ const BEATS_RAW: BeatDefinition[] = [
       {
         label: 'Label the pockets',
         // Fires itself after the inclusion frame lands so the ladder→labels
-        // move reads as one transition (3.7.0 → 3.7.1), not two presses.
+        // move reads as one transition (3.8.0 → 3.8.1), not two presses.
         // Slightly longer than ZoomStack's push so the camera has settled.
         autoMs: 2000,
         labels: [
@@ -293,7 +310,7 @@ const BEATS_RAW: BeatDefinition[] = [
 
   // ─── Act 4 · The Life ──────────────────────────────────────────────────
   {
-    index: 7,
+    index: 8,
     act: 'life',
     id: 'reveal',
     title: 'Something Moves',
@@ -318,7 +335,7 @@ const BEATS_RAW: BeatDefinition[] = [
     ],
   },
   {
-    index: 8,
+    index: 9,
     act: 'life',
     id: 'still-the-same-rock',
     title: 'Back to the Rock',
@@ -332,31 +349,13 @@ const BEATS_RAW: BeatDefinition[] = [
     supporting: 'You have been looking at it this whole time.',
   },
 
-  // ─── Act 5 · The Reach ─────────────────────────────────────────────────
-  {
-    index: 9,
-    act: 'reach',
-    id: 'mars-film',
-    title: 'Searching for Life in Salt Crystals',
-    cue: 'Set it up in one line, then stop talking for two minutes.',
-    seconds: 135,
-    stage: 'video',
-    anchor: 'hidden',
-    scene: 'none',
-    // Burned-in narration text sits close to frame edges — never crop this one.
-    fit: 'contain',
-    videoSrc: '/assets/video/searching-for-life.mp4',
-    poster: '/assets/images/searching-for-life-poster.jpg',
-    audio: true,
-  },
-
   // ─── Act 6 · The Depth ─────────────────────────────────────────────────
   {
     index: 10,
     act: 'depth',
     id: 'the-dive',
     title: 'California to the North Sea',
-    cue: 'Reset the room after the film. Get them counting.',
+    cue: 'Reset the room. Get them counting.',
     ask: 'ASK: count me down from five, out loud, everybody.',
     seconds: 45,
     stage: 'scene',

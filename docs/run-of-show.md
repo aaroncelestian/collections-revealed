@@ -9,9 +9,10 @@ The Searles Lake halite crystal is the hub. It opens the talk, returns at every
 act break, and closes it. The cold open is silent and pink — you do **not** say
 what is inside yet. Act 4 is the first time the room sees life in the crystal.
 
-**Microscope vs film:** play the microbe clip (Act 4) *before* the Mars film
-(Act 5), so the film lands. Keep the live microscope hunt (Act 7) *after* the
-film and Boulby — that is the interactive payoff, not the first reveal.
+**Microscope vs film:** the Searching for Life film is the intro — it plays
+right after the cabinet pull-back, before you name the crystal. The microbe
+clip (Act 4) is the first time the room sees life in *this* rock. Keep the live
+microscope hunt (Act 7) after Boulby — that is the interactive payoff.
 
 **One press does one thing.** Some beats hold several presses — a question, a
 pause, then the answer. The HUD always shows `reveal n/m` so you know whether
@@ -55,10 +56,20 @@ presses after the Halite close-up lands:
 - Nest into one glowing drawer — "One drawer."
 - Pull to the aisle — "Not a warehouse."
 - Walk the row — "150,000 specimens. A materials library."
-- Press into Dive (skip the hold / “already in a drawer” beat); the plunge
-  auto-advances when the wash completes.
+- Press into Dive (skip the hold / “already in a drawer” beat). When the wash
+  completes, press to start the intro film — that press is what lets it play
+  with sound.
 
-**~2:05 · Name the Object** — pink crystal returns.
+**~2:05 · Searching for Life in Salt Crystals** — the full 1:57 film, with
+sound. This is the intro. Stop talking. It sets the question; the rest of the
+talk is the answer.
+
+The film starts unmuted because your keypress counts as the gesture browsers
+require. It also carries its narration as burned-in on-screen text, so it still
+reads if the house audio fails. If sound is blocked the app retries muted by
+itself — do not stop to fix it.
+
+**After the film · Name the Object** — pink crystal returns.
 "Halite. Rock salt. Searles Lake, California." Stop there. No trapped water,
 no life — the zoom earns that.
 
@@ -108,21 +119,14 @@ the salt.*
 **4:45 · Back to the Rock** — the crystal returns full frame. Point at it.
 "Same rock. You have been looking at it this whole time."
 
-### Act 5 — The Reach (5:20, 2:15)
+### Act 5 — The Reach
 
-**5:20 · Searching for Life in Salt Crystals** — the full 1:57 film, with
-sound. Set it up in one line, then stop talking. It lands because they have
-already seen the cell.
-
-The film starts unmuted because your keypress counts as the gesture browsers
-require. It also carries its narration as burned-in on-screen text, so it still
-reads if the house audio fails. If sound is blocked the app retries muted by
-itself — do not stop to fix it.
+The Searching for Life film now plays as the intro (after Pull Back, before
+Name the Object). Key `5` still jumps to it.
 
 ### Act 6 — The Depth (7:35, 4:20)
 
-**7:35 · California to the North Sea** — resets the room after two passive
-minutes.
+**7:35 · California to the North Sea** — resets the room. Get them counting.
 > **ASK:** "Count me down from five, out loud, everybody."
 > Press. Big numbers appear. Count *with* them, do not lead.
 > On zero the arc fires across the globe.
@@ -159,7 +163,7 @@ the drilling clip, salt in hand, then the real sample bottle we carried out.
 
 ### Act 7 — The Return (11:55, 2:40)
 
-**11:55 · Drive the Microscope** — after the film and after Boulby. Hand the
+**11:55 · Drive the Microscope** — after Boulby. Hand the
 live crystal to the room, then let the last three presses carry the room out.
 The beat opens already inside the inclusion, in the water, with the cells in
 shot, and drifts there for as long as you hold it. Press once to take the

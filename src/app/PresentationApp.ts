@@ -199,11 +199,13 @@ export class PresentationApp {
     this.goTo(this.beatIndex, this.stepIndex, { replayCues: false })
   }
 
-  /** Drawer plunge finished — land on Name the Object without replaying cold open. */
+  /**
+   * Drawer plunge finished. Stay on the wash — the next press starts the intro
+   * film, and that press is the gesture browsers need before it may play with
+   * sound.
+   */
   private onConstellationDiveComplete() {
-    const claim = BEATS.findIndex((b) => b.id === 'the-claim')
-    if (claim < 0) return
-    this.goTo(claim, -1)
+    // Intentionally empty. Auto-advancing onto an audio beat would mute it.
   }
 
   // ── Presenter intents ──────────────────────────────────────────────────
