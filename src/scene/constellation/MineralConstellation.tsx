@@ -1193,10 +1193,12 @@ const CAM_EASE_SEC = 2.45
 const PERI_TO_SKY_SEC = 4.1
 /** Longer ease for sky ↔ reveal ↔ cabinets nested-doll handoff. */
 const REVEAL_CAM_EASE_SEC = 3.2
-/** Pan-up to overlook the glowing drawer (2× the original pan duration). */
+/** Ease from the aisle onto the open mouth before the push in. */
 const DIVE_PAN_SEC = 2.7
-/** Plunge into the drawer light — left at the previous zoom pace. */
+/** Dolly through the mouth into the tray. */
 const DIVE_PLUNGE_SEC = 2.0
+/** Field of view once the lens is inside the tray. */
+const DIVE_INSIDE_FOV = 42
 const SKY_R = 14.4
 const SKY_Y = 3.1
 /** Match OrbitControls autoRotate (positive speed → rotateLeft → decreasing theta). */
@@ -1247,13 +1249,18 @@ const CABINETS_AISLE = {
   look: new THREE.Vector3(0, 1.15, 14.5),
 }
 
+/**
+ * Centered in front of the open mouth. Staying above the cabinet made the
+ * plunge hit the top of the drawer instead of the opening.
+ */
 const DIVE_PAN = {
-  pos: new THREE.Vector3(DIVE_MOUTH.x + 0.1, DIVE_MOUTH.y + 5.8, 18.6),
-  look: new THREE.Vector3(DIVE_MOUTH.x, DIVE_MOUTH.y + 0.05, DIVE_MOUTH.z + 0.05),
+  pos: new THREE.Vector3(DIVE_MOUTH.x, DIVE_MOUTH.y + 0.42, DIVE_MOUTH.z + 2.15),
+  look: new THREE.Vector3(DIVE_MOUTH.x, DIVE_MOUTH.y - 0.02, DIVE_MOUTH.z - 0.45),
 }
+/** Just past the lip, looking down the tray at the crystals. */
 const DIVE_PLUNGE = {
-  pos: new THREE.Vector3(DIVE_MOUTH.x, DIVE_MOUTH.y + 0.06, DIVE_MOUTH.z - 0.5),
-  look: new THREE.Vector3(DIVE_MOUTH.x, DIVE_MOUTH.y, DIVE_MOUTH.z - 1.35),
+  pos: new THREE.Vector3(DIVE_MOUTH.x, DIVE_MOUTH.y + 0.04, DIVE_MOUTH.z - 0.05),
+  look: new THREE.Vector3(DIVE_MOUTH.x, DIVE_MOUTH.y - 0.05, DIVE_MOUTH.z - 0.7),
 }
 
 /** Aisle walk from room entry toward the dive drawer on the right. */
@@ -1273,6 +1280,15 @@ let hallWalkActive = false
 const REVEAL_ENTER_SEC = 5.4
 /** 0→this: shrink sky into tray + camera to overhead open-drawer view. */
 const REVEAL_NEST_FRAC = 0.48
+
+/**
+ * Where a sky-space point sits once the constellation has nested by ease `e`
+ * (0 = still the full sky, 1 = shrunk into the open tray).
+ */
+function nestedAnchor(e: number, anchor: THREE.Vector3, out: THREE.Vector3) {
+  const scale = THREE.MathUtils.lerp(1, SKY_NEST_SCALE, e)
+  return out.copy(SKY_ORIGIN).lerp(SKY_NEST, e).addScaledVector(anchor, scale)
+}
 
 /**
  * Shared 0–1 progress for sky→reveal (nest → drawer pull-back).
@@ -1612,6 +1628,9 @@ function CameraRig({
   const booted = useRef(false)
   /** Hold look on Halite while dollying from peri → sky. */
   const pullFromHero = useRef(false)
+  /** Sky-space point the camera is aimed at when the drawer move begins. */
+  const nestAnchor = useRef(new THREE.Vector3())
+  const aim = useRef(new THREE.Vector3())
 
   useFrame((_, dt) => {
     const persp = camera as THREE.PerspectiveCamera
@@ -1641,7 +1660,10 @@ function CameraRig({
     const phaseChanged = phase !== prevPhase.current
     const focusChanged = focusId !== prevFocus.current
 
-    if (phaseChanged || focusChanged) {
+    // Dropping a crystal selection must not restart the drawer move.
+    if (!phaseChanged && focusChanged && revealEnter.current && phase === 'reveal') {
+      prevFocus.current = focusId
+    } else if (phaseChanged || focusChanged) {
       fromPos.current.copy(camera.position)
       fromLook.current.copy(look.current)
       baseFov.current = persp.fov
@@ -1653,7 +1675,20 @@ function CameraRig({
       hallWalkActive = false
       pullFromHero.current = false
 
-      if (focus) {
+      if (phase === 'reveal' && prevPhase.current === 'sky') {
+        // Keep the live framing. Aiming at the sky origin here swings the
+        // constellation off Halite before the drawer move has started.
+        revealEnter.current = true
+        revealBlend = reduced ? 1 : 0
+        camera.getWorldDirection(aim.current)
+        const dist = Math.max(camera.position.distanceTo(look.current), 0.5)
+        nestAnchor.current.copy(camera.position).addScaledVector(aim.current, dist)
+        fromLook.current.copy(nestAnchor.current)
+        look.current.copy(nestAnchor.current)
+        toPos.current.copy(REVEAL_OUT.pos)
+        toLook.current.copy(REVEAL_OUT.look)
+        easeDur.current = REVEAL_ENTER_SEC
+      } else if (focus) {
         toPos.current.set(focus.pos.x + 1.6, focus.pos.y + 0.9, focus.pos.z + 2.4)
         toLook.current.copy(focus.pos)
         easeDur.current = CAM_EASE_SEC * 0.55
@@ -1663,14 +1698,6 @@ function CameraRig({
         toPos.current.copy(DIVE_PLUNGE.pos)
         toLook.current.copy(DIVE_PLUNGE.look)
         easeDur.current = CAM_EASE_SEC
-      } else if (phase === 'reveal' && prevPhase.current === 'sky') {
-        // Nest constellation into already-open drawer while zooming out, then pull back
-        revealEnter.current = true
-        revealBlend = reduced ? 1 : 0
-        fromLook.current.set(0, 0.2, 0)
-        toPos.current.copy(REVEAL_OUT.pos)
-        toLook.current.copy(REVEAL_OUT.look)
-        easeDur.current = REVEAL_ENTER_SEC
       } else if (phase === 'instrument') {
         // Continue from the cabinets entry view and walk right to the dive drawer
         walkActive.current = true
@@ -1760,7 +1787,7 @@ function CameraRig({
       if (reduced) {
         camera.position.copy(toPos.current)
         look.current.copy(toLook.current)
-        persp.fov = 72
+        persp.fov = DIVE_INSIDE_FOV
         persp.updateProjectionMatrix()
         onDiveProgress?.(1, true)
         if (!settled.current) {
@@ -1775,15 +1802,17 @@ function CameraRig({
           const v = easeInOutCubic(diveClock.current / panDur)
           camera.position.lerpVectors(fromPos.current, midPos.current, v)
           look.current.lerpVectors(fromLook.current, midLook.current, v)
-          persp.fov = THREE.MathUtils.lerp(baseFov.current, 38, v)
+          persp.fov = THREE.MathUtils.lerp(baseFov.current, 36, v)
           onDiveProgress?.(0, false)
         } else {
           const raw = Math.min(1, (diveClock.current - panDur) / plungeDur)
           const v = easeInOutCubic(raw)
           camera.position.lerpVectors(midPos.current, toPos.current, v)
           look.current.lerpVectors(midLook.current, toLook.current, v)
-          persp.fov = THREE.MathUtils.lerp(38, 72, v)
-          const wash = Math.min(1, easeInOutCubic(Math.max(0, (raw - 0.15) / 0.55)))
+          persp.fov = THREE.MathUtils.lerp(36, DIVE_INSIDE_FOV, v)
+          // Hold the interior in frame, then wash once the lens is inside the tray.
+          const wash = Math.min(1, easeInOutCubic(Math.max(0, (raw - 0.78) / 0.22)))
+          document.documentElement.dataset.diveCam = `${camera.position.x.toFixed(2)},${camera.position.y.toFixed(2)},${camera.position.z.toFixed(2)},${persp.fov.toFixed(0)}`
           onDiveProgress?.(wash, raw >= 1)
           if (raw >= 1 && !settled.current) {
             settled.current = true
@@ -1792,23 +1821,25 @@ function CameraRig({
         }
         persp.updateProjectionMatrix()
       }
-    } else if (!focus && revealEnter.current && phase === 'reveal') {
+    } else if (revealEnter.current && phase === 'reveal') {
       hallWalkActive = false
       revealClock.current += dt
       const t = Math.min(1, revealClock.current / REVEAL_ENTER_SEC)
       revealBlend = t
 
       if (t <= REVEAL_NEST_FRAC) {
-        // Sky → overhead open drawer: constellation nests in lockstep
+        // Sky → overhead open drawer. The framed point rides the nest so the
+        // picture we left keeps traveling instead of recentering.
         const v = easeInOutCubic(t / REVEAL_NEST_FRAC)
         camera.position.lerpVectors(fromPos.current, REVEAL_OVER.pos, v)
-        look.current.lerpVectors(fromLook.current, REVEAL_OVER.look, v)
+        nestedAnchor(v, nestAnchor.current, look.current)
         persp.fov = THREE.MathUtils.lerp(baseFov.current, 42, v)
       } else {
         // Pull back from the open tray so the cabinet face reads
         const v = easeInOutCubic((t - REVEAL_NEST_FRAC) / (1 - REVEAL_NEST_FRAC))
         camera.position.lerpVectors(REVEAL_OVER.pos, REVEAL_OUT.pos, v)
-        look.current.lerpVectors(REVEAL_OVER.look, REVEAL_OUT.look, v)
+        nestedAnchor(1, nestAnchor.current, aim.current)
+        look.current.lerpVectors(aim.current, REVEAL_OUT.look, v)
         persp.fov = THREE.MathUtils.lerp(42, 38, v)
       }
       persp.updateProjectionMatrix()
@@ -1896,6 +1927,9 @@ function CameraRig({
       if (progress.current >= 1 && !settled.current) {
         settled.current = true
         onSettle?.(true)
+        if (phase === 'sky' || phase === 'peers' || phase === 'return') {
+          onOrbitTarget?.([look.current.x, look.current.y, look.current.z])
+        }
       }
     } else {
       if (phase !== 'instrument') hallWalkActive = false
@@ -1904,6 +1938,9 @@ function CameraRig({
       if (!settled.current) {
         settled.current = true
         onSettle?.(true)
+        if (phase === 'sky' || phase === 'peers' || phase === 'return') {
+          onOrbitTarget?.([look.current.x, look.current.y, look.current.z])
+        }
       }
     }
 
@@ -1995,12 +2032,12 @@ function Scene({
 
   // Layout (before paint / useFrame) so sky never enables orbit on the same
   // commit as the phase change — that was snapping the view instead of zooming.
+  // Do not retarget orbit here when leaving the sky. OrbitControls would swing
+  // the gaze to the origin on the way into the drawer.
   useLayoutEffect(() => {
     setCamSettled(reduced)
     if (phase === 'peers') {
       setOrbitTarget([HERO.pos.x, HERO.pos.y, HERO.pos.z])
-    } else if (phase !== 'sky') {
-      setOrbitTarget([0, 0.2, 0])
     }
   }, [phase, focusId, reduced])
 
