@@ -672,8 +672,45 @@ body {
   color: #fff;
 }
 
+.hud-offline {
+  margin-top: 0.15rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.hud-offline.is-wait {
+  color: #ffe566;
+}
+
+.hud-offline.is-ready {
+  color: #8fe0a0;
+}
+
+.hud-install {
+  align-self: flex-start;
+  margin-top: 0.2rem;
+  padding: 0.2rem 0.45rem;
+  font: inherit;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--bg);
+  background: var(--accent);
+  border: 1px solid var(--accent);
+  border-radius: 3px;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.hud-install:hover {
+  filter: brightness(1.08);
+}
+
 /* A hidden HUD must not leave an invisible click target on the stage. */
-.presenter-hud.is-hidden .hud-fullscreen {
+.presenter-hud.is-hidden .hud-fullscreen,
+.presenter-hud.is-hidden .hud-install {
   pointer-events: none;
 }
 

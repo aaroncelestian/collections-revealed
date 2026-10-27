@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "preview": "vite preview",
+    "preview": "vite preview --host 127.0.0.1 --port 4173 --strictPort",
+    "present": "node scripts/present.mjs",
+    "pack-usb": "node scripts/pack-usb.mjs",
     "assets": "./scripts/prepare-assets.sh",
     "world": "node scripts/build-world-data.mjs",
     "preflight": "node scripts/preflight.mjs"
@@ -28,6 +30,7 @@
     "topojson-client": "^3.1.0",
     "typescript": "~5.8.3",
     "vite": "^6.3.5",
+    "vite-plugin-pwa": "^2.0.0",
     "world-atlas": "^2.0.2"
   }
 }

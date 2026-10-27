@@ -25,7 +25,6 @@ import {
   startConstellation,
   type ConstellationHandle,
 } from '../scene/constellation/mountConstellation'
-import { publicAsset } from '../lib/publicAsset'
 import { isFullscreen, toggleFullscreen } from '../lib/fullscreen'
 
 const CONSTELLATION_PHASES = new Set<string>([
@@ -181,9 +180,7 @@ export class PresentationApp {
     this.constellation.setRendering(false)
 
     try {
-      this.hero = (await startHaliteHero(this.heroCanvas, {
-        theatreUrl: publicAsset('/hero/halite-theatre.json'),
-      })) as HeroHandle
+      this.hero = (await startHaliteHero(this.heroCanvas)) as HeroHandle
       this.hero.setVisible(false)
       this.hero.setRendering(false)
     } catch (error) {

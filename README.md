@@ -19,6 +19,54 @@ npm run dev
 `npm run preflight` checks that every asset path the code references actually
 exists. Run it before you present.
 
+## Present without internet
+
+The live GitHub Pages URL dies the moment the room loses wifi. Do not present
+from it. The talk itself does not need the network — films, photos, the globe,
+and the 3D crystal are all in the build. Pick one of these, in this order:
+
+### 1. Venue computer: Chrome app (needs wifi once)
+
+At the tech check, on the **house computer**, in **Chrome** (not Safari):
+
+1. Open the GitHub Pages URL for this talk.
+2. Wait until the HUD bottom line says **Offline ready**. That is the
+   ~70 MB download of every film and still.
+3. Click **Install as app**, or Chrome menu → **Save and share** →
+   **Install page as app…**
+4. Present from that installed app, not from the browser tab.
+
+After that, wifi can go away. Classic Chrome Apps are gone; this is the
+replacement, and it is a real standalone window.
+
+If the house machine wipes profiles overnight, do this the morning of, not
+the night before.
+
+### 2. USB stick (no wifi on the house machine at all)
+
+At home:
+
+```bash
+npm install
+npm run pack-usb
+```
+
+Copy the `talk-usb/` folder onto a stick. On the venue computer, copy it to
+the Desktop, then double-click `Present.command` (Mac) or `Present.bat`
+(Windows). If the machine blocks scripts, open `index.html` in Chrome.
+
+### 3. Your own laptop
+
+```bash
+npm run present
+```
+
+opens `http://127.0.0.1:4173/`. Night-before drill: run that, **turn Wi-Fi
+off**, and click through the whole talk.
+
+If a video is a black rectangle, it is still sitting in iCloud — Finder →
+this folder → File → Download Now, then retry.
+
 ## Presenter controls
 
 | Input | Action |

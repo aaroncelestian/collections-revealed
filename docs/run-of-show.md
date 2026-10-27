@@ -215,6 +215,10 @@ nothing breaks if the room stays quiet.
 
 ## If something goes wrong
 
+- **There is no internet.** Do not open the GitHub Pages URL unless the HUD
+  already says **Offline ready** (or you installed it as a Chrome app). USB
+  fallback: copy `talk-usb/` to the house Desktop and double-click
+  `Present.command` / `Present.bat`.
 - **The film has no sound.** Keep going. The narration is burned into the
   picture.
 - **You are behind.** The drift readout tells you by how much. Act 6 is the

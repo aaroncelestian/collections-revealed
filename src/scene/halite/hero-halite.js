@@ -10,6 +10,7 @@ import { BokehPass } from "three/addons/postprocessing/BokehPass.js";
 import { getProject, types } from "@theatre/core";
 import { setPauseButtonState, setPanButtonState } from "./hero-info.js";
 import { niceScaleUm, formatScale } from "../../lib/scale";
+import theatreState from "../../../public/hero/halite-theatre.json";
 
 /** 1 Three.js unit = 20 µm. Crystal long axis = 2 mm. Bacteria diameter = 1 µm. */
 const UM_PER_UNIT = 20;
@@ -260,11 +261,7 @@ function mountFocusRack(host) {
   return el;
 }
 
-export async function startHaliteHero(canvas, meta = {}) {
-  const stateUrl = meta.theatreUrl || "/hero/halite-theatre.json";
-  const stateRes = await fetch(stateUrl);
-  if (!stateRes.ok) throw new Error(`Failed to load ${stateUrl}`);
-  const theatreState = await stateRes.json();
+export async function startHaliteHero(canvas) {
 
   const renderer = new THREE.WebGLRenderer({
     canvas,
