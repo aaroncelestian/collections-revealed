@@ -68,6 +68,13 @@ else
   echo "   skip (source boulby_Drive--720.mov not found)"
 fi
 
+echo "==> faststart (moov at front so clips start on the first bytes)"
+python3 "$ROOT/scripts/faststart-mp4.py" \
+  "$VID/bacteria.mp4" \
+  "$VID/sampling.mp4" \
+  "$VID/boulby-drive.mp4" \
+  "$VID/searching-for-life.mp4" || true
+
 echo "==> Searles field stills"
 field() {
   local src="$1" out="$2"

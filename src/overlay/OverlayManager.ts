@@ -42,6 +42,8 @@ export class OverlayManager {
   private titleShown = false
   /** Prior beat stage — detects the zoom-ladder → microbe-clip handoff. */
   private lastStage: string | null = null
+  private onVideoCanPlay: (() => void) | null = null
+  private onVideoError: ((ev: Event) => void) | null = null
 
   constructor() {
     this.copyEl = el('beat-copy')
@@ -125,8 +127,29 @@ export class OverlayManager {
   /** Fluid-inclusions ladder → bacteria clip: zoom in, then dissolve. */
   private async handoffZoomToVideo(frame: BeatFrame, token: number) {
     void this.setVideo(frame, true, token)
-    await this.zoom.punchIntoVideo()
+    await this.waitForVideoFrame(token)
     if (token !== this.renderToken) return
+    await this.zoom.punchIntoVideo()
+  }
+
+  /** Don't drop the zoom plate onto a still-black <video>. */
+  private waitForVideoFrame(token: number, ms = 1200): Promise<void> {
+    return new Promise((resolve) => {
+      if (this.video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA || token !== this.renderToken) {
+        resolve()
+        return
+      }
+      let settled = false
+      const done = () => {
+        if (settled) return
+        settled = true
+        this.video.removeEventListener('loadeddata', done)
+        window.clearTimeout(timer)
+        resolve()
+      }
+      const timer = window.setTimeout(done, ms)
+      this.video.addEventListener('loadeddata', done)
+    })
   }
 
   // ── Layers ────────────────────────────────────────────────────────────
@@ -301,16 +324,19 @@ export class OverlayManager {
     this.youtubeFrame.hidden = true
     this.youtubeFrame.innerHTML = ''
     this.video.hidden = false
+    this.video.playsInline = true
 
     // Only reload when the clip actually changes, so a caption step does not
     // restart the film from the top.
     if (this.currentVideoSrc !== beat.videoSrc) {
+      this.unbindVideoWaiters()
       this.currentVideoSrc = beat.videoSrc ?? null
       this.video.src = beat.videoSrc!
       this.video.poster = beat.poster ?? ''
       this.video.loop = !beat.audio
       this.setCaptionTrack(beat)
-      this.video.currentTime = 0
+      // A seek before HAVE_METADATA aborts the load in some browsers and
+      // was tearing the clip down before the first frame. New src starts at 0.
     }
 
     // The keypress that got us here is the user gesture browsers require
@@ -318,14 +344,24 @@ export class OverlayManager {
     this.video.muted = !beat.audio
     this.video.volume = 1
 
+    this.bindVideoErrorFallback(frame, token)
+    await this.tryPlay(token, frame)
+  }
+
+  private async tryPlay(token: number, frame: BeatFrame, fromCanPlay = false): Promise<void> {
+    if (token !== this.renderToken) return
     try {
       await this.video.play()
       return
-    } catch {
-      // A press lands while the clip is still opening: the next beat's render
-      // aborts this play(), and everything below would tear down the picture
-      // that render just put up — including a clip it had started itself.
+    } catch (err) {
       if (token !== this.renderToken) return
+      const name = err instanceof DOMException ? err.name : ''
+      // Setting src / a later render aborts the in-flight play(). Leave the
+      // element alone — the newer play() or a canplay retry will pick it up.
+      if (name === 'AbortError') {
+        this.scheduleCanPlayRetry(token, frame)
+        return
+      }
     }
 
     if (!this.video.muted) {
@@ -334,14 +370,62 @@ export class OverlayManager {
       try {
         await this.video.play()
         return
-      } catch {
+      } catch (err) {
         if (token !== this.renderToken) return
+        const name = err instanceof DOMException ? err.name : ''
+        if (name === 'AbortError') {
+          this.scheduleCanPlayRetry(token, frame)
+          return
+        }
       }
     }
 
+    if (!fromCanPlay && this.video.readyState < HTMLMediaElement.HAVE_FUTURE_DATA) {
+      this.scheduleCanPlayRetry(token, frame)
+      return
+    }
+
     console.warn('[overlay] Video would not play.')
-    this.stopVideo()
-    if (frame.photoSrc) this.setPhoto(frame, true)
+  }
+
+  private scheduleCanPlayRetry(token: number, frame: BeatFrame) {
+    this.unbindCanPlay()
+    const onReady = () => {
+      this.unbindCanPlay()
+      void this.tryPlay(token, frame, true)
+    }
+    this.onVideoCanPlay = onReady
+    this.video.addEventListener('canplay', onReady)
+  }
+
+  private bindVideoErrorFallback(frame: BeatFrame, token: number) {
+    this.unbindError()
+    const onError = () => {
+      this.unbindError()
+      if (token !== this.renderToken) return
+      console.warn('[overlay] Video error', this.video.error)
+      this.stopVideo()
+      if (frame.photoSrc) this.setPhoto(frame, true)
+    }
+    this.onVideoError = onError
+    this.video.addEventListener('error', onError)
+  }
+
+  private unbindCanPlay() {
+    if (!this.onVideoCanPlay) return
+    this.video.removeEventListener('canplay', this.onVideoCanPlay)
+    this.onVideoCanPlay = null
+  }
+
+  private unbindError() {
+    if (!this.onVideoError) return
+    this.video.removeEventListener('error', this.onVideoError)
+    this.onVideoError = null
+  }
+
+  private unbindVideoWaiters() {
+    this.unbindCanPlay()
+    this.unbindError()
   }
 
   private setCaptionTrack(beat: BeatDefinition) {
@@ -363,6 +447,7 @@ export class OverlayManager {
 
   private stopVideo() {
     if (this.currentVideoSrc === null && this.videoLayer.hidden) return
+    this.unbindVideoWaiters()
     this.video.pause()
     this.video.removeAttribute('src')
     this.video.load()
