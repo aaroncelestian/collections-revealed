@@ -53,7 +53,8 @@ npm run pack-usb
 
 Copy the `talk-usb/` folder onto a stick. On the venue computer, copy it to
 the Desktop, then double-click `Present.command` (Mac) or `Present.bat`
-(Windows). If the machine blocks scripts, open `index.html` in Chrome.
+(Windows). That opens Chrome as an app window — no tabs, no address bar.
+If the machine blocks scripts, double-click `index.html` in Chrome.
 
 ### 3. Your own laptop
 
